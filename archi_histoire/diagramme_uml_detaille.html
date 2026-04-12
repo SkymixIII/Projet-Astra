@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJET ASTRA - Diagramme UML Complet</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #fff; padding: 2rem; margin: 0 auto; }
+        h1 { font-size: 1.6rem; color: #1a1a2e; margin-bottom: 0.3rem; }
+        h1 + p { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.2rem; color: #1a1a2e; margin: 2.5rem 0 1rem 0; padding-bottom: 0.4rem; border-bottom: 2px solid #2c3e50; }
+        h2:first-of-type { margin-top: 0; }
+        h3 { font-size: 0.95rem; color: #555; margin: 1rem 0 0.5rem 0; font-weight: normal; font-style: italic; }
+        .diagram { display: flex; justify-content: center; margin-bottom: 1rem; width: 100%; overflow-x: auto; }
+        .diagram pre.mermaid { width: 100%; min-width: 100%; }
+        .diagram pre.mermaid svg { width: 100% !important; max-width: none !important; min-width: 100% !important; height: auto !important; }
+        .note { background: #f8f9fa; border-left: 4px solid #2c3e50; padding: 0.8rem 1rem; margin: 0.5rem 0 1.5rem 0; font-size: 0.85rem; color: #444; line-height: 1.5; }
+        .note strong { color: #1a1a2e; }
+        table { border-collapse: collapse; width: 100%; margin: 0.5rem 0 1.5rem 0; font-size: 0.85rem; }
+        th { background: #2c3e50; color: #fff; padding: 0.5rem 0.8rem; text-align: left; }
+        td { padding: 0.5rem 0.8rem; border: 1px solid #ddd; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        hr { border: none; border-top: 1px solid #eee; margin: 2rem 0; }
+    </style>
+</head>
+<body>
+
+<h1>PROJET ASTRA - Diagramme UML Complet</h1>
+<p>Architecture du jeu basee sur archi.md — toutes les classes, interfaces, enums et leurs relations.</p>
+
+
+<!-- ============================================================ -->
+<h2>1. Hierarchie : Item / Batiment / Joueur / Ouvrier</h2>
+<!-- ============================================================ -->
+
+<h3>L'interface Item est la racine de tout element positionne sur la carte. Batiment en herite avec une position fixe. Joueur et Ouvrier sont mobiles.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Item {
+        &lt;&lt;interface&gt;&gt;
+        +int x
+        +int y
+        +distance(Item) double
+        +deplacer(int x, int y) void
+        +deplacer(Direction d) void
+    }
+    class Direction {
+        &lt;&lt;enumeration&gt;&gt;
+        NORD
+        SUD
+        EST
+        OUEST
+    }
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+        +int sante
+        +List~Ouvrier~ personnelAffecte
+        +int maxPersonnel
+        +isOperationnel() boolean
+        +affecterPersonnel(Ouvrier) void
+        +retirerPersonnel(Ouvrier) void
+        +subirDegats(int) void
+        +reparer(int) void
+    }
+    class Joueur {
+        -Direction orientation
+        -Map~TypeRessource_Integer~ ressources
+        -List~Ouvrier~ ouvriers
+        -List~Batiment~ batiments
+        +creerJoueur() void
+        +deplacer(int x, int y) void
+        +deplacer(Direction) void
+    }
+    class Ouvrier {
+        -int identifiant
+        -Role role
+        -int faim
+        -int soif
+        -int repos
+        -int moral
+        -int experience
+        -EtatOuvrier etat
+        -boolean disponibilite
+        +gagnerExp(int) void
+        +getNiveau() int
+        +evoluer() void
+        +affecterPoste(Batiment) void
+        +mettreAJourBesoins() void
+        +getProductivite() float
+    }
+    Batiment --|> Item : extends
+    Joueur ..|> Item : implements
+    Ouvrier ..|> Item : implements
+    Joueur --> Direction : orientation
+</pre></div>
+
+<div class="note">
+    <strong>Note :</strong> Batiment herite de Item mais sa position (x, y) est fixee a la construction.
+    Joueur et Ouvrier implementent Item et sont mobiles (methodes deplacer).
+</div>
+
+
+<!-- ============================================================ -->
+<h2>2. Ouvrier : Role et EtatOuvrier</h2>
+<!-- ============================================================ -->
+
+<h3>Un ouvrier a un role (metier) et un etat qui influence sa productivite. Il evolue par experience ou par l'ecole.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Ouvrier {
+        -int identifiant
+        -Role role
+        -int faim
+        -int soif
+        -int repos
+        -int moral
+        -int experience
+        -EtatOuvrier etat
+        -boolean disponibilite
+        +gagnerExp(int gain) void
+        +getNiveau() int
+        +evoluer() void
+        +affecterPoste(Batiment b) void
+        +mettreAJourBesoins() void
+        +getProductivite() float
+    }
+    class Role {
+        &lt;&lt;enumeration&gt;&gt;
+        MINEUR
+        MACON
+        TRANSPORTEUR
+        FERMIER
+        BUCHERON
+        TECHNICIEN
+        SOIGNANT
+        INGENIEUR
+        SCIENTIFIQUE
+        FORMATEUR
+        +getPole() String
+    }
+    class EtatOuvrier {
+        &lt;&lt;enumeration&gt;&gt;
+        NORMAL
+        FATIGUE
+        STRESSE
+        MOTIVE
+        +getMultiplicateur() float
+    }
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+    }
+    Ouvrier --> Role : a un
+    Ouvrier --> EtatOuvrier : a un
+    Ouvrier --> Batiment : affecterPoste
+</pre></div>
+
+<table>
+    <tr><th>Metier</th><th>Pole</th><th>Objectif principal</th><th>Evolution possible</th></tr>
+    <tr><td>Mineur</td><td>Production brute</td><td>Extraire des ressources mines/carrieres</td><td>Technicien (experience ou ecole)</td></tr>
+    <tr><td>Macon</td><td>Production brute</td><td>Fabriquer des batiments</td><td>Formateur (experience ++)</td></tr>
+    <tr><td>Transporteur</td><td>Logistique</td><td>Deplacer stocks entre sites</td><td>-</td></tr>
+    <tr><td>Fermier</td><td>Subsistance</td><td>Produire la nourriture</td><td>-</td></tr>
+    <tr><td>Bucheron</td><td>Production brute</td><td>Fabriquer des batiments (avec macon)</td><td>Formateur (experience ++)</td></tr>
+    <tr><td>Technicien</td><td>Industriel</td><td>Utiliser machines complexes</td><td>Ingenieur (obligatoire par ecole)</td></tr>
+    <tr><td>Soignant</td><td>Sante/Social</td><td>Soigner les gens</td><td>Scientifique (ecole ou experience)</td></tr>
+    <tr><td>Ingenieur</td><td>Industriel</td><td>Assembler modules de la fusee</td><td>Scientifique (experience)</td></tr>
+    <tr><td>Scientifique</td><td>Recherche</td><td>Cree les "patrons" de creation</td><td>Ingenieur ou Formateur (experience)</td></tr>
+    <tr><td>Formateur</td><td>Education</td><td>Fait evoluer l'equipage via lecons</td><td>Scientifique (experience)</td></tr>
+</table>
+
+
+<!-- ============================================================ -->
+<h2>3. Classe Jeu et ses compositions</h2>
+<!-- ============================================================ -->
+
+<h3>Jeu est le point d'entree et l'orchestrateur. Il possede (composition) les composants principaux et delegue la logique a chacun.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Jeu {
+        -Joueur joueur
+        -Carte carte
+        -EventBus bus
+        -Fusee fusee
+        -Temps temps
+        -Age age
+        +main(args) void
+        +processTick() void
+        +mettreAJourProduction() void
+        +consommerBesoinsVitaux() void
+        +recupererCommande() void
+        +traiterCommande() void
+        +ajouterOuvrier(Ouvrier) void
+        +ajouterBatiment(Batiment) void
+        +gererDate() void
+    }
+    class Joueur {
+        -Direction orientation
+        -Map~TypeRessource_Integer~ ressources
+        -List~Ouvrier~ ouvriers
+        -List~Batiment~ batiments
+    }
+    class Carte {
+        -Case[][] matrice
+        -int largeur
+        -int hauteur
+        +getTile(int x, int y) Case
+        +estDansLimites(int x, int y) boolean
+        +getVoisins(int x, int y) List~Case~
+    }
+    class Case {
+        -List~Item~ contenu
+        +ajouter(Item) void
+        +supprimer(Item) void
+        +estOccupee() boolean
+    }
+    class Temps {
+        -DayOfWeek jour
+        -int heure
+        +augmenterHeure() void
+        +augmenterJour() void
+    }
+    class DayOfWeek {
+        &lt;&lt;enumeration&gt;&gt;
+        LUNDI
+        MARDI
+        MERCREDI
+        JEUDI
+        VENDREDI
+        SAMEDI
+        DIMANCHE
+    }
+    class Age {
+        -int niveau
+        -NomAge nomAge
+        +niveauSuivant() void
+    }
+    class NomAge {
+        &lt;&lt;enumeration&gt;&gt;
+        AGE_PRIMITIF
+        AGE_INDUSTRIEL
+        AGE_TECHNOLOGIQUE
+        AGE_SPATIAL
+    }
+    class EventBus {
+        -Map~Canal_List~ abonnes
+    }
+    class Fusee {
+        -float etatPropulseur
+        -float etatChargeUtile
+        -float etatCommande
+    }
+    class Ouvrier { }
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+    }
+    Jeu *-- Joueur
+    Jeu *-- Carte
+    Jeu *-- EventBus
+    Jeu *-- Fusee
+    Jeu *-- Temps
+    Jeu *-- Age
+    Joueur o-- Ouvrier : 0..*
+    Joueur o-- Batiment : 0..*
+    Carte *-- Case : n x m
+    Temps --> DayOfWeek
+    Age --> NomAge
+</pre></div>
+
+<div class="note">
+    <strong>Regle temporelle :</strong> 10 min reelles = une demi-journee en jeu (sans compter la nuit).
+</div>
+
+
+<!-- ============================================================ -->
+<h2>4. Ressources et chaines de production</h2>
+<!-- ============================================================ -->
+
+<h3>Les ressources sont representees par un type (enum) et une quantite. Les stocks utilisent Map&lt;TypeRessource, Integer&gt;.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class TypeRessource {
+        &lt;&lt;enumeration&gt;&gt;
+        FER
+        SILICIUM
+        PETROLE
+        EAU
+        BOIS
+        ENERGIE
+        ACIER
+        KEROSENE
+        PLASTIQUE
+        CARTE_MERE
+        PROCESSEUR_VOL
+        ALLIAGE_THERMIQUE
+        ELECTRICITE
+        NOURRITURE
+        EAU_POTABLE
+    }
+    class Ressource {
+        -TypeRessource type
+        -int quantite
+        +ajouter(int qte) void
+        +retirer(int qte) boolean
+    }
+    class LieuDeRessource {
+        -TypeRessource typeExtrait
+        -int gisementRestant
+        -float tauxExtraction
+        +extraire() Ressource
+        +estEpuise() boolean
+    }
+    class Usine {
+        -TypeUsine type
+        -Map~TypeRessource_Integer~ stock
+        -TypeRessource production
+        +produire() Ressource
+        +peutProduire() boolean
+    }
+    class TypeUsine {
+        &lt;&lt;enumeration&gt;&gt;
+        FONDERIE
+        RAFFINERIE
+        USINE_ELECTRONIQUE
+        FONDERIE_AVANCEE
+    }
+    class RessourceInsuffisanteException {
+        &lt;&lt;exception&gt;&gt;
+    }
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+    }
+    Ressource --> TypeRessource : type
+    LieuDeRessource --> TypeRessource : typeExtrait
+    LieuDeRessource ..> Ressource : cree via extraire
+    LieuDeRessource ..|> Batiment : implements
+    Usine o-- Ressource : stock
+    Usine ..> Ressource : cree via produire
+    Usine ..|> Batiment : implements
+    Usine --> TypeUsine : type
+    Usine ..> RessourceInsuffisanteException : throws
+</pre></div>
+
+<table>
+    <tr><th>Type d'usine</th><th>Ressources necessaires</th><th>Piece produite</th><th>Role technique</th></tr>
+    <tr><td>Fonderie</td><td>Fer(x3) + Petrole(x1) ou Energie(x2)</td><td>Poutre d'acier</td><td>Structure batiments + squelette fusee</td></tr>
+    <tr><td>Raffinerie (kerosene)</td><td>Petrole(x5) + Minerai(x1)</td><td>Kerosene</td><td>Energie pour decollage</td></tr>
+    <tr><td>Raffinerie (plastique)</td><td>Petrole(x2)</td><td>Plastique</td><td>Cablage</td></tr>
+    <tr><td>Usine electronique</td><td>Silicium(x2) + Fer(x1)</td><td>Carte mere</td><td>Systeme de navigation</td></tr>
+    <tr><td>Usine electronique</td><td>Carte mere(x2) + Acier(x1)</td><td>Processeur de vol</td><td>Necessaire pour fusee</td></tr>
+    <tr><td>Fonderie avancee</td><td>Acier(x2) + Silicium(x1)</td><td>Alliage thermique</td><td>Plus efficace sur la fusee</td></tr>
+</table>
+
+<table>
+    <tr><th>Type de ressource</th><th>Lieu d'extraction</th></tr>
+    <tr><td>Minerai de fer</td><td>Mine de fer</td></tr>
+    <tr><td>Sable / Terres rares</td><td>Carriere (de mineraux)</td></tr>
+    <tr><td>Petrole</td><td>Puits de petrole</td></tr>
+    <tr><td>Eau</td><td>Station de pompage</td></tr>
+    <tr><td>Bois</td><td>Foret / Serre</td></tr>
+    <tr><td>Energie</td><td>Centrale (Solaire / Fuel)</td></tr>
+</table>
+
+
+<!-- ============================================================ -->
+<h2>5. Tous les batiments</h2>
+<!-- ============================================================ -->
+
+<h3>Tous les batiments implementent l'interface Batiment. Chaque type a ses attributs et methodes specifiques.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+        +int sante
+        +List~Ouvrier~ personnelAffecte
+        +int maxPersonnel
+        +isOperationnel() boolean
+        +affecterPersonnel(Ouvrier) void
+        +retirerPersonnel(Ouvrier) void
+        +subirDegats(int) void
+        +reparer(int) void
+    }
+    class Usine {
+        -TypeUsine type
+        -Map~TypeRessource_Integer~ stock
+        -TypeRessource production
+        +produire() Ressource
+        +peutProduire() boolean
+    }
+    class LieuDeRessource {
+        -TypeRessource typeExtrait
+        -int gisementRestant
+        -float tauxExtraction
+        +extraire() Ressource
+        +estEpuise() boolean
+    }
+    class Maison {
+        -int capacite
+        -List~Ouvrier~ occupants
+        +ajouterOccupant(Ouvrier) void
+        +retirerOccupant(Ouvrier) void
+        +estPleine() boolean
+    }
+    class Hopital {
+        -int capaciteSoin
+        -List~Ouvrier~ patients
+        +soigner(Ouvrier) void
+        +boosterMoral(Ouvrier) void
+    }
+    class Ecole {
+        -int capaciteFormation
+        -List~Ouvrier~ eleves
+        +former(Ouvrier) void
+    }
+    class Entrepot {
+        -Map~TypeRessource_Integer~ stock
+        -int capaciteMax
+        +stocker(TypeRessource, int) void
+        +retirer(TypeRessource, int) boolean
+        +getStockTotal() int
+    }
+    class StationPompage {
+        -int debitPompage
+        +pomper() Ressource
+    }
+    class Serre {
+        -int rendement
+        +cultiver() Ressource
+    }
+    class Centrale {
+        -String typeEnergie
+        -int puissance
+        +produireElectricite() Ressource
+    }
+    class CentreRecherche {
+        -ArbreTechnologique arbre
+        +produireSciences() int
+    }
+    class CentreLancement {
+        -Fusee fusee
+        +assemblerModule(ModuleFusee) void
+    }
+    Usine ..|> Batiment
+    LieuDeRessource ..|> Batiment
+    Maison ..|> Batiment
+    Hopital ..|> Batiment
+    Ecole ..|> Batiment
+    Entrepot ..|> Batiment
+    StationPompage ..|> Batiment
+    Serre ..|> Batiment
+    Centrale ..|> Batiment
+    CentreRecherche ..|> Batiment
+    CentreLancement ..|> Batiment
+</pre></div>
+
+<table>
+    <tr><th>Type de batiment</th><th>Pole</th><th>Fonction principale</th><th>Personnel</th></tr>
+    <tr><td>Logement / Dortoir (Maison)</td><td>Social</td><td>Lieu de repos et de stockage</td><td>-</td></tr>
+    <tr><td>Station de pompage</td><td>Survie</td><td>Eau (pompage + recyclage)</td><td>Paysans</td></tr>
+    <tr><td>Hopital</td><td>Sante</td><td>Soigner les malades, rebooster le moral</td><td>Soignant, medecins</td></tr>
+    <tr><td>Ecole</td><td>Education</td><td>Former le personnel, debloquer capacites</td><td>Formateurs</td></tr>
+    <tr><td>Centre de recherche</td><td>Science</td><td>Debloquer technologies, evoluer usines</td><td>Ingenieur, scientifique</td></tr>
+    <tr><td>Entrepot</td><td>Logistique</td><td>Stocker les ressources</td><td>Transporteurs</td></tr>
+    <tr><td>Centre de lancement</td><td>Fusee</td><td>Assembler les 3 modules de la fusee</td><td>Ingenieur, scientifique</td></tr>
+    <tr><td>Serre</td><td>Survie</td><td>Production nourriture et bois</td><td>Fermiers</td></tr>
+    <tr><td>Centrale</td><td>Energie</td><td>Production d'electricite</td><td>Techniciens</td></tr>
+</table>
+
+
+<!-- ============================================================ -->
+<h2>6. Technologie et arbre technologique</h2>
+<!-- ============================================================ -->
+
+<h3>Chaque technologie a des prerequis. L'ArbreTechnologique centralise le catalogue et la progression du joueur.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Technologie {
+        -String nom
+        -int coutScience
+        -boolean debloquee
+        -List~Technologie~ prerequis
+        +estDisponible() boolean
+        +debloquer() void
+    }
+    class ArbreTechnologique {
+        -Map~String_Technologie~ catalogue
+        -Technologie rechercheActive
+        -int progressionActuelle
+        +lancerRecherche(String nom) void
+        +ajouterProgression(int points) void
+        +getRechercheActive() Technologie
+    }
+    class CentreRecherche {
+        -ArbreTechnologique arbre
+        +produireSciences() int
+    }
+    class RechercheImpossibleException {
+        &lt;&lt;exception&gt;&gt;
+    }
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+    }
+    ArbreTechnologique *-- Technologie : catalogue 0..*
+    Technologie --> Technologie : prerequis
+    CentreRecherche --> ArbreTechnologique : utilise
+    CentreRecherche ..|> Batiment : implements
+    ArbreTechnologique ..> RechercheImpossibleException : throws
+</pre></div>
+
+<table>
+    <tr><th>Technologie</th><th>Prerequis</th><th>Niveau</th><th>Type</th><th>Effets</th></tr>
+    <tr><td>Extraction optimisee</td><td>-</td><td>1</td><td>Industrie</td><td>+20% production mines</td></tr>
+    <tr><td>Traitement de l'eau</td><td>-</td><td>1</td><td>Industrie</td><td>Debloque eau potable dans les industries</td></tr>
+    <tr><td>Agriculture controlee</td><td>-</td><td>1</td><td>Survie</td><td>Debloque champs</td></tr>
+    <tr><td>Stockage</td><td>-</td><td>-</td><td>Gestion</td><td>+20% capacite stockage ressources</td></tr>
+    <tr><td>Stockage basique survie</td><td>-</td><td>-</td><td>Survie</td><td>+20% capacite stockage nourriture + eau</td></tr>
+    <tr><td>Metallurgie</td><td>Extraction optimisee</td><td>2</td><td>Industrie</td><td>Debloque acier</td></tr>
+    <tr><td>Raffinage petrole</td><td>Extraction optimisee</td><td>2</td><td>Fusee</td><td>Debloque carburant</td></tr>
+    <tr><td>Reseau electrique</td><td>Traitement eau</td><td>2</td><td>Industrie</td><td>Alimente batiments</td></tr>
+    <tr><td>Architecture fusee</td><td>Metallurgie + Raffinage petrole</td><td>2</td><td>Fusee</td><td>Debloque assemblage fusee</td></tr>
+    <tr><td>Electronique</td><td>Metallurgie + Reseau electrique</td><td>3</td><td>Industrie</td><td>Automatise une tache</td></tr>
+    <tr><td>Chimie avancee</td><td>Raffinage petrole</td><td>3</td><td>Fusee</td><td>Ameliore carburant (+10 force decollage)</td></tr>
+    <tr><td>Formation scientifique</td><td>Agri. controlee + Stockage survie</td><td>3</td><td>Survie</td><td>+1 experience a tous les chercheurs</td></tr>
+    <tr><td>Alliages thermiques</td><td>Metallurgie + Chimie + Archi. fusee</td><td>4</td><td>Fusee</td><td>Resistance chaleur fusee (+10 sec)</td></tr>
+    <tr><td>Informatique embarquee</td><td>Electronique + Archi. fusee</td><td>4</td><td>Fusee</td><td>Systeme de navigation fusee</td></tr>
+    <tr><td>Combustion avancee</td><td>Chimie avancee</td><td>4</td><td>Fusee</td><td>+20 force decollage</td></tr>
+    <tr><td>Simulation spatiale</td><td>Formation scientifique</td><td>4</td><td>Fusee</td><td>Simulations sans risque, -20% taux erreur</td></tr>
+    <tr><td>Optimisation modules</td><td>Architecture fusee</td><td>5</td><td>Fusee</td><td>Simulation 10% d'erreurs</td></tr>
+</table>
+
+
+<!-- ============================================================ -->
+<h2>7. Fusee : condition de victoire</h2>
+<!-- ============================================================ -->
+
+<h3>La fusee est composee de 3 modules. La probabilite de succes depend de la qualite des composants et de l'expertise de l'equipage.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Fusee {
+        -float etatPropulseur
+        -float etatChargeUtile
+        -float etatCommande
+        +calculerProbabiliteSucces() float
+        +lancer() boolean
+    }
+    class CentreLancement {
+        -Fusee fusee
+        +assemblerModule(ModuleFusee) void
+    }
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+    }
+    CentreLancement --> Fusee : assemble
+    CentreLancement ..|> Batiment : implements
+</pre></div>
+
+<table>
+    <tr><th>Module</th><th>Quantite necessaire</th><th>Personnel requis</th><th>Risque d'echec</th></tr>
+    <tr><td>Propulseur</td><td>10 poutres acier, 20 kerosene, 5 alliage thermique</td><td>Technicien, Scientifique</td><td>Pas d'alliage thermique ou kerosene nul</td></tr>
+    <tr><td>Charge utile</td><td>5 poutres acier, 10 cablage, 5 carte mere</td><td>Ouvrier, Technicien, Scientifique</td><td>Pas d'isolation</td></tr>
+    <tr><td>Ordi de bord</td><td>2 processeurs vol, 5 carte mere, 2 alliage thermique</td><td>Ingenieur, Scientifique</td><td>Pas d'alliage thermique</td></tr>
+</table>
+
+
+<!-- ============================================================ -->
+<h2>8. EventBus : qui publie et qui ecoute</h2>
+<!-- ============================================================ -->
+
+<h3>L'EventBus distribue les evenements entre les composants du jeu via 3 canaux avec file d'attente et ordres de priorite.</h3>
+
+<div class="diagram"><pre class="mermaid">
+graph TB
+    subgraph PUB["Publient"]
+        direction LR
+        J_pub["Jeu"]
+        O_pub["Ouvrier"]
+        G_pub["GenerateurAleatoire"]
+    end
+    subgraph BUS["EventBus"]
+        direction LR
+        S["SYSTEME"]
+        SO["SOCIAL"]
+        E["ENVIRONNEMENT"]
+    end
+    subgraph ECO["Ecoutent"]
+        direction LR
+        F_eco["Fusee"]
+        J_eco["Jeu"]
+        U_eco["Usine"]
+        L_eco["LieuDeRessource"]
+    end
+    J_pub -->|"publie"| S
+    O_pub -->|"publie"| SO
+    G_pub -->|"publie"| E
+    S -->|"notifie"| F_eco
+    SO -->|"notifie"| J_eco
+    E -->|"notifie"| U_eco
+    E -->|"notifie"| L_eco
+</pre></div>
+
+
+<!-- ============================================================ -->
+<h2>9. EventBus : classes</h2>
+<!-- ============================================================ -->
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class EventBus {
+        -Map~Canal_List~ abonnes
+        +sEnregistrer(Canal, EventListener) void
+        +seDesinscrire(Canal, EventListener) void
+        +publier(Canal, Evenement) void
+        +possedeAbonne(Canal) boolean
+    }
+    class Canal {
+        &lt;&lt;enumeration&gt;&gt;
+        SYSTEME
+        SOCIAL
+        ENVIRONNEMENT
+    }
+    class EventListener {
+        &lt;&lt;interface&gt;&gt;
+        +onEvent(Evenement) void
+    }
+    EventBus --> Canal
+    EventBus o-- EventListener : abonnes 0..*
+</pre></div>
+
+
+<!-- ============================================================ -->
+<h2>10. Evenements : classe abstraite et sous-classes</h2>
+<!-- ============================================================ -->
+
+<h3>Chaque type d'evenement est une sous-classe d'Evenement. Le GenerateurAleatoire les cree et les publie via l'EventBus.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Evenement {
+        &lt;&lt;abstract&gt;&gt;
+        #int timestamp
+        #String description
+        +getTimestamp() int
+        +getDescription() String
+    }
+    class Greve {
+        -Batiment batimentConcerne
+        -List~Ouvrier~ grevistes
+    }
+    class Tempete {
+        -int severite
+    }
+    class DecouverteGisement {
+        -TypeRessource type
+        -int x
+        -int y
+    }
+    class AccidentTravail {
+        -Ouvrier victime
+        -Batiment lieu
+    }
+    class PerceeTechnologique {
+        -Technologie technologie
+    }
+    class GenerateurAleatoire {
+        +genererGisement(Carte, TypeRessource) void
+        +tirageEvenement(Difficulte) Evenement
+        +ajusterSeuilCritique(float) void
+    }
+    class Difficulte {
+        &lt;&lt;enumeration&gt;&gt;
+        APPRENTISSAGE
+        NORMAL
+        DIFFICILE
+    }
+    Greve --|> Evenement
+    Tempete --|> Evenement
+    DecouverteGisement --|> Evenement
+    AccidentTravail --|> Evenement
+    PerceeTechnologique --|> Evenement
+    GenerateurAleatoire ..> Evenement : cree
+    GenerateurAleatoire --> Difficulte
+</pre></div>
+
+<table>
+    <tr><th>Evenement</th><th>Condition de declenchement</th><th>Effet sur le jeu</th><th>Resolution</th></tr>
+    <tr><td>Greve, arret de travail</td><td>Moral bas (&gt;60% du personnel sous normal)</td><td>Arret progressif de la production</td><td>Ameliorer dortoirs/bouffe/eau</td></tr>
+    <tr><td>Tempete</td><td>Aleatoire</td><td>Arret extraction + degats batiments</td><td>Reparation batiment</td></tr>
+    <tr><td>Decouverte gisement</td><td>Aleatoire / sondage</td><td>Apparition nouvelle ressource</td><td>Deployer infrastructure</td></tr>
+    <tr><td>Accident travail</td><td>Fatigue ou stress eleve</td><td>Baisse temporaire production</td><td>Soin immediat</td></tr>
+    <tr><td>Percee technologique</td><td>Investissement recherche</td><td>Reduction temps travail/recherche</td><td>-</td></tr>
+</table>
+
+
+<!-- ============================================================ -->
+<h2>11. Separation vue / modele</h2>
+<!-- ============================================================ -->
+
+<h3>L'affichage est separe du modele : les classes metier ne contiennent aucune methode d'affichage. Affichage lit les donnees pour les rendre.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Carte {
+        -Case[][] matrice
+        -int largeur
+        -int hauteur
+        +getTile(int x, int y) Case
+        +estDansLimites(int x, int y) boolean
+        +getVoisins(int x, int y) List~Case~
+    }
+    class Case {
+        -List~Item~ contenu
+        +ajouter(Item) void
+        +supprimer(Item) void
+        +estOccupee() boolean
+    }
+    class Affichage {
+        -Carte carte
+        -Jeu jeu
+        +afficherCarte() void
+        +afficherCase(Case) void
+        +afficherTableauDeBord(List~Ouvrier~) void
+        +afficherFusee(Fusee) void
+        +rafraichir() void
+    }
+    class Jeu {
+        ...
+    }
+    Carte *-- Case : n x m
+    Affichage ..> Carte : lit
+    Affichage ..> Jeu : lit
+    Jeu *-- Carte
+</pre></div>
+
+
+<!-- ============================================================ -->
+<h2>12. Transport et exceptions</h2>
+<!-- ============================================================ -->
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class CalculateurTrajet {
+        &lt;&lt;interface&gt;&gt;
+        +calculerTempsTrajet(Case, Case) int
+        +estAccessible(Case) boolean
+        +calculerCoutEnergie(float) float
+        +getVitesseMoyenne() float
+    }
+    class RessourceInsuffisanteException {
+        &lt;&lt;exception&gt;&gt;
+    }
+    class RechercheImpossibleException {
+        &lt;&lt;exception&gt;&gt;
+    }
+</pre></div>
+
+<div class="note">
+    <strong>Transport :</strong> Pour les ouvriers, pas de calcul de trajet (les ressources vont directement au stock). Le CalculateurTrajet est utilise seulement pour le joueur.<br>
+    <strong>RessourceInsuffisanteException :</strong> Lancee par Usine.produire() quand le stock est insuffisant. Attrapee par la boucle du jeu.<br>
+    <strong>RechercheImpossibleException :</strong> Lancee par ArbreTechnologique.lancerRecherche() quand les prerequis ne sont pas remplis.
+</div>
+
+
+<hr>
+
+<!-- ============================================================ -->
+<h2>13. Vue d'ensemble : toutes les relations</h2>
+<!-- ============================================================ -->
+
+<h3>Diagramme compact montrant les principales relations entre toutes les classes du projet.</h3>
+
+<div class="diagram"><pre class="mermaid">
+classDiagram
+    class Item {
+        &lt;&lt;interface&gt;&gt;
+    }
+    class Batiment {
+        &lt;&lt;interface&gt;&gt;
+    }
+    class Joueur { }
+    class Ouvrier { }
+    class Usine { }
+    class LieuDeRessource { }
+    class Maison { }
+    class Hopital { }
+    class Ecole { }
+    class Entrepot { }
+    class StationPompage { }
+    class Serre { }
+    class Centrale { }
+    class CentreRecherche { }
+    class CentreLancement { }
+    class Jeu { }
+    class Carte { }
+    class Case { }
+    class Temps { }
+    class Age { }
+    class Fusee { }
+    class EventBus { }
+    class Evenement {
+        &lt;&lt;abstract&gt;&gt;
+    }
+    class ArbreTechnologique { }
+    class Technologie { }
+    class Affichage { }
+    class GenerateurAleatoire { }
+    class Greve { }
+    class Tempete { }
+    class DecouverteGisement { }
+    class AccidentTravail { }
+    class PerceeTechnologique { }
+
+    Batiment --|> Item : extends
+    Joueur ..|> Item : implements
+    Ouvrier ..|> Item : implements
+
+    Usine ..|> Batiment
+    LieuDeRessource ..|> Batiment
+    Maison ..|> Batiment
+    Hopital ..|> Batiment
+    Ecole ..|> Batiment
+    Entrepot ..|> Batiment
+    StationPompage ..|> Batiment
+    Serre ..|> Batiment
+    Centrale ..|> Batiment
+    CentreRecherche ..|> Batiment
+    CentreLancement ..|> Batiment
+
+    Greve --|> Evenement
+    Tempete --|> Evenement
+    DecouverteGisement --|> Evenement
+    AccidentTravail --|> Evenement
+    PerceeTechnologique --|> Evenement
+
+    Jeu *-- Joueur
+    Jeu *-- Carte
+    Jeu *-- EventBus
+    Jeu *-- Fusee
+    Jeu *-- Temps
+    Jeu *-- Age
+
+    Joueur o-- Ouvrier
+    Joueur o-- Batiment
+    Carte *-- Case
+
+    CentreRecherche --> ArbreTechnologique
+    CentreLancement --> Fusee
+    ArbreTechnologique *-- Technologie
+    Technologie --> Technologie : prerequis
+
+    Affichage ..> Carte : lit
+    Affichage ..> Jeu : lit
+    GenerateurAleatoire ..> Evenement : cree
+    GenerateurAleatoire ..> Carte : modifie
+    EventBus ..> Evenement : publie
+</pre></div>
+
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'default',
+        securityLevel: 'loose',
+        classDiagram: { useMaxWidth: false, defaultRenderer: 'dagre-wrapper' },
+        flowchart: { useMaxWidth: false, htmlLabels: true }
+    });
+
+    // Force les SVG a prendre toute la largeur apres le rendu
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            document.querySelectorAll('.diagram svg').forEach(svg => {
+                svg.removeAttribute('height');
+                svg.style.width = '100%';
+                svg.style.maxWidth = 'none';
+                svg.style.height = 'auto';
+            });
+        }, 1000);
+    });
+</script>
+</body>
+</html>

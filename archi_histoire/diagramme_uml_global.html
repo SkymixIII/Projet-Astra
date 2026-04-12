@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UML - TOB Projet Long</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a2e;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    color: #e0e0e0;
+  }
+
+  #toolbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    background: #16213e;
+    border-bottom: 2px solid #0f3460;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.5);
+  }
+
+  #toolbar h1 {
+    font-size: 16px;
+    color: #e94560;
+    margin-right: 20px;
+  }
+
+  #toolbar button {
+    background: #0f3460;
+    color: #e0e0e0;
+    border: 1px solid #533483;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background .2s;
+  }
+
+  #toolbar button:hover { background: #533483; }
+
+  .legend {
+    display: flex;
+    gap: 12px;
+    margin-left: auto;
+    font-size: 11px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,.2);
+  }
+
+  #canvas {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 6000px;
+    height: 4000px;
+    cursor: grab;
+  }
+
+  #canvas.grabbing { cursor: grabbing; }
+
+  svg#connections {
+    position: absolute;
+    top: 0; left: 0;
+    width: 6000px;
+    height: 4000px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .uml-class {
+    position: absolute;
+    min-width: 200px;
+    max-width: 300px;
+    border-radius: 6px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.4);
+    z-index: 10;
+    cursor: move;
+    transition: box-shadow .2s;
+    font-size: 12px;
+    border: 2px solid;
+  }
+
+  .uml-class:hover {
+    box-shadow: 0 6px 25px rgba(233,69,96,.3);
+    z-index: 100;
+  }
+
+  .uml-class.highlight {
+    box-shadow: 0 0 20px rgba(233,69,96,.6);
+    z-index: 100;
+  }
+
+  /* Types de classes */
+  .uml-class.interface { border-color: #00b4d8; background: #0a1628; }
+  .uml-class.interface .class-header { background: #00b4d8; color: #0a1628; }
+
+  .uml-class.classe { border-color: #48bfe3; background: #0d1b2a; }
+  .uml-class.classe .class-header { background: #1b4965; color: #caf0f8; }
+
+  .uml-class.enum { border-color: #90be6d; background: #1a2e1a; }
+  .uml-class.enum .class-header { background: #4a7c4a; color: #d8f3dc; }
+
+  .uml-class.abstract { border-color: #f4a261; background: #2a1a0d; }
+  .uml-class.abstract .class-header { background: #a85c2a; color: #fde8c9; }
+
+  .uml-class.exception { border-color: #e76f51; background: #2a0d0d; }
+  .uml-class.exception .class-header { background: #9b2226; color: #ffddd2; }
+
+  .class-header {
+    padding: 8px 10px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 4px 4px 0 0;
+    font-size: 13px;
+  }
+
+  .class-header .stereotype {
+    font-size: 10px;
+    font-weight: normal;
+    font-style: italic;
+    display: block;
+    opacity: .8;
+  }
+
+  .class-section {
+    padding: 6px 10px;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  .class-section:empty { display: none; }
+
+  .class-section div {
+    padding: 1px 0;
+    font-size: 11px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .class-section div::before {
+    margin-right: 4px;
+  }
+
+  .attr::before { content: "~"; color: #90be6d; }
+  .method::before { content: "+"; color: #00b4d8; }
+
+  /* Lignes SVG */
+  .conn-line {
+    stroke-width: 1.5;
+    fill: none;
+    opacity: .6;
+    transition: opacity .2s;
+  }
+
+  .conn-line.highlight { opacity: 1; stroke-width: 2.5; }
+
+  .conn-implements { stroke: #00b4d8; stroke-dasharray: 8 4; }
+  .conn-extends { stroke: #f4a261; }
+  .conn-composition { stroke: #e94560; }
+  .conn-aggregation { stroke: #90be6d; stroke-dasharray: 5 3; }
+  .conn-dependency { stroke: #888; stroke-dasharray: 3 3; }
+  .conn-association { stroke: #ccc; stroke-dasharray: none; }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    background: #16213e;
+    border: 1px solid #533483;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    z-index: 2000;
+    pointer-events: none;
+    display: none;
+    max-width: 300px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.5);
+  }
+
+  /* Minimap */
+  #minimap {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    width: 200px;
+    height: 130px;
+    background: #16213e;
+    border: 2px solid #0f3460;
+    border-radius: 6px;
+    z-index: 1000;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,.5);
+  }
+
+  #minimap-viewport {
+    position: absolute;
+    border: 1px solid #e94560;
+    background: rgba(233,69,96,.1);
+    pointer-events: none;
+  }
+
+  #minimap canvas { width: 100%; height: 100%; }
+
+  /* Search */
+  #search {
+    background: #0d1b2a;
+    border: 1px solid #533483;
+    color: #e0e0e0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    width: 180px;
+    outline: none;
+  }
+
+  #search:focus { border-color: #e94560; }
+
+  #zoom-info {
+    font-size: 11px;
+    color: #888;
+    min-width: 50px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <h1>UML - TOB Projet Long</h1>
+  <input type="text" id="search" placeholder="Rechercher une classe...">
+  <button onclick="resetView()">Recentrer</button>
+  <button onclick="zoomIn()">Zoom +</button>
+  <button onclick="zoomOut()">Zoom -</button>
+  <span id="zoom-info">100%</span>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-color" style="background:#00b4d8"></div>Interface</div>
+    <div class="legend-item"><div class="legend-color" style="background:#1b4965"></div>Classe</div>
+    <div class="legend-item"><div class="legend-color" style="background:#4a7c4a"></div>Enum</div>
+    <div class="legend-item"><div class="legend-color" style="background:#a85c2a"></div>Abstraite</div>
+    <div class="legend-item"><div class="legend-color" style="background:#9b2226"></div>Exception</div>
+    <div class="legend-item"><div class="legend-color" style="background:#00b4d8"></div>--- implements</div>
+    <div class="legend-item"><div class="legend-color" style="background:#f4a261"></div>&mdash; extends</div>
+    <div class="legend-item"><div class="legend-color" style="background:#e94560"></div>&mdash; composition</div>
+    <div class="legend-item"><div class="legend-color" style="background:#90be6d"></div>--- aggregation</div>
+  </div>
+</div>
+
+<div id="tooltip"></div>
+
+<div id="canvas">
+  <svg id="connections"></svg>
+</div>
+
+<div id="minimap">
+  <canvas id="minimap-canvas"></canvas>
+  <div id="minimap-viewport"></div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const classes = [
+  // --- Interfaces & Enums (top) ---
+  {
+    id: "Item", type: "interface", x: 900, y: 60,
+    stereotype: "interface",
+    attrs: ["int x", "int y"],
+    methods: ["distance(Item): double", "deplacer(x, y): void", "deplacer(Direction): void"]
+  },
+  {
+    id: "Batiment", type: "interface", x: 900, y: 260,
+    stereotype: "interface extends Item",
+    attrs: ["int sante", "List<Ouvrier> personnelAffecte", "int maxPersonnel"],
+    methods: ["isOperationnel(): boolean", "affecterPersonnel(Ouvrier): void", "retirerPersonnel(Ouvrier): void", "subirDegats(int): void", "reparer(int): void"]
+  },
+  {
+    id: "EventListener", type: "interface", x: 2200, y: 60,
+    stereotype: "interface",
+    attrs: [],
+    methods: ["onEvent(Evenement): void"]
+  },
+
+  // --- Enums ---
+  {
+    id: "Direction", type: "enum", x: 520, y: 60,
+    stereotype: "enum",
+    attrs: ["NORD", "SUD", "EST", "OUEST"],
+    methods: []
+  },
+  {
+    id: "TypeRessource", type: "enum", x: 40, y: 60,
+    stereotype: "enum",
+    attrs: ["FER, SILICIUM, PETROLE", "EAU, BOIS, ENERGIE", "ACIER, KEROSENE, PLASTIQUE", "CARTE_MERE, PROCESSEUR_VOL", "ALLIAGE_THERMIQUE", "ELECTRICITE, NOURRITURE", "EAU_POTABLE"],
+    methods: []
+  },
+  {
+    id: "Role", type: "enum", x: 280, y: 60,
+    stereotype: "enum",
+    attrs: ["MINEUR, MACON", "TRANSPORTEUR, FERMIER", "BUCHERON, TECHNICIEN", "SOIGNANT, INGENIEUR", "SCIENTIFIQUE, FORMATEUR"],
+    methods: ["getPole(): String"]
+  },
+  {
+    id: "EtatOuvrier", type: "enum", x: 280, y: 310,
+    stereotype: "enum",
+    attrs: ["NORMAL, FATIGUE", "STRESSE, MOTIVE"],
+    methods: ["getMultiplicateur(): float"]
+  },
+  {
+    id: "TypeUsine", type: "enum", x: 630, y: 920,
+    stereotype: "enum",
+    attrs: ["FONDERIE", "RAFFINERIE", "USINE_ELECTRONIQUE", "FONDERIE_AVANCEE"],
+    methods: []
+  },
+  {
+    id: "Canal", type: "enum", x: 2200, y: 220,
+    stereotype: "enum",
+    attrs: ["SYSTEME", "SOCIAL", "ENVIRONNEMENT"],
+    methods: []
+  },
+  {
+    id: "NomAge", type: "enum", x: 1730, y: 60,
+    stereotype: "enum",
+    attrs: ["AGE_PRIMITIF", "AGE_INDUSTRIEL", "AGE_TECHNOLOGIQUE", "AGE_SPATIAL"],
+    methods: []
+  },
+  {
+    id: "Difficulte", type: "enum", x: 2460, y: 220,
+    stereotype: "enum",
+    attrs: ["APPRENTISSAGE", "NORMAL", "DIFFICILE"],
+    methods: []
+  },
+
+  // --- Classes principales ---
+  {
+    id: "Joueur", type: "classe", x: 520, y: 260,
+    stereotype: "implements Item",
+    attrs: ["Direction orientation", "Map<TypeRess, Int> ressources", "List<Ouvrier> ouvriers", "List<Batiment> batiments"],
+    methods: ["creerJoueur(): void", "deplacer(x, y): void", "deplacer(Direction): void"]
+  },
+  {
+    id: "Ouvrier", type: "classe", x: 40, y: 390,
+    stereotype: "implements Item",
+    attrs: ["int identifiant", "Role role", "int faim, soif, repos, moral", "int experience", "EtatOuvrier etat", "boolean disponibilite"],
+    methods: ["gagnerExp(int): void", "getNiveau(): int", "evoluer(): void", "affecterPoste(Batiment): void", "mettreAJourBesoins(): void", "getProductivite(): float"]
+  },
+  {
+    id: "Jeu", type: "classe", x: 1400, y: 60,
+    stereotype: "orchestrateur",
+    attrs: ["Joueur joueur", "Carte carte", "EventBus bus", "Fusee fusee", "Temps temps", "Age age"],
+    methods: ["main(args): void", "processTick(): void", "mettreAJourProduction(): void", "consommerBesoinsVitaux(): void", "recupererCommande(): void", "traiterCommande(): void"]
+  },
+  {
+    id: "Carte", type: "classe", x: 1400, y: 370,
+    stereotype: "anciennement Map",
+    attrs: ["Case[][] matrice", "int largeur", "int hauteur"],
+    methods: ["getTile(x, y): Case", "estDansLimites(x, y): boolean", "getVoisins(x, y): List<Case>"]
+  },
+  {
+    id: "Case", type: "classe", x: 1400, y: 560,
+    stereotype: "",
+    attrs: ["List<Item> contenu"],
+    methods: ["ajouter(Item): void", "supprimer(Item): void", "estOccupee(): boolean"]
+  },
+  {
+    id: "Temps", type: "classe", x: 1680, y: 370,
+    stereotype: "",
+    attrs: ["DayOfWeek jour", "int heure"],
+    methods: ["augmenterHeure(): void", "augmenterJour(): void"]
+  },
+  {
+    id: "Age", type: "classe", x: 1680, y: 540,
+    stereotype: "",
+    attrs: ["int niveau", "NomAge nomAge"],
+    methods: ["niveauSuivant(): void"]
+  },
+  {
+    id: "Ressource", type: "classe", x: 40, y: 680,
+    stereotype: "",
+    attrs: ["TypeRessource type", "int quantite"],
+    methods: ["ajouter(int): void", "retirer(int): boolean"]
+  },
+
+  // --- Batiments ---
+  {
+    id: "Usine", type: "classe", x: 630, y: 540,
+    stereotype: "implements Batiment",
+    attrs: ["TypeUsine type", "Map<TypeRess, Int> stock", "TypeRessource production"],
+    methods: ["produire(): Ressource", "peutProduire(): boolean"]
+  },
+  {
+    id: "LieuDeRessource", type: "classe", x: 630, y: 730,
+    stereotype: "implements Batiment",
+    attrs: ["TypeRessource typeExtrait", "int gisementRestant", "float tauxExtraction"],
+    methods: ["extraire(): Ressource", "estEpuise(): boolean"]
+  },
+  {
+    id: "Maison", type: "classe", x: 870, y: 540,
+    stereotype: "implements Batiment",
+    attrs: ["int capacite", "List<Ouvrier> occupants"],
+    methods: ["ajouterOccupant(Ouvrier): void", "retirerOccupant(Ouvrier): void", "estPleine(): boolean"]
+  },
+  {
+    id: "Hopital", type: "classe", x: 870, y: 730,
+    stereotype: "implements Batiment",
+    attrs: ["int capaciteSoin", "List<Ouvrier> patients"],
+    methods: ["soigner(Ouvrier): void", "boosterMoral(Ouvrier): void"]
+  },
+  {
+    id: "Ecole", type: "classe", x: 1100, y: 540,
+    stereotype: "implements Batiment",
+    attrs: ["int capaciteFormation", "List<Ouvrier> eleves"],
+    methods: ["former(Ouvrier): void"]
+  },
+  {
+    id: "Entrepot", type: "classe", x: 1100, y: 730,
+    stereotype: "implements Batiment",
+    attrs: ["Map<TypeRess, Int> stock", "int capaciteMax"],
+    methods: ["stocker(TypeRess, int): void", "retirer(TypeRess, int): boolean", "getStockTotal(): int"]
+  },
+  {
+    id: "StationPompage", type: "classe", x: 630, y: 1100,
+    stereotype: "implements Batiment",
+    attrs: ["int debitPompage"],
+    methods: ["pomper(): Ressource"]
+  },
+  {
+    id: "Serre", type: "classe", x: 870, y: 1100,
+    stereotype: "implements Batiment",
+    attrs: ["int rendement"],
+    methods: ["cultiver(): Ressource"]
+  },
+  {
+    id: "Centrale", type: "classe", x: 870, y: 920,
+    stereotype: "implements Batiment",
+    attrs: ["String typeEnergie", "int puissance"],
+    methods: ["produireElectricite(): Ressource"]
+  },
+  {
+    id: "CentreRecherche", type: "classe", x: 1100, y: 920,
+    stereotype: "implements Batiment",
+    attrs: ["ArbreTechnologique arbre"],
+    methods: ["produireSciences(): int"]
+  },
+  {
+    id: "CentreLancement", type: "classe", x: 1100, y: 1100,
+    stereotype: "implements Batiment",
+    attrs: ["Fusee fusee"],
+    methods: ["assemblerModule(ModuleFusee): void"]
+  },
+
+  // --- Technologie ---
+  {
+    id: "Technologie", type: "classe", x: 1400, y: 920,
+    stereotype: "",
+    attrs: ["String nom", "int coutScience", "boolean debloquee", "List<Technologie> prerequis"],
+    methods: ["estDisponible(): boolean", "debloquer(): void"]
+  },
+  {
+    id: "ArbreTechnologique", type: "classe", x: 1400, y: 740,
+    stereotype: "",
+    attrs: ["Map<String, Technologie> catalogue", "Technologie rechercheActive", "int progressionActuelle"],
+    methods: ["lancerRecherche(String): void", "ajouterProgression(int): void", "getRechercheActive(): Technologie"]
+  },
+
+  // --- Fusee ---
+  {
+    id: "Fusee", type: "classe", x: 1680, y: 740,
+    stereotype: "condition de victoire",
+    attrs: ["float etatPropulseur", "float etatChargeUtile", "float etatCommande"],
+    methods: ["calculerProbabiliteSucces(): float", "lancer(): boolean"]
+  },
+
+  // --- Evenements ---
+  {
+    id: "EventBus", type: "classe", x: 2000, y: 370,
+    stereotype: "",
+    attrs: ["Map<Canal, List<EventListener>> abonnes"],
+    methods: ["sEnregistrer(Canal, EL): void", "seDesinscrire(Canal, EL): void", "publier(Canal, Evt): void", "possedeAbonne(Canal): boolean"]
+  },
+  {
+    id: "Evenement", type: "abstract", x: 2000, y: 570,
+    stereotype: "abstract",
+    attrs: ["int timestamp", "String description"],
+    methods: ["getTimestamp(): int", "getDescription(): String"]
+  },
+  {
+    id: "Greve", type: "classe", x: 1900, y: 780,
+    stereotype: "extends Evenement",
+    attrs: ["Batiment batimentConcerne", "List<Ouvrier> grevistes"],
+    methods: []
+  },
+  {
+    id: "Tempete", type: "classe", x: 2120, y: 780,
+    stereotype: "extends Evenement",
+    attrs: ["int severite"],
+    methods: []
+  },
+  {
+    id: "DecouverteGisement", type: "classe", x: 1900, y: 940,
+    stereotype: "extends Evenement",
+    attrs: ["TypeRessource type", "int x, int y"],
+    methods: []
+  },
+  {
+    id: "AccidentTravail", type: "classe", x: 2120, y: 940,
+    stereotype: "extends Evenement",
+    attrs: ["Ouvrier victime", "Batiment lieu"],
+    methods: []
+  },
+  {
+    id: "PerceeTechnologique", type: "classe", x: 2340, y: 780,
+    stereotype: "extends Evenement",
+    attrs: ["Technologie technologie"],
+    methods: []
+  },
+  {
+    id: "GenerateurAleatoire", type: "classe", x: 2340, y: 570,
+    stereotype: "",
+    attrs: [],
+    methods: ["genererGisement(Carte, TypeRess): void", "tirageEvenement(Diff): Evenement", "ajusterSeuilCritique(float): void"]
+  },
+
+  // --- Affichage ---
+  {
+    id: "Affichage", type: "classe", x: 1680, y: 200,
+    stereotype: "vue separee du modele",
+    attrs: ["Carte carte", "Jeu jeu"],
+    methods: ["afficherCarte(): void", "afficherCase(Case): void", "afficherTableauDeBord(): void", "afficherFusee(Fusee): void", "rafraichir(): void"]
+  },
+
+  // --- Exceptions ---
+  {
+    id: "RessourceInsuffisanteException", type: "exception", x: 300, y: 680,
+    stereotype: "exception",
+    attrs: [],
+    methods: []
+  },
+  {
+    id: "RechercheImpossibleException", type: "exception", x: 300, y: 780,
+    stereotype: "exception",
+    attrs: [],
+    methods: []
+  }
+];
+
+const connections = [
+  // Heritage: Batiment extends Item
+  { from: "Batiment", to: "Item", type: "extends", label: "extends" },
+
+  // Implements Item
+  { from: "Joueur", to: "Item", type: "implements", label: "implements" },
+  { from: "Ouvrier", to: "Item", type: "implements", label: "implements" },
+
+  // Implements Batiment
+  { from: "Usine", to: "Batiment", type: "implements", label: "implements" },
+  { from: "LieuDeRessource", to: "Batiment", type: "implements", label: "implements" },
+  { from: "Maison", to: "Batiment", type: "implements", label: "implements" },
+  { from: "Hopital", to: "Batiment", type: "implements", label: "implements" },
+  { from: "Ecole", to: "Batiment", type: "implements", label: "implements" },
+  { from: "Entrepot", to: "Batiment", type: "implements", label: "implements" },
+  { from: "StationPompage", to: "Batiment", type: "implements", label: "implements" },
+  { from: "Serre", to: "Batiment", type: "implements", label: "implements" },
+  { from: "Centrale", to: "Batiment", type: "implements", label: "implements" },
+  { from: "CentreRecherche", to: "Batiment", type: "implements", label: "implements" },
+  { from: "CentreLancement", to: "Batiment", type: "implements", label: "implements" },
+
+  // Extends Evenement
+  { from: "Greve", to: "Evenement", type: "extends", label: "extends" },
+  { from: "Tempete", to: "Evenement", type: "extends", label: "extends" },
+  { from: "DecouverteGisement", to: "Evenement", type: "extends", label: "extends" },
+  { from: "AccidentTravail", to: "Evenement", type: "extends", label: "extends" },
+  { from: "PerceeTechnologique", to: "Evenement", type: "extends", label: "extends" },
+
+  // Compositions (Jeu possede)
+  { from: "Jeu", to: "Joueur", type: "composition", label: "1" },
+  { from: "Jeu", to: "Carte", type: "composition", label: "1" },
+  { from: "Jeu", to: "EventBus", type: "composition", label: "1" },
+  { from: "Jeu", to: "Fusee", type: "composition", label: "1" },
+  { from: "Jeu", to: "Temps", type: "composition", label: "1" },
+  { from: "Jeu", to: "Age", type: "composition", label: "1" },
+
+  // Compositions (Carte -> Case)
+  { from: "Carte", to: "Case", type: "composition", label: "n x m" },
+
+  // Compositions (ArbreTechno -> Technologie)
+  { from: "ArbreTechnologique", to: "Technologie", type: "composition", label: "0..*" },
+
+  // Aggregations
+  { from: "Joueur", to: "Ouvrier", type: "aggregation", label: "0..*" },
+  { from: "Joueur", to: "Batiment", type: "aggregation", label: "0..*" },
+  { from: "Case", to: "Item", type: "aggregation", label: "0..*" },
+  { from: "EventBus", to: "EventListener", type: "aggregation", label: "0..*" },
+
+  // Associations
+  { from: "Ouvrier", to: "Role", type: "association", label: "role" },
+  { from: "Ouvrier", to: "EtatOuvrier", type: "association", label: "etat" },
+  { from: "Joueur", to: "Direction", type: "association", label: "orientation" },
+  { from: "Usine", to: "TypeUsine", type: "association", label: "type" },
+  { from: "Age", to: "NomAge", type: "association", label: "nomAge" },
+  { from: "CentreRecherche", to: "ArbreTechnologique", type: "association", label: "utilise" },
+  { from: "CentreLancement", to: "Fusee", type: "association", label: "assemble" },
+
+  // Dependencies
+  { from: "Usine", to: "RessourceInsuffisanteException", type: "dependency", label: "throws" },
+  { from: "ArbreTechnologique", to: "RechercheImpossibleException", type: "dependency", label: "throws" },
+  { from: "GenerateurAleatoire", to: "Carte", type: "dependency", label: "modifie" },
+  { from: "GenerateurAleatoire", to: "Evenement", type: "dependency", label: "cree" },
+  { from: "Affichage", to: "Carte", type: "dependency", label: "lit" },
+  { from: "Affichage", to: "Jeu", type: "dependency", label: "lit" },
+  { from: "Affichage", to: "Fusee", type: "dependency", label: "lit" },
+  { from: "EventBus", to: "Evenement", type: "dependency", label: "publie" },
+
+  // Self-reference
+  { from: "Technologie", to: "Technologie", type: "association", label: "prerequis" },
+];
+
+// ============================================================
+// RENDER
+// ============================================================
+const canvas = document.getElementById("canvas");
+const svg = document.getElementById("connections");
+const tooltip = document.getElementById("tooltip");
+const searchInput = document.getElementById("search");
+const zoomInfo = document.getElementById("zoom-info");
+
+let scale = 1;
+let panX = 0, panY = 0;
+let isPanning = false;
+let panStartX, panStartY;
+let dragTarget = null, dragOffsetX, dragOffsetY;
+
+// Create class elements
+const classElements = {};
+
+classes.forEach(cls => {
+  const el = document.createElement("div");
+  el.className = `uml-class ${cls.type}`;
+  el.id = `class-${cls.id}`;
+  el.style.left = cls.x + "px";
+  el.style.top = cls.y + "px";
+  el.dataset.id = cls.id;
+
+  let html = `<div class="class-header">`;
+  if (cls.stereotype) html += `<span class="stereotype">&laquo;${cls.stereotype}&raquo;</span>`;
+  html += `${cls.id}</div>`;
+
+  html += `<div class="class-section">`;
+  cls.attrs.forEach(a => html += `<div class="attr">${a}</div>`);
+  html += `</div>`;
+
+  html += `<div class="class-section">`;
+  cls.methods.forEach(m => html += `<div class="method">${m}</div>`);
+  html += `</div>`;
+
+  el.innerHTML = html;
+  canvas.appendChild(el);
+  classElements[cls.id] = { el, data: cls };
+});
+
+// Draw connections
+function getCenter(id) {
+  const el = classElements[id]?.el;
+  if (!el) return { x: 0, y: 0 };
+  const x = parseFloat(el.style.left) + el.offsetWidth / 2;
+  const y = parseFloat(el.style.top) + el.offsetHeight / 2;
+  return { x, y };
+}
+
+function getEdgePoint(id, targetX, targetY) {
+  const el = classElements[id]?.el;
+  if (!el) return { x: 0, y: 0 };
+  const cx = parseFloat(el.style.left) + el.offsetWidth / 2;
+  const cy = parseFloat(el.style.top) + el.offsetHeight / 2;
+  const w = el.offsetWidth / 2;
+  const h = el.offsetHeight / 2;
+
+  const dx = targetX - cx;
+  const dy = targetY - cy;
+
+  if (dx === 0 && dy === 0) return { x: cx, y: cy };
+
+  const absDx = Math.abs(dx);
+  const absDy = Math.abs(dy);
+
+  let scale;
+  if (absDx / w > absDy / h) {
+    scale = w / absDx;
+  } else {
+    scale = h / absDy;
+  }
+
+  return { x: cx + dx * scale, y: cy + dy * scale };
+}
+
+function drawConnections() {
+  svg.innerHTML = "";
+
+  // Arrowhead markers
+  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+
+  const markers = [
+    { id: "arrow-extends", color: "#f4a261", type: "triangle" },
+    { id: "arrow-implements", color: "#00b4d8", type: "triangle" },
+    { id: "arrow-composition", color: "#e94560", type: "diamond-filled" },
+    { id: "arrow-aggregation", color: "#90be6d", type: "diamond-empty" },
+    { id: "arrow-dependency", color: "#888", type: "arrow" },
+    { id: "arrow-association", color: "#ccc", type: "arrow" },
+  ];
+
+  markers.forEach(m => {
+    const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+    marker.setAttribute("id", m.id);
+    marker.setAttribute("markerWidth", "12");
+    marker.setAttribute("markerHeight", "12");
+    marker.setAttribute("refX", "10");
+    marker.setAttribute("refY", "6");
+    marker.setAttribute("orient", "auto");
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+    if (m.type === "triangle") {
+      path.setAttribute("d", "M0,2 L10,6 L0,10 Z");
+      path.setAttribute("fill", m.color);
+    } else if (m.type === "diamond-filled") {
+      path.setAttribute("d", "M0,6 L5,2 L10,6 L5,10 Z");
+      path.setAttribute("fill", m.color);
+    } else if (m.type === "diamond-empty") {
+      path.setAttribute("d", "M0,6 L5,2 L10,6 L5,10 Z");
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", m.color);
+      path.setAttribute("stroke-width", "1.5");
+    } else {
+      path.setAttribute("d", "M0,2 L10,6 L0,10");
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", m.color);
+      path.setAttribute("stroke-width", "1.5");
+    }
+
+    marker.appendChild(path);
+    defs.appendChild(marker);
+  });
+
+  svg.appendChild(defs);
+
+  connections.forEach((conn, i) => {
+    const fromCenter = getCenter(conn.from);
+    const toCenter = getCenter(conn.to);
+
+    // Self-reference
+    if (conn.from === conn.to) {
+      const el = classElements[conn.from]?.el;
+      if (!el) return;
+      const x = parseFloat(el.style.left) + el.offsetWidth;
+      const y = parseFloat(el.style.top) + el.offsetHeight / 3;
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", `M${x},${y} C${x + 50},${y - 40} ${x + 50},${y + 40} ${x},${y + 20}`);
+      path.setAttribute("class", `conn-line conn-${conn.type}`);
+      path.setAttribute("marker-end", `url(#arrow-${conn.type})`);
+      path.dataset.from = conn.from;
+      path.dataset.to = conn.to;
+      path.dataset.index = i;
+      svg.appendChild(path);
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", x + 55);
+      text.setAttribute("y", y + 5);
+      text.setAttribute("fill", "#aaa");
+      text.setAttribute("font-size", "10");
+      text.textContent = conn.label || "";
+      svg.appendChild(text);
+      return;
+    }
+
+    const from = getEdgePoint(conn.from, toCenter.x, toCenter.y);
+    const to = getEdgePoint(conn.to, fromCenter.x, fromCenter.y);
+
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", from.x);
+    line.setAttribute("y1", from.y);
+    line.setAttribute("x2", to.x);
+    line.setAttribute("y2", to.y);
+    line.setAttribute("class", `conn-line conn-${conn.type}`);
+    line.setAttribute("marker-end", `url(#arrow-${conn.type})`);
+    line.dataset.from = conn.from;
+    line.dataset.to = conn.to;
+    line.dataset.index = i;
+    svg.appendChild(line);
+
+    // Label
+    if (conn.label) {
+      const mx = (from.x + to.x) / 2;
+      const my = (from.y + to.y) / 2;
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", mx + 5);
+      text.setAttribute("y", my - 5);
+      text.setAttribute("fill", "#aaa");
+      text.setAttribute("font-size", "10");
+      text.setAttribute("font-family", "Segoe UI, sans-serif");
+      text.textContent = conn.label;
+      svg.appendChild(text);
+    }
+  });
+}
+
+drawConnections();
+
+// ============================================================
+// PAN & ZOOM
+// ============================================================
+function applyTransform() {
+  canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  canvas.style.transformOrigin = "0 0";
+  zoomInfo.textContent = Math.round(scale * 100) + "%";
+  updateMinimap();
+}
+
+document.addEventListener("wheel", e => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? -0.08 : 0.08;
+  scale = Math.max(0.15, Math.min(3, scale + delta));
+  applyTransform();
+}, { passive: false });
+
+canvas.addEventListener("mousedown", e => {
+  if (e.target.closest(".uml-class")) {
+    const el = e.target.closest(".uml-class");
+    dragTarget = el;
+    dragOffsetX = e.clientX / scale - parseFloat(el.style.left);
+    dragOffsetY = (e.clientY - 50) / scale - parseFloat(el.style.top);
+    el.style.zIndex = 200;
+    return;
+  }
+  isPanning = true;
+  canvas.classList.add("grabbing");
+  panStartX = e.clientX - panX;
+  panStartY = e.clientY - panY;
+});
+
+document.addEventListener("mousemove", e => {
+  if (dragTarget) {
+    const newX = e.clientX / scale - dragOffsetX - panX / scale;
+    const newY = (e.clientY - 50) / scale - dragOffsetY - panY / scale;
+    dragTarget.style.left = newX + "px";
+    dragTarget.style.top = newY + "px";
+    const id = dragTarget.dataset.id;
+    const cls = classes.find(c => c.id === id);
+    if (cls) { cls.x = newX; cls.y = newY; }
+    drawConnections();
+    return;
+  }
+  if (isPanning) {
+    panX = e.clientX - panStartX;
+    panY = e.clientY - panStartY;
+    applyTransform();
+  }
+});
+
+document.addEventListener("mouseup", () => {
+  if (dragTarget) {
+    dragTarget.style.zIndex = 10;
+    dragTarget = null;
+    updateMinimap();
+  }
+  isPanning = false;
+  canvas.classList.remove("grabbing");
+});
+
+function zoomIn() { scale = Math.min(3, scale + 0.15); applyTransform(); }
+function zoomOut() { scale = Math.max(0.15, scale - 0.15); applyTransform(); }
+function resetView() { scale = 0.65; panX = 50; panY = 0; applyTransform(); }
+
+// ============================================================
+// HOVER HIGHLIGHT
+// ============================================================
+Object.values(classElements).forEach(({ el, data }) => {
+  el.addEventListener("mouseenter", () => {
+    el.classList.add("highlight");
+    // Highlight connected classes and lines
+    svg.querySelectorAll(".conn-line").forEach(line => {
+      if (line.dataset.from === data.id || line.dataset.to === data.id) {
+        line.classList.add("highlight");
+        const otherId = line.dataset.from === data.id ? line.dataset.to : line.dataset.from;
+        classElements[otherId]?.el.classList.add("highlight");
+      }
+    });
+  });
+
+  el.addEventListener("mouseleave", () => {
+    document.querySelectorAll(".highlight").forEach(e => e.classList.remove("highlight"));
+  });
+});
+
+// ============================================================
+// SEARCH
+// ============================================================
+searchInput.addEventListener("input", () => {
+  const q = searchInput.value.toLowerCase().trim();
+  document.querySelectorAll(".uml-class").forEach(el => {
+    el.style.opacity = 1;
+  });
+  if (!q) return;
+
+  let found = null;
+  document.querySelectorAll(".uml-class").forEach(el => {
+    const id = el.dataset.id.toLowerCase();
+    if (id.includes(q)) {
+      el.style.opacity = 1;
+      if (!found) found = el;
+    } else {
+      el.style.opacity = 0.2;
+    }
+  });
+
+  if (found) {
+    const x = parseFloat(found.style.left);
+    const y = parseFloat(found.style.top);
+    panX = -x * scale + window.innerWidth / 2 - found.offsetWidth / 2 * scale;
+    panY = -y * scale + window.innerHeight / 2 - found.offsetHeight / 2 * scale + 50;
+    applyTransform();
+  }
+});
+
+// ============================================================
+// MINIMAP
+// ============================================================
+const minimapCanvas = document.getElementById("minimap-canvas");
+const minimapCtx = minimapCanvas.getContext("2d");
+const minimapViewport = document.getElementById("minimap-viewport");
+
+function updateMinimap() {
+  const mw = 200, mh = 130;
+  minimapCanvas.width = mw;
+  minimapCanvas.height = mh;
+  minimapCtx.clearRect(0, 0, mw, mh);
+
+  // Find bounds
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  classes.forEach(cls => {
+    const el = classElements[cls.id]?.el;
+    if (!el) return;
+    const x = parseFloat(el.style.left);
+    const y = parseFloat(el.style.top);
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x + el.offsetWidth);
+    maxY = Math.max(maxY, y + el.offsetHeight);
+  });
+
+  const pad = 50;
+  minX -= pad; minY -= pad; maxX += pad; maxY += pad;
+  const scaleX = mw / (maxX - minX);
+  const scaleY = mh / (maxY - minY);
+  const s = Math.min(scaleX, scaleY);
+
+  const colors = {
+    interface: "#00b4d8",
+    classe: "#1b4965",
+    enum: "#4a7c4a",
+    abstract: "#a85c2a",
+    exception: "#9b2226"
+  };
+
+  classes.forEach(cls => {
+    const el = classElements[cls.id]?.el;
+    if (!el) return;
+    const x = (parseFloat(el.style.left) - minX) * s;
+    const y = (parseFloat(el.style.top) - minY) * s;
+    const w = el.offsetWidth * s;
+    const h = el.offsetHeight * s;
+    minimapCtx.fillStyle = colors[cls.type] || "#1b4965";
+    minimapCtx.fillRect(x, y, Math.max(w, 2), Math.max(h, 2));
+  });
+
+  // Viewport
+  const vx = (-panX / scale - minX) * s;
+  const vy = (-panY / scale - minY + 50 / scale) * s;
+  const vw = (window.innerWidth / scale) * s;
+  const vh = ((window.innerHeight - 50) / scale) * s;
+  minimapViewport.style.left = vx + "px";
+  minimapViewport.style.top = vy + "px";
+  minimapViewport.style.width = vw + "px";
+  minimapViewport.style.height = vh + "px";
+}
+
+window.addEventListener("resize", () => { updateMinimap(); });
+
+// Initial view
+resetView();
+</script>
+</body>
+</html>
