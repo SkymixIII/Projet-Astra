@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrats des méthodes — Projet ASTRA (Version étendue)</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #16213e;
+    --bg3: #0d1b2a;
+    --accent: #e94560;
+    --accent2: #00b4d8;
+    --accent3: #90be6d;
+    --accent4: #f4a261;
+    --accent5: #c77dff;
+    --text: #e0e0e0;
+    --text-muted: #8892a4;
+    --border: #1e3a5f;
+    --pre-bg: #0a1628;
+    --tag-interface: #003f5c;
+    --tag-class: #1b4965;
+    --tag-enum: #2d6a2d;
+    --tag-abstract: #5c3317;
+    --tag-exception: #5c1a1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--bg2);
+    border-bottom: 3px solid var(--accent);
+    padding: 32px 48px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,.6);
+  }
+
+  header .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  /* ── SEARCH BAR ── */
+  .header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .header-content {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .search-container {
+    flex: 0 1 360px;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    background: var(--pre-bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-size: 18px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 2px rgba(0, 180, 216, .15);
+  }
+
+  .search-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .search-input-button {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    background: darkorange;
+    border: 2px solid var(--border);
+    color: var(--textContent);
+    border-radius: 4px;
+    font-size: 18px;
+    transition: border-color .2s, box-shadow .2s;
+    font-weight : bold;
+    text-align :center;
+  }
+
+  .search-input-button:hover {
+    background : orange;
+    font-size: 20px;
+  }
+
+  .search-input-button::placeholder {
+    color: var(--text-muted);
+  }
+
+  .search-result-count {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg2);
+    padding: 2px 6px;
+    border-radius: 2px;
+    display: none;
+  }
+
+  .search-result-count.active {
+    display: block;
+  }
+
+  /* ── HIGHLIGHT ── */
+  .search-highlight {
+    background: rgba(233, 69, 96, .4);
+    color: #fff;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+
+  .hidden-by-search {
+    display: none !important;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    display: flex;
+    min-height: calc(100vh - 88px);
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 88px;
+    height: calc(100vh - 88px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  nav .nav-section {
+    padding: 4px 0;
+  }
+
+  nav .nav-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 20px 4px;
+  }
+
+  nav a {
+    display: block;
+    padding: 5px 20px 5px 28px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+
+  nav a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,.04);
+    border-left-color: var(--accent2);
+  }
+
+  nav a.active {
+    color: var(--accent2);
+    border-left-color: var(--accent2);
+  }
+
+  nav .nav-parent {
+    display: block;
+    padding: 6px 20px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+
+  nav .nav-parent:hover {
+    background: rgba(255,255,255,.04);
+    border-left-color: var(--accent);
+  }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 1000px;
+    overflow-x: hidden;
+  }
+
+  /* ── SECTION HEADERS ── */
+  h2 {
+    font-size: 22px;
+    color: #fff;
+    margin-top: 48px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h2:first-child { margin-top: 0; }
+
+  h2 .section-num {
+    font-size: 12px;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 17px;
+    color: #fff;
+    margin-top: 32px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3:first-of-type { margin-top: 20px; }
+
+  h4 {
+    font-size: 15px;
+    color: var(--accent2);
+    margin-top: 20px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  /* ── TYPE BADGES ── */
+  .type-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .type-interface {
+    background: var(--tag-interface);
+    color: #00d4ff;
+  }
+
+  .type-class {
+    background: var(--tag-class);
+    color: #90caf9;
+  }
+
+  .type-enum {
+    background: var(--tag-enum);
+    color: #a5d6a7;
+  }
+
+  .type-abstract {
+    background: var(--tag-abstract);
+    color: #ffb74d;
+  }
+
+  .type-exception {
+    background: var(--tag-exception);
+    color: #ef9a9a;
+  }
+
+  /* ── TABLES ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  table thead {
+    background: rgba(233, 69, 96, .15);
+  }
+
+  table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-weight: 700;
+    color: #fff;
+    border-bottom: 2px solid var(--border);
+  }
+
+  table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  table tr:last-child td {
+    border-bottom: none;
+  }
+
+  table tr:hover {
+    background: rgba(255,255,255,.02);
+  }
+
+  table code {
+    background: var(--pre-bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent3);
+  }
+
+  /* ── CODE ── */
+  code {
+    background: var(--pre-bg);
+    color: var(--accent3);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+  }
+
+  /* ── BLOCKQUOTE ── */
+  blockquote {
+    border-left: 4px solid var(--accent2);
+    padding-left: 16px;
+    margin: 16px 0;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ── LISTS ── */
+  ul, ol {
+    margin: 16px 0;
+    margin-left: 24px;
+  }
+
+  ul li, ol li {
+    margin: 8px 0;
+  }
+
+  /* ── INTRO BOX ── */
+  .intro-box {
+    background: rgba(233, 69, 96, .1);
+    border: 1px solid var(--accent);
+    border-left: 4px solid var(--accent);
+    padding: 16px;
+    margin: 20px 0;
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .intro-box strong {
+    color: #fff;
+  }
+
+  /* ── SIGNATURE BOX ── */
+  .signature-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    padding: 12px 16px;
+    margin: 12px 0;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    color: var(--accent2);
+    font-size: 13px;
+    overflow-x: auto;
+  }
+
+  /* ── NONE TAG ── */
+  .none-tag {
+    background: var(--tag-enum);
+    color: #a5d6a7;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1200px) {
+    main { padding: 32px 40px; }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+
+    nav {
+      width: 100%;
+      min-width: unset;
+      height: auto;
+      position: relative;
+      top: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      max-height: 300px;
+    }
+
+    main { max-width: 100%; padding: 24px; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 15px; }
+    table { font-size: 13px; }
+    table th, table td { padding: 8px 12px; }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent2);
+  }
+
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-wrapper">
+    <div class="header-content">
+      <span class="badge">Version étendue</span>
+      <h1>Contrats des méthodes Projet ASTRA avec types</h1>
+    </div>
+
+    <div class="search-container">
+        <form action="" id="form2">
+            <div>
+                <input class="search-input" type="text" id="search">
+                <input class="search-input-button" type="button" id="submit_form" onclick="checkInput()" value="Rechercher">
+            </div>
+        </form>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+<nav>
+  <div class="nav-section">
+    <div class="nav-section-title">Navigation</div>
+    <a href="#sommaire">Sommaire</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">1. Interfaces</div>
+    <a href="#item">Item</a>
+    <a href="#batiment">Batiment</a>
+    <a href="#eventlistener">EventListener</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">2. Énumérations</div>
+    <a href="#role">Role</a>
+    <a href="#etatouvrier">EtatOuvrier</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">3. Classes principales</div>
+    <a href="#joueur">Joueur</a>
+    <a href="#ouvrier">Ouvrier</a>
+    <a href="#jeu">Jeu</a>
+    <a href="#carte">Carte</a>
+    <a href="#case">Case</a>
+    <a href="#temps">Temps</a>
+    <a href="#age">Age</a>
+    <a href="#ressource">Ressource</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">4. Bâtiments</div>
+    <a href="#usine">Usine</a>
+    <a href="#lieuderessource">LieuDeRessource</a>
+    <a href="#maison">Maison</a>
+    <a href="#hopital">Hôpital</a>
+    <a href="#ecole">École</a>
+    <a href="#entrepot">Entrepôt</a>
+    <a href="#stationpompage">StationPompage</a>
+    <a href="#serre">Serre</a>
+    <a href="#centrale">Centrale</a>
+    <a href="#centrerecherche">CentreRecherche</a>
+    <a href="#centrelancement">CentreLancement</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">5. Technologie</div>
+    <a href="#arbretechnologique">ArbreTechnologique</a>
+    <a href="#technologie">Technologie</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">6. Fusée</div>
+    <a href="#fusee">Fusee</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">7. Événements</div>
+    <a href="#eventbus">EventBus</a>
+    <a href="#evenement">Evenement</a>
+    <a href="#generateuraleatoire">GenerateurAleatoire</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">8. Affichage</div>
+    <a href="#affichage">Affichage</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">9. Exceptions</div>
+    <a href="#exceptions">Exceptions</a>
+  </div>
+</nav>
+
+<main>
+
+
+<!-- ═══ INTERFACES ═══ -->
+<h2 id="interfaces-sec"><span class="section-num">1</span> Interfaces</h2>
+
+<h3 id="item"><span class="type-badge type-interface">interface</span> Item</h3>
+
+<h4>distance(autreItem: Item): double</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>double distance(Item autreItem)</code></td></tr>
+    <tr><td>Précondition</td><td><code>autreItem != null</code> ; <code>this.x</code>, <code>this.y</code>, <code>autreItem.x</code>, <code>autreItem.y</code> sont initialisés (coordonnées valides).</td></tr>
+    <tr><td>Postcondition</td><td>Retourne un <code>double >= 0</code> égal à <code>sqrt((autreItem.x - this.x)² + (autreItem.y - this.y)²)</code>. Ni <code>this</code> ni <code>autreItem</code> ne sont modifiés.</td></tr>
+  </tbody>
+</table>
+
+<h4>deplacer(x: int, y: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void deplacer(int x, int y)</code></td></tr>
+    <tr><td>Précondition</td><td><code>x >= 0</code> ; <code>y >= 0</code> ; <code>Carte.estDansLimites(x, y) == true</code> ; la case <code>(x, y)</code> est accessible (non bloquée).</td></tr>
+    <tr><td>Postcondition</td><td><code>this.x == x</code> et <code>this.y == y</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>deplacer(direction: Direction): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void deplacer(Direction direction)</code></td></tr>
+    <tr><td>Précondition</td><td><code>direction != null</code> ; la case adjacente dans <code>direction</code> existe dans la <code>Carte</code> et est accessible.</td></tr>
+    <tr><td>Postcondition</td><td>Les coordonnées de l'item sont incrémentées d'une unité dans le sens de <code>direction</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="batiment"><span class="type-badge type-interface">interface</span> Batiment</h3>
+
+<blockquote>Hérite de <code>Item</code>. Attributs supplémentaires : <code>int sante</code>, <code>List&lt;Ouvrier&gt; personnelAffecte</code>, <code>int maxPersonnel</code>.</blockquote>
+
+<h4>isOperationnel(): boolean</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>boolean isOperationnel()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>true</code> si et seulement si <code>sante > 0</code>. L'état du bâtiment n'est pas modifié.</td></tr>
+  </tbody>
+</table>
+
+<h4>affecterPersonnel(ouvrier: Ouvrier): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void affecterPersonnel(Ouvrier ouvrier)</code></td></tr>
+    <tr><td>Précondition</td><td><code>ouvrier != null</code> ; <code>ouvrier.disponibilite == true</code> ; <code>personnelAffecte.size() &lt; maxPersonnel</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>personnelAffecte.contains(ouvrier) == true</code> ; <code>ouvrier.disponibilite == false</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>retirerPersonnel(ouvrier: Ouvrier): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void retirerPersonnel(Ouvrier ouvrier)</code></td></tr>
+    <tr><td>Précondition</td><td><code>ouvrier != null</code> ; <code>personnelAffecte.contains(ouvrier) == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>personnelAffecte.contains(ouvrier) == false</code> ; <code>ouvrier.disponibilite == true</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="eventlistener"><span class="type-badge type-interface">interface</span> EventListener</h3>
+
+<h4>onEvent(event: Evenement): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void onEvent(Evenement event)</code></td></tr>
+    <tr><td>Précondition</td><td><code>event != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td>L'objet a traité l'événement en fonction de son type concret. L'événement lui-même n'est pas modifié.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ ÉNUMÉRATIONS ═══ -->
+<h2 id="enumerations-sec"><span class="section-num">2</span> Énumérations</h2>
+
+<h3 id="role"><span class="type-badge type-enum">énumération</span> Role</h3>
+
+<table>
+  <thead>
+    <tr><th>Valeur</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>CHERCHEUR</code></td><td>Rôle de chercheur pour l'exploration technologique.</td></tr>
+    <tr><td><code>OUVRIER</code></td><td>Rôle d'ouvrier pour la production.</td></tr>
+    <tr><td><code>MEDECIN</code></td><td>Rôle de médecin pour les soins.</td></tr>
+    <tr><td><code>INGENIER</code></td><td>Rôle d'ingénieur pour la gestion des modules.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="etatouvrier"><span class="type-badge type-enum">énumération</span> EtatOuvrier</h3>
+
+<table>
+  <thead>
+    <tr><th>Valeur</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>TRAVAIL</code></td><td>L'ouvrier est en état de travailler.</td></tr>
+    <tr><td><code>REPOS</code></td><td>L'ouvrier se repose pour récupérer.</td></tr>
+    <tr><td><code>MALADE</code></td><td>L'ouvrier est malade et doit être soigné.</td></tr>
+    <tr><td><code>DECES</code></td><td>L'ouvrier a décédé (état terminal).</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ CLASSES PRINCIPALES ═══ -->
+<h2 id="classes-principales-sec"><span class="section-num">3</span> Classes principales</h2>
+
+<h3 id="joueur"><span class="type-badge type-class">classe</span> Joueur</h3>
+
+<blockquote>Attributs : <code>String nom</code>, <code>List&lt;Ressource&gt; ressources</code>, <code>int argent</code>.</blockquote>
+
+<h4>obtenirRessource(typeRessource: TypeRessource): Ressource</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Ressource obtenirRessource(TypeRessource typeRessource)</code></td></tr>
+    <tr><td>Précondition</td><td><code>typeRessource != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne la <code>Ressource</code> correspondant à <code>typeRessource</code> dans <code>ressources</code>, ou <code>null</code> si absent.</td></tr>
+  </tbody>
+</table>
+
+<h4>depenser(montant: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void depenser(int montant)</code></td></tr>
+    <tr><td>Précondition</td><td><code>montant > 0</code> ; <code>argent >= montant</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>argent</code> diminué de <code>montant</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="ouvrier"><span class="type-badge type-class">classe</span> Ouvrier</h3>
+
+<blockquote>Hérite de <code>Item</code>. Attributs : <code>Role role</code>, <code>int faim</code>, <code>int soif</code>, <code>int repos</code>, <code>int moral</code>, <code>EtatOuvrier etat</code>, <code>Batiment affectation</code>, <code>boolean disponibilite</code>, <code>float productivite</code>.</blockquote>
+
+<h4>manger(quantite: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void manger(int quantite)</code></td></tr>
+    <tr><td>Précondition</td><td><code>quantite > 0</code> ; <code>faim > 0</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>faim</code> diminué de <code>quantite</code> (minimum 0).</td></tr>
+  </tbody>
+</table>
+
+<h4>boire(quantite: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void boire(int quantite)</code></td></tr>
+    <tr><td>Précondition</td><td><code>quantite > 0</code> ; <code>soif > 0</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>soif</code> diminué de <code>quantite</code> (minimum 0).</td></tr>
+  </tbody>
+</table>
+
+<h4>seReposer(duree: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void seReposer(int duree)</code></td></tr>
+    <tr><td>Précondition</td><td><code>duree > 0</code> ; <code>etat != EtatOuvrier.DECES</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>repos</code> augmenté de <code>duree</code> (maximum 100) ; <code>moral</code> augmenté de <code>duree / 2</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>seRemplirFaim(): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void seRemplirFaim()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td><code>faim = 0</code> ; <code>moral</code> augmenté de 5.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="jeu"><span class="type-badge type-class">classe</span> Jeu</h3>
+
+<blockquote>Attributs : <code>Joueur joueur</code>, <code>Carte carte</code>, <code>Temps temps</code>, <code>List&lt;Ouvrier&gt; ouvriers</code>, <code>Fusee fusee</code>, <code>ArbreTechnologique arbre</code>.</blockquote>
+
+<h4>initialiser(tailleCarteX: int, tailleCarteY: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void initialiser(int tailleCarteX, int tailleCarteY)</code></td></tr>
+    <tr><td>Précondition</td><td><code>tailleCarteX > 0</code> ; <code>tailleCarteY > 0</code> ; jeu non initialisé.</td></tr>
+    <tr><td>Postcondition</td><td><code>carte</code>, <code>temps</code>, <code>fusee</code>, <code>arbre</code> sont initialisés ; <code>ouvriers</code> est une liste vide.</td></tr>
+  </tbody>
+</table>
+
+<h4>avancerTemps(): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void avancerTemps()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td><code>temps</code> incrémenté d'une unité ; tous les ouvriers ont leur faim/soif augmentée ; tous les bâtiments subissent une dégradation.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="carte"><span class="type-badge type-class">classe</span> Carte</h3>
+
+<blockquote>Attributs : <code>Case[][] matrice</code>, <code>int largeur</code>, <code>int hauteur</code>.</blockquote>
+
+<h4>obtenirCase(x: int, y: int): Case</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Case obtenirCase(int x, int y)</code></td></tr>
+    <tr><td>Précondition</td><td><code>estDansLimites(x, y) == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>matrice[x][y]</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>estDansLimites(x: int, y: int): boolean</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>boolean estDansLimites(int x, int y)</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>true</code> si <code>0 <= x < largeur</code> et <code>0 <= y < hauteur</code>. État non modifié.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="case"><span class="type-badge type-class">classe</span> Case</h3>
+
+<blockquote>Attributs : <code>int x</code>, <code>int y</code>, <code>List&lt;Item&gt; contenu</code>, <code>boolean accessible</code>.</blockquote>
+
+<h4>ajouter(item: Item): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void ajouter(Item item)</code></td></tr>
+    <tr><td>Précondition</td><td><code>item != null</code> ; <code>accessible == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>contenu.contains(item) == true</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>retirer(item: Item): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void retirer(Item item)</code></td></tr>
+    <tr><td>Précondition</td><td><code>item != null</code> ; <code>contenu.contains(item) == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>contenu.contains(item) == false</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="temps"><span class="type-badge type-class">classe</span> Temps</h3>
+
+<blockquote>Attributs : <code>int tick</code>.</blockquote>
+
+<h4>avancer(): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void avancer()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td><code>tick</code> incrémenté de 1.</td></tr>
+  </tbody>
+</table>
+
+<h4>getTick(): int</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>int getTick()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne la valeur courant de <code>tick</code>. État non modifié.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="age"><span class="type-badge type-class">classe</span> Age</h3>
+
+<blockquote>Attributs : <code>int annees</code>, <code>int mois</code>.</blockquote>
+
+<h4>vieillir(moisEcouled: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void vieillir(int moisEcouled)</code></td></tr>
+    <tr><td>Précondition</td><td><code>moisEcouled > 0</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>mois</code> augmenté de <code>moisEcouled</code> ; si <code>mois >= 12</code>, <code>annees</code> incrémenté et <code>mois</code> décrémenté de 12.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="ressource"><span class="type-badge type-class">classe</span> Ressource</h3>
+
+<blockquote>Attributs : <code>TypeRessource type</code>, <code>int quantite</code>.</blockquote>
+
+<h4>ajouter(quantite: int): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void ajouter(int quantite)</code></td></tr>
+    <tr><td>Précondition</td><td><code>quantite > 0</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>this.quantite</code> augmenté de <code>quantite</code>.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ BÂTIMENTS ═══ -->
+<h2 id="batiments-sec"><span class="section-num">4</span> Bâtiments</h2>
+
+<h3 id="usine"><span class="type-badge type-class">classe</span> Usine</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attributs : <code>Map&lt;TypeRessource, Integer&gt; stock</code>, <code>float productivite</code>.</blockquote>
+
+<h4>produire(typeRessource: TypeRessource, quantite: int): Ressource throws RessourceInsuffisanteException</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Ressource produire(TypeRessource typeRessource, int quantite) throws RessourceInsuffisanteException</code></td></tr>
+    <tr><td>Précondition</td><td><code>typeRessource != null</code> ; <code>quantite > 0</code> ; <code>isOperationnel() == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Si <code>stock[typeRessource] >= quantite</code>, une <code>Ressource</code> est créée et retournée, <code>stock</code> diminué. Sinon, <code>RessourceInsuffisanteException</code> levée.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="lieuderessource"><span class="type-badge type-class">classe</span> LieuDeRessource</h3>
+
+<blockquote>Hérite de <code>Item</code>. Attributs : <code>TypeRessource type</code>, <code>int quantite</code>.</blockquote>
+
+<h4>exploiter(quantite: int): Ressource</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Ressource exploiter(int quantite)</code></td></tr>
+    <tr><td>Précondition</td><td><code>quantite > 0</code> ; <code>quantite <= this.quantite</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Une <code>Ressource</code> de type <code>this.type</code> et de quantité <code>quantite</code> est créée et retournée ; <code>this.quantite</code> diminué de <code>quantite</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="maison"><span class="type-badge type-class">classe</span> Maison</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Capacité d'hébergement pour les ouvriers.</blockquote>
+
+<h4>loger(ouvrier: Ouvrier): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void loger(Ouvrier ouvrier)</code></td></tr>
+    <tr><td>Précondition</td><td><code>ouvrier != null</code> ; <code>isOperationnel() == true</code> ; <code>personnelAffecte.size() < maxPersonnel</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>personnelAffecte.contains(ouvrier) == true</code> ; <code>ouvrier.repos</code> augmenté lors des passages.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="hopital"><span class="type-badge type-class">classe</span> Hôpital</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>float efficaciteSoins</code>.</blockquote>
+
+<h4>soigner(ouvrier: Ouvrier): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void soigner(Ouvrier ouvrier)</code></td></tr>
+    <tr><td>Précondition</td><td><code>ouvrier != null</code> ; <code>ouvrier.etat == EtatOuvrier.MALADE</code> ; <code>isOperationnel() == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>ouvrier.etat</code> changé à <code>EtatOuvrier.TRAVAIL</code> avec probabilité <code>efficaciteSoins</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="ecole"><span class="type-badge type-class">classe</span> École</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>float progressionRecherche</code>.</blockquote>
+
+<h4>enseigner(ouvrier: Ouvrier): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void enseigner(Ouvrier ouvrier)</code></td></tr>
+    <tr><td>Précondition</td><td><code>ouvrier != null</code> ; <code>ouvrier.role == Role.CHERCHEUR</code> ; <code>isOperationnel() == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>ouvrier.productivite</code> augmentée de <code>progressionRecherche</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="entrepot"><span class="type-badge type-class">classe</span> Entrepôt</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>Map&lt;TypeRessource, Integer&gt; stock</code>.</blockquote>
+
+<h4>stocker(ressource: Ressource): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void stocker(Ressource ressource)</code></td></tr>
+    <tr><td>Précondition</td><td><code>ressource != null</code> ; <code>isOperationnel() == true</code> ; stock non plein.</td></tr>
+    <tr><td>Postcondition</td><td><code>stock[ressource.type] += ressource.quantite</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="stationpompage"><span class="type-badge type-class">classe</span> StationPompage</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>int debitEau</code>.</blockquote>
+
+<h4>pomper(): Ressource</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Ressource pomper()</code></td></tr>
+    <tr><td>Précondition</td><td><code>isOperationnel() == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne une <code>Ressource</code> d'eau de quantité <code>debitEau</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="serre"><span class="type-badge type-class">classe</span> Serre</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>int rendementNourriture</code>.</blockquote>
+
+<h4>recolter(): Ressource</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Ressource recolter()</code></td></tr>
+    <tr><td>Précondition</td><td><code>isOperationnel() == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne une <code>Ressource</code> de nourriture de quantité <code>rendementNourriture</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="centrale"><span class="type-badge type-class">classe</span> Centrale</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>int productionEnergie</code>.</blockquote>
+
+<h4>produireEnergie(): Ressource</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Ressource produireEnergie()</code></td></tr>
+    <tr><td>Précondition</td><td><code>isOperationnel() == true</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne une <code>Ressource</code> d'énergie de quantité <code>productionEnergie</code>.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="centrerecherche"><span class="type-badge type-class">classe</span> CentreRecherche</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>float vitessRecherche</code>.</blockquote>
+
+<h4>contribuerRecherche(pourcentage: float): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void contribuerRecherche(float pourcentage)</code></td></tr>
+    <tr><td>Précondition</td><td><code>pourcentage > 0</code> ; <code>isOperationnel() == true</code> ; au moins un ouvrier affecté.</td></tr>
+    <tr><td>Postcondition</td><td>Progression technologique augmentée proportionnellement à <code>vitessRecherche</code> et au nombre d'ouvriers.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="centrelancement"><span class="type-badge type-class">classe</span> CentreLancement</h3>
+
+<blockquote>Hérite de <code>Batiment</code>. Attribut : <code>Fusee fusee</code>.</blockquote>
+
+<h4>lancerFusee(): boolean</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>boolean lancerFusee()</code></td></tr>
+    <tr><td>Précondition</td><td><code>isOperationnel() == true</code> ; <code>fusee != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Appelle <code>fusee.lancer()</code> et retourne le résultat.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ TECHNOLOGIE ═══ -->
+<h2 id="technologie-sec"><span class="section-num">5</span> Technologie</h2>
+
+<h3 id="arbretechnologique"><span class="type-badge type-class">classe</span> ArbreTechnologique</h3>
+
+<blockquote>Attributs : <code>List&lt;Technologie&gt; technologies</code>.</blockquote>
+
+<h4>lancerRecherche(nom: String): void throws RechercheImpossibleException</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void lancerRecherche(String nom) throws RechercheImpossibleException</code></td></tr>
+    <tr><td>Précondition</td><td><code>nom != null</code> ; technologie identifiée par <code>nom</code> existe.</td></tr>
+    <tr><td>Postcondition</td><td>Si tous les prérequis sont débloqués : <code>debloquee = true</code> pour cette technologie. Sinon : <code>RechercheImpossibleException</code> levée.</td></tr>
+  </tbody>
+</table>
+
+<h4>estToutDebloque(): boolean</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>boolean estToutDebloque()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>true</code> si toutes les technologiest ont <code>debloquee == true</code>. État non modifié.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="technologie"><span class="type-badge type-class">classe</span> Technologie</h3>
+
+<blockquote>Attributs : <code>String nom</code>, <code>List&lt;Technologie&gt; prerequis</code>, <code>boolean debloquee</code>, <code>int coûtRecherche</code>.</blockquote>
+
+<h4>estDisponible(): boolean</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>boolean estDisponible()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>true</code> ssi tous les <code>prerequis</code> ont <code>debloquee == true</code> (ou liste vide).</td></tr>
+  </tbody>
+</table>
+
+<h4>debloquer(): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void debloquer()</code></td></tr>
+    <tr><td>Précondition</td><td><code>estDisponible() == true</code> ; <code>debloquee == false</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>debloquee == true</code>.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ FUSEE ═══ -->
+<h2 id="fusee-sec"><span class="section-num">6</span> Fusée</h2>
+
+<h3 id="fusee"><span class="type-badge type-class">classe</span> Fusee</h3>
+
+<h4>calculerProbabiliteSucces(): float</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>float calculerProbabiliteSucces()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne un <code>float</code> ∈ [0.0, 1.0] issu des trois états de module et de la productivité des ingénieurs. Fusée non modifiée.</td></tr>
+  </tbody>
+</table>
+
+<h4>lancer(): boolean</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>boolean lancer()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Si probabilité <code>≥ 1.0</code> : retourne <code>true</code> (victoire). Sinon : retourne <code>false</code>, ressources perdues partiellement ou totalement.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ EVENEMENTS ═══ -->
+<h2 id="evenements-sec"><span class="section-num">7</span> Événements</h2>
+
+<h3 id="eventbus"><span class="type-badge type-class">classe</span> EventBus</h3>
+
+<h4>sEnregistrer(canal: String, eventListener: EventListener): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void sEnregistrer(String canal, EventListener eventListener)</code></td></tr>
+    <tr><td>Précondition</td><td><code>canal != null</code> ; <code>eventListener != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>abonnes[canal]</code> contient <code>eventListener</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>seDesinscrire(canal: String, eventListener: EventListener): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void seDesinscrire(String canal, EventListener eventListener)</code></td></tr>
+    <tr><td>Précondition</td><td><code>canal != null</code> ; <code>eventListener</code> dans <code>abonnes[canal]</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>eventListener</code> absent de <code>abonnes[canal]</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>publier(canal: String, evenement: Evenement): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void publier(String canal, Evenement evenement)</code></td></tr>
+    <tr><td>Précondition</td><td><code>canal != null</code> ; <code>evenement != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td><code>onEvent(evenement)</code> appelé sur chaque abonné du canal.</td></tr>
+  </tbody>
+</table>
+
+<h4>possedeAbonne(canal: String): boolean</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>boolean possedeAbonne(String canal)</code></td></tr>
+    <tr><td>Précondition</td><td><code>canal != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>true</code> si <code>abonnes[canal]</code> non vide. État non modifié.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="evenement"><span class="type-badge type-abstract">abstrait</span> Evenement</h3>
+
+<blockquote>Attributs : <code>int timestamp</code>, <code>String description</code>.</blockquote>
+
+<h4>getTimestamp(): int</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>int getTimestamp()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>int timestamp</code> (tick de jeu à la création de l'événement). L'état de l'objet n'est pas modifié.</td></tr>
+  </tbody>
+</table>
+
+<h4>getDescription(): String</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>String getDescription()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne <code>String description</code> non-null décrivant la nature de l'événement. L'état de l'objet n'est pas modifié.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="generateuraleatoire"><span class="type-badge type-class">classe</span> GenerateurAleatoire</h3>
+
+<h4>genererGisement(carte: Carte, typeRessource: TypeRessource): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void genererGisement(Carte carte, TypeRessource typeRessource)</code></td></tr>
+    <tr><td>Précondition</td><td><code>carte != null</code> ; <code>typeRessource != null</code> ; au moins une <code>Case</code> libre existe dans <code>carte.matrice</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Un <code>LieuDeRessource</code> de <code>TypeRessource typeRessource</code> a été créé et ajouté à une <code>Case</code> de <code>carte</code> choisie pseudo-aléatoirement.</td></tr>
+  </tbody>
+</table>
+
+<h4>tirageEvenement(difficulte: Difficulte): Evenement</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>Evenement tirageEvenement(Difficulte difficulte)</code></td></tr>
+    <tr><td>Précondition</td><td><code>difficulte != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Retourne un <code>Evenement</code> non-null dont le type concret est issu d'un tirage pondéré : probabilités d'événements positifs élevées pour <code>Difficulte.APPRENTISSAGE</code>, probabilités de catastrophes élevées pour <code>Difficulte.DIFFICILE</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>ajusterSeuilCritique(multiplicateur: float): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void ajusterSeuilCritique(float multiplicateur)</code></td></tr>
+    <tr><td>Précondition</td><td><code>multiplicateur > 0f</code> ; le mode de jeu actif est <code>Difficulte.DIFFICILE</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Le seuil interne de rareté des ressources est multiplié par <code>multiplicateur</code> pour les prochains appels à <code>genererGisement()</code>.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ AFFICHAGE ═══ -->
+<h2 id="affichage-sec"><span class="section-num">8</span> Affichage</h2>
+
+<h3 id="affichage"><span class="type-badge type-class">classe</span> Affichage</h3>
+
+<blockquote>Attributs : <code>Carte carte</code>, <code>Jeu jeu</code>.</blockquote>
+
+<h4>afficherCarte(): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void afficherCarte()</code></td></tr>
+    <tr><td>Précondition</td><td><code>carte != null</code> (<code>Carte carte</code> initialisée).</td></tr>
+    <tr><td>Postcondition</td><td>La représentation visuelle complète de <code>Carte carte</code> (toutes les <code>Case[][]</code>, bâtiments, ouvriers) est mise à jour dans l'interface utilisateur.</td></tr>
+  </tbody>
+</table>
+
+<h4>afficherCase(caseAffichee: Case): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void afficherCase(Case caseAffichee)</code></td></tr>
+    <tr><td>Précondition</td><td><code>caseAffichee != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Les éléments de <code>List&lt;Item&gt; caseAffichee.contenu</code> sont rendus à l'écran.</td></tr>
+  </tbody>
+</table>
+
+<h4>afficherTableauDeBord(): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void afficherTableauDeBord()</code></td></tr>
+    <tr><td>Précondition</td><td><code>jeu != null</code> (<code>Jeu jeu</code> initialisé).</td></tr>
+    <tr><td>Postcondition</td><td>Le tableau de bord est mis à jour avec les valeurs courantes de <code>int faim</code>, <code>int soif</code>, <code>int repos</code>, <code>int moral</code>, <code>EtatOuvrier etat</code>, et le <code>Batiment</code> affecté de chaque <code>Ouvrier</code>.</td></tr>
+  </tbody>
+</table>
+
+<h4>afficherFusee(fusee: Fusee): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void afficherFusee(Fusee fusee)</code></td></tr>
+    <tr><td>Précondition</td><td><code>fusee != null</code>.</td></tr>
+    <tr><td>Postcondition</td><td>Les valeurs <code>float etatPropulseur</code>, <code>float etatChargeUtile</code>, <code>float etatCommande</code> de <code>fusee</code> sont affichées dans l'interface du centre de lancement.</td></tr>
+  </tbody>
+</table>
+
+<h4>rafraichir(): void</h4>
+<table>
+  <thead>
+    <tr><th>Aspect</th><th>Détail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Signature complète</td><td><code>void rafraichir()</code></td></tr>
+    <tr><td>Précondition</td><td>Aucune.</td></tr>
+    <tr><td>Postcondition</td><td><code>afficherCarte()</code>, <code>afficherTableauDeBord()</code> et tous les autres composants actifs de l'interface ont été rappelés ; l'UI reflète l'état courant de <code>Jeu jeu</code>.</td></tr>
+  </tbody>
+</table>
+
+<!-- ═══ EXCEPTIONS ═══ -->
+<h2 id="exceptions"><span class="section-num">9</span> Exceptions</h2>
+
+<table class="exception-table">
+  <thead>
+    <tr><th>Classe</th><th>Signature</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>RessourceInsuffisanteException</strong></td>
+      <td><code>class RessourceInsuffisanteException extends Exception</code></td>
+      <td>Levée par <code>Ressource produire() throws RessourceInsuffisanteException</code> dans <code>Usine</code> lorsque <code>Map&lt;TypeRessource, Integer&gt; stock</code> ne contient pas les quantités requises.</td>
+    </tr>
+    <tr>
+      <td><strong>RechercheImpossibleException</strong></td>
+      <td><code>class RechercheImpossibleException extends Exception</code></td>
+      <td>Levée par <code>void lancerRecherche(String nom) throws RechercheImpossibleException</code> dans <code>ArbreTechnologique</code> lorsque <code>List&lt;Technologie&gt; prerequis</code> contient au moins une <code>Technologie</code> non débloquée.</td>
+    </tr>
+  </tbody>
+</table>
+
+</main>
+</div>
+
+<script>
+// ═══ ACTIVE NAV LINK ON SCROLL ═══
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+}, { passive: true });
+
+// ═══ SEARCH FUNCTIONALITY ═══
+const searchInput = document.getElementById('searchInput');
+const searchCount = document.getElementById('searchCount');
+let searchableElements = [];
+let currentHighlightIndex = 0;
+
+// Initialiser les éléments recherchables
+function initializeSearchableElements() {
+  searchableElements = [];
+  
+  // Chercher les en-têtes de méthodes (h4)
+  document.querySelectorAll('h4').forEach(h4 => {
+    searchableElements.push({
+      element: h4,
+      text: h4.textContent.toLowerCase(),
+      type: 'method',
+      parent: h4.closest('h3') || h4.closest('h2')
+    });
+  });
+  
+  // Chercher les en-têtes de classes/interfaces (h3)
+  document.querySelectorAll('h3').forEach(h3 => {
+    searchableElements.push({
+      element: h3,
+      text: h3.textContent.toLowerCase(),
+      type: 'class',
+      parent: h3
+    });
+  });
+  
+  // Chercher les en-têtes de sections (h2)
+  document.querySelectorAll('h2').forEach(h2 => {
+    searchableElements.push({
+      element: h2,
+      text: h2.textContent.toLowerCase(),
+      type: 'section',
+      parent: h2
+    });
+  });
+}
+
+// Fonction de recherche
+function performSearch(query) {
+  // Réinitialiser
+  document.querySelectorAll('.search-highlight').forEach(el => {
+    const parent = el.parentNode;
+    while (el.firstChild) {
+      parent.insertBefore(el.firstChild, el);
+    }
+    parent.removeChild(el);
+  });
+  
+  document.querySelectorAll('.hidden-by-search').forEach(el => {
+    el.classList.remove('hidden-by-search');
+  });
+  
+  if (!query.trim()) {
+    searchCount.classList.remove('active');
+    currentHighlightIndex = 0;
+    return;
+  }
+  
+  const lowerQuery = query.toLowerCase();
+  let matchCount = 0;
+  const matchedElements = new Set();
+  
+  // Chercher et mettre en évidence les correspondances
+  searchableElements.forEach(item => {
+    if (item.text.includes(lowerQuery)) {
+      matchCount++;
+      matchedElements.add(item.element);
+      
+      // Ajouter les parents au set
+      let current = item.parent;
+      while (current && current.tagName !== 'MAIN') {
+        matchedElements.add(current);
+        current = current.parentElement;
+      }
+      
+      // Mettre en évidence dans le texte
+      highlightTextInElement(item.element, lowerQuery);
+    }
+  });
+  
+  // Cacher les sections non-correspondantes
+  document.querySelectorAll('h2').forEach(h2 => {
+    const section = h2.closest('h2').parentElement;
+    let hasMatch = false;
+    section.querySelectorAll('h3, h4').forEach(heading => {
+      if (matchedElements.has(heading)) {
+        hasMatch = true;
+      }
+    });
+    if (!hasMatch && !matchedElements.has(h2)) {
+      h2.classList.add('hidden-by-search');
+    }
+  });
+  
+  // Cacher les classes/interfaces sans méthodes correspondantes
+  document.querySelectorAll('h3').forEach(h3 => {
+    let hasMatch = false;
+    const section = h3.nextElementSibling;
+    let current = section;
+    while (current && current.tagName !== 'H2' && current.tagName !== 'H3') {
+      if (current.tagName === 'H4' && matchedElements.has(current)) {
+        hasMatch = true;
+        break;
+      }
+      current = current.nextElementSibling;
+    }
+    if (!hasMatch && !matchedElements.has(h3)) {
+      h3.classList.add('hidden-by-search');
+    }
+  });
+  
+  // Afficher le compteur
+  if (matchCount > 0) {
+    searchCount.textContent = `${matchCount} résultat${matchCount > 1 ? 's' : ''}`;
+    searchCount.classList.add('active');
+  } else {
+    searchCount.textContent = 'Aucun résultat';
+    searchCount.classList.add('active');
+  }
+}
+
+// Fonction pour mettre en évidence le texte
+function highlightTextInElement(element, query) {
+  const regex = new RegExp(`(${query})`, 'gi');
+  const text = element.textContent;
+  
+  if (regex.test(text)) {
+    const parts = text.split(regex);
+    element.innerHTML = '';
+    
+    parts.forEach((part, index) => {
+      if (index % 2 === 0) {
+        element.appendChild(document.createTextNode(part));
+      } else {
+        const span = document.createElement('span');
+        span.className = 'search-highlight';
+        span.textContent = part;
+        element.appendChild(span);
+      }
+    });
+  }
+}
+
+// Initialiser et ajouter les écouteurs
+initializeSearchableElements();
+
+searchInput.addEventListener('input', (e) => {
+  performSearch(e.target.value);
+  currentHighlightIndex = 0;
+});
+
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    searchInput.value = '';
+    performSearch('');
+    searchInput.blur();
+  }
+});
+
+// Focus sur la barre de recherche avec Ctrl+K ou Cmd+K
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+
+function checkInput() {
+    var query = document.getElementById('search').value;
+    window.find(query);
+    return true;
+}
+</script>
+
+</body>
+</html>

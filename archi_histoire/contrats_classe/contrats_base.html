@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contrats des méthodes — Projet ASTRA (Version de base)</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #16213e;
+    --bg3: #0d1b2a;
+    --accent: #e94560;
+    --accent2: #00b4d8;
+    --accent3: #90be6d;
+    --accent4: #f4a261;
+    --accent5: #c77dff;
+    --text: #e0e0e0;
+    --text-muted: #8892a4;
+    --border: #1e3a5f;
+    --pre-bg: #0a1628;
+    --tag-interface: #003f5c;
+    --tag-class: #1b4965;
+    --tag-enum: #2d6a2d;
+    --tag-abstract: #5c3317;
+    --tag-exception: #5c1a1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--bg2);
+    border-bottom: 3px solid var(--accent);
+    padding: 32px 48px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,.6);
+  }
+
+  header .badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    display: flex;
+    min-height: calc(100vh - 88px);
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 88px;
+    height: calc(100vh - 88px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  nav .nav-section {
+    padding: 4px 0;
+  }
+
+  nav .nav-section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 8px 20px 4px;
+  }
+
+  nav a {
+    display: block;
+    padding: 5px 20px 5px 28px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+
+  nav a:hover {
+    color: var(--text);
+    background: rgba(255,255,255,.04);
+    border-left-color: var(--accent2);
+  }
+
+  nav a.active {
+    color: var(--accent2);
+    border-left-color: var(--accent2);
+  }
+
+  nav .nav-parent {
+    display: block;
+    padding: 6px 20px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+
+  nav .nav-parent:hover {
+    background: rgba(255,255,255,.04);
+    border-left-color: var(--accent);
+  }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 960px;
+    overflow-x: hidden;
+  }
+
+  /* ── SECTION HEADERS ── */
+  h2 {
+    font-size: 22px;
+    color: #fff;
+    margin-top: 48px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  h2:first-child { margin-top: 0; }
+
+  h2 .section-num {
+    font-size: 12px;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 17px;
+    color: var(--accent2);
+    margin-top: 32px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── CLASS BADGES ── */
+  .type-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+    vertical-align: middle;
+  }
+
+  .type-interface { background: var(--tag-interface); color: var(--accent2); border: 1px solid var(--accent2); }
+  .type-class { background: var(--tag-class); color: #caf0f8; border: 1px solid #48bfe3; }
+  .type-enum { background: var(--tag-enum); color: var(--accent3); border: 1px solid var(--accent3); }
+  .type-abstract { background: var(--tag-abstract); color: var(--accent4); border: 1px solid var(--accent4); }
+  .type-exception { background: var(--tag-exception); color: #ffddd2; border: 1px solid #e76f51; }
+
+  /* ── METHOD CARD ── */
+  .method-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+
+  .method-card:hover {
+    border-color: var(--accent2);
+  }
+
+  .method-header {
+    background: var(--pre-bg);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .method-name {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 13.5px;
+    color: var(--accent4);
+    font-weight: 600;
+  }
+
+  .method-return {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  .method-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .contract-block {
+    padding: 14px 16px;
+  }
+
+  .contract-block:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .contract-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .pre-label { color: var(--accent); }
+  .post-label { color: var(--accent3); }
+
+  .contract-text {
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .contract-text code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11.5px;
+    background: rgba(0,180,216,.1);
+    color: var(--accent2);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  .none-tag {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 12px;
+  }
+
+  /* ── EXCEPTION TABLE ── */
+  .exception-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  .exception-table th {
+    background: var(--pre-bg);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .exception-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12.5px;
+    vertical-align: top;
+  }
+
+  .exception-table tr:last-child td { border-bottom: none; }
+
+  .exception-table td:first-child {
+    font-family: 'Consolas', 'Courier New', monospace;
+    color: #ffddd2;
+    white-space: nowrap;
+  }
+
+  /* ── NOTICE ── */
+  .notice {
+    background: rgba(244,162,97,.08);
+    border-left: 3px solid var(--accent4);
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 16px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  .notice code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    color: var(--accent4);
+  }
+
+  /* ── THROWS TAG ── */
+  .throws-tag {
+    display: inline-block;
+    font-size: 10px;
+    background: rgba(231,111,81,.2);
+    color: #e76f51;
+    border: 1px solid #e76f51;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    vertical-align: middle;
+    margin-left: 4px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .header-content {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .search-container {
+    flex: 0 1 360px;
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    background: var(--pre-bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-size: 18px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 2px rgba(0, 180, 216, .15);
+  }
+
+  .search-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .search-input-button {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    background: darkorange;
+    border: 2px solid var(--border);
+    color: var(--textContent);
+    border-radius: 4px;
+    font-size: 18px;
+    transition: border-color .2s, box-shadow .2s;
+    font-weight : bold;
+    text-align :center;
+  }
+
+  .search-input-button:hover {
+    background : orange;
+    font-size: 20px;
+  }
+
+  .search-input-button::placeholder {
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-wrapper">
+    <div class="header-content">
+      <span class="badge">Version simple</span>
+      <h1>Contrats des méthodes Projet ASTRA sans types</h1>
+    </div>
+
+    <div class="search-container">
+        <form action="" id="form2">
+            <div>
+                <input class="search-input" type="text" id="search">
+                <input class="search-input-button" type="button" id="submit_form" onclick="checkInput()" value="Rechercher">
+            </div>
+        </form>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<nav>
+  <div class="nav-section">
+    <div class="nav-section-title">Interfaces</div>
+    <a href="#item">Item</a>
+    <a href="#batiment">Batiment</a>
+    <a href="#eventlistener">EventListener</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Énumérations</div>
+    <a href="#role">Role</a>
+    <a href="#etatouvrier">EtatOuvrier</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Classes principales</div>
+    <a href="#joueur">Joueur</a>
+    <a href="#ouvrier">Ouvrier</a>
+    <a href="#jeu">Jeu</a>
+    <a href="#carte">Carte</a>
+    <a href="#case">Case</a>
+    <a href="#temps">Temps</a>
+    <a href="#age">Age</a>
+    <a href="#ressource">Ressource</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Bâtiments</div>
+    <a href="#usine">Usine</a>
+    <a href="#liederessource">LieuDeRessource</a>
+    <a href="#maison">Maison</a>
+    <a href="#hopital">Hopital</a>
+    <a href="#ecole">Ecole</a>
+    <a href="#entrepot">Entrepot</a>
+    <a href="#stationpompage">StationPompage</a>
+    <a href="#serre">Serre</a>
+    <a href="#centrale">Centrale</a>
+    <a href="#centrerecherche">CentreRecherche</a>
+    <a href="#centrelancement">CentreLancement</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Technologie</div>
+    <a href="#arbretechnologique">ArbreTechnologique</a>
+    <a href="#technologie">Technologie</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Fusée</div>
+    <a href="#fusee">Fusee</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Événements</div>
+    <a href="#eventbus">EventBus</a>
+    <a href="#evenement">Evenement</a>
+    <a href="#generateuraleatoire">GenerateurAleatoire</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Affichage</div>
+    <a href="#affichage">Affichage</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Exceptions</div>
+    <a href="#exceptions">Vue d'ensemble</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══ INTERFACES ═══ -->
+<h2 id="interfaces"><span class="section-num">1</span> Interfaces</h2>
+
+<h3 id="item"><span class="type-badge type-interface">interface</span> Item</h3>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">distance(autreItem)</span><span class="method-return">→ double</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>autreItem != null</code> ; <code>this</code> et <code>autreItem</code> possèdent des coordonnées initialisées.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne un <code>double ≥ 0</code> égal à la distance euclidienne entre les deux items. Aucun des deux items n'est modifié.</div></div>
+  </div>
+</div>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">deplacer(x, y)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>x ≥ 0</code>, <code>y ≥ 0</code> ; <code>Carte.estDansLimites(x, y) == true</code> ; la case cible est accessible.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>this.x == x</code> et <code>this.y == y</code>.</div></div>
+  </div>
+</div>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">deplacer(direction)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>direction != null</code> ; la case adjacente dans cette direction existe et est accessible.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Les coordonnées de l'item sont incrémentées d'une unité dans le sens de <code>direction</code>.</div></div>
+  </div>
+</div>
+
+<!-- Batiment -->
+<h3 id="batiment"><span class="type-badge type-interface">interface</span> Batiment <small style="font-size:11px;color:var(--text-muted);font-weight:400;margin-left:6px">extends Item</small></h3>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">isOperationnel()</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> ssi <code>sante > 0</code>. État du bâtiment non modifié.</div></div>
+  </div>
+</div>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">affecterPersonnel(ouvrier)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <!--@TODO changer  la cond en  <= sur le max personnel-->
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvrier != null</code> ; <code>ouvrier.disponibilite == true</code> ; <code>personnelAffecte.size() &lt; maxPersonnel</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>personnelAffecte</code> contient <code>ouvrier</code> ; <code>ouvrier.disponibilite == false</code>.</div></div>
+  </div>
+</div>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">retirerPersonnel(ouvrier)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvrier != null</code> ; <code>ouvrier</code> appartient à <code>personnelAffecte</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>ouvrier</code> absent de <code>personnelAffecte</code> ; <code>ouvrier.disponibilite == true</code>.</div></div>
+  </div>
+</div>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">subirDegats(quantite)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>quantite > 0</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>sante == max(0, sante_avant - quantite)</code> ; si <code>sante == 0</code>, <code>isOperationnel()</code> retourne <code>false</code>.</div></div>
+  </div>
+</div>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">reparer(quantite)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>quantite > 0</code> ; <code>sante &lt; santeMax</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>sante == min(santeMax, sante_avant + quantite)</code>.</div></div>
+  </div>
+</div>
+
+<!-- EventListener -->
+<h3 id="eventlistener"><span class="type-badge type-interface">interface</span> EventListener</h3>
+
+<div class="method-card">
+  <div class="method-header"><span class="method-name">onEvent(evenement)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>evenement != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">L'événement est traité ; les effets dépendent du type concret de <code>evenement</code> et du composant abonné.</div></div>
+  </div>
+</div>
+
+<!-- ═══ ENUMS ═══ -->
+<h2 id="enums"><span class="section-num">2</span> Énumérations</h2>
+
+<h3 id="role"><span class="type-badge type-enum">enum</span> Role</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getPole()</span><span class="method-return">→ String</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne le <code>String</code> non-null identifiant le pôle fonctionnel du rôle. État de l'enum non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="etatouvrier"><span class="type-badge type-enum">enum</span> EtatOuvrier</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getMultiplicateur()</span><span class="method-return">→ float</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>float > 0</code> : <code>NORMAL</code>→1.0, <code>FATIGUE</code>→0.8, <code>STRESSE</code>→0.9, <code>MOTIVE</code>→1.2. État non modifié.</div></div>
+  </div>
+</div>
+
+<!-- ═══ CLASSES PRINCIPALES ═══ -->
+<h2 id="classes-principales"><span class="section-num">3</span> Classes principales</h2>
+
+<h3 id="joueur"><span class="type-badge type-class">classe</span> Joueur</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">creerJoueur()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text">Aucune instance <code>Joueur</code> active dans la partie en cours.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Joueur initialisé : position de départ valide, orientation par défaut, stocks et listes vides.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">deplacer(x, y)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>Carte.estDansLimites(x, y) == true</code> ; case accessible.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>this.x == x</code> et <code>this.y == y</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">deplacer(direction)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>direction != null</code> ; case adjacente accessible.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Coordonnées avancées d'une unité dans <code>direction</code> ; <code>this.orientation == direction</code>.</div></div>
+  </div>
+</div>
+
+<h3 id="ouvrier"><span class="type-badge type-class">classe</span> Ouvrier</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">gagnerExp(gain)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>gain > 0</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>experience == experience_avant + gain</code> ; <code>evoluer()</code> peut être déclenché si le seuil est atteint.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getNiveau()</span><span class="method-return">→ int</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>int</code> ∈ [1, 5] représentant le palier de progression. État non modifié.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">evoluer()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>experience ≥ seuilNiveauSuivant</code> ; rang supérieur accessible pour ce <code>role</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>role</code> mis à jour vers le palier supérieur ; <code>experience</code> inchangée.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">affecterPoste(batiment)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>batiment != null</code> ; <code>batiment.isOperationnel() == true</code> ; <code>this.disponibilite == true</code> ; place disponible dans le bâtiment.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>batiment.personnelAffecte</code> contient <code>this</code> ; <code>this.disponibilite == false</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">mettreAJourBesoins()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>faim</code>, <code>soif</code>, <code>repos</code>, <code>moral</code> décrémentés ; <code>etat</code> dégradé si un besoin atteint 0.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getProductivite()</span><span class="method-return">→ float</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>float > 0</code> = <code>expNormalisee × etat.getMultiplicateur()</code>. État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="jeu"><span class="type-badge type-class">classe</span> Jeu</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">main(args)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text">Environnement Java disponible ; aucune instance <code>Jeu</code> active.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Instance <code>Jeu</code> créée ; boucle de jeu démarrée.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">processTick()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text">Partie en cours.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>mettreAJourProduction()</code>, <code>consommerBesoinsVitaux()</code> et vérification des événements exécutés ; <code>temps</code> avancé d'un tick.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">mettreAJourProduction()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>batiments</code> initialisée.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>produire()</code> ou <code>extraire()</code> appelé sur chaque bâtiment opérationnel avec ressources et personnel suffisants.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">consommerBesoinsVitaux()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvriers</code> initialisée.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>mettreAJourBesoins()</code> appelé sur chaque ouvrier.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">recupererCommande()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Prochaine commande utilisateur lue et placée en file d'attente.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">traiterCommande()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text">Une commande disponible en file.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Commande exécutée ; effets appliqués au jeu ; commande retirée de la file.</div></div>
+  </div>
+</div>
+
+<h3 id="carte"><span class="type-badge type-class">classe</span> Carte</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getTile(x, y)</span><span class="method-return">→ Case</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>estDansLimites(x, y) == true</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>Case</code> avec <code>Case != null</code> en <code>(x, y)</code>. Carte non modifiée.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">estDansLimites(x, y)</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> ssi <code>0 ≤ x &lt; largeur</code> et <code>0 ≤ y &lt; hauteur</code>. Carte non modifiée.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getVoisins(x, y)</span><span class="method-return">→ List&lt;Case&gt;</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>estDansLimites(x, y) == true</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne liste 2–4 <code>Case</code> adjacentes dans les limites (On ne regarde pas les diagonales). Carte non modifiée.</div></div>
+  </div>
+</div>
+
+<h3 id="case"><span class="type-badge type-class">classe</span> Case</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">ajouter(item)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>item != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>contenu</code> contient <code>item</code> ; taille += 1.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">supprimer(item)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>item != null</code> ; <code>item</code> dans <code>contenu</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>item</code> absent de <code>contenu</code> ; taille -= 1.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">estOccupee()</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> si <code>contenu.size() > 0</code>, <code>false</code> sinon. État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="temps"><span class="type-badge type-class">classe</span> Temps</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">augmenterHeure()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>heure == (heure_avant + 1) % 24</code> ; si <code>heure == 0</code>, <code>augmenterJour()</code> appelé.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">augmenterJour()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>jour</code> passe au <code>DayOfWeek</code> suivant dans le cycle hebdomadaire.</div></div>
+  </div>
+</div>
+
+<h3 id="age"><span class="type-badge type-class">classe</span> Age</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">niveauSuivant()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>nomAge != NomAge.AGE_SPATIAL</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>niveau == niveau_avant + 1</code> ; <code>nomAge</code> passe à l'entrée enum suivante.</div></div>
+  </div>
+</div>
+
+<h3 id="ressource"><span class="type-badge type-class">classe</span> Ressource</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">ajouter(quantite)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>quantite > 0</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>this.quantite == quantite_avant + quantite</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">retirer(quantite)</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>quantite > 0</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Si stock suffisant : <code>this.quantite == quantite_avant - quantite</code>, retourne <code>true</code>. Sinon : inchangé, retourne <code>false</code>.</div></div>
+  </div>
+</div>
+
+<!-- ═══ BATIMENTS ═══ -->
+<h2 id="batiments"><span class="section-num">4</span> Bâtiments</h2>
+
+<h3 id="usine"><span class="type-badge type-class">classe</span> Usine</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">produire()</span><span class="method-return">→ Ressource <span class="throws-tag">throws RessourceInsuffisanteException</span></span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>peutProduire() == true</code> ; <code>isOperationnel() == true</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Ressources d'entrée consommées du stock ; retourne une <code>Ressource</code> de type <code>production</code>. Lève <code>RessourceInsuffisanteException</code> si stock insuffisant.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">peutProduire()</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> si opérationnel et stocks suffisants. État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="liederessource"><span class="type-badge type-class">classe</span> LieuDeRessource</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">extraire()</span><span class="method-return">→ Ressource</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>estEpuise() == false</code> ; <code>isOperationnel() == true</code> ; au moins un ouvrier affecté.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>gisementRestant -= tauxExtraction</code> ; retourne <code>Ressource(typeExtrait, tauxExtraction)</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">estEpuise()</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> si <code>gisementRestant ≤ 0</code>. État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="maison"><span class="type-badge type-class">classe</span> Maison</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">ajouterOccupant(ouvrier)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvrier != null</code> ; <code>estPleine() == false</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>occupants</code> contient <code>ouvrier</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">retirerOccupant(ouvrier)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvrier != null</code> ; <code>ouvrier</code> dans <code>occupants</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>ouvrier</code> absent de <code>occupants</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">estPleine()</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> si <code>occupants.size() ≥ capacite</code>.</div></div>
+  </div>
+</div>
+
+<h3 id="hopital"><span class="type-badge type-class">classe</span> Hopital</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">soigner(ouvrier)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvrier != null</code> ; <code>isOperationnel() == true</code> ; <code>patients.size() &lt; capaciteSoin</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>ouvrier</code> dans <code>patients</code> ; besoins restaurés progressivement.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">boosterMoral(ouvrier)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvrier != null</code> ; <code>isOperationnel() == true</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>ouvrier.moral > ouvrier.moral_avant</code> ; <code>etat</code> peut être amélioré.</div></div>
+  </div>
+</div>
+
+<h3 id="ecole"><span class="type-badge type-class">classe</span> Ecole</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">former(ouvrier)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>ouvrier != null</code> ; <code>isOperationnel() == true</code> ; <code>eleves.size() &lt; capaciteFormation</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>ouvrier</code> dans <code>eleves</code> ; après formation : <code>gagnerExp()</code> ou <code>evoluer()</code> déclenché.</div></div>
+  </div>
+</div>
+
+<h3 id="entrepot"><span class="type-badge type-class">classe</span> Entrepot</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">stocker(typeRessource, quantite)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>quantite > 0</code> ; <code>getStockTotal() + quantite ≤ capaciteMax</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>stock[typeRessource] += quantite</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">retirer(typeRessource, quantite)</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>quantite > 0</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Si suffisant : <code>stock[typeRessource] -= quantite</code>, retourne <code>true</code>. Sinon inchangé, retourne <code>false</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getStockTotal()</span><span class="method-return">→ int</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne la somme de toutes les quantités en stock. État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="stationpompage"><span class="type-badge type-class">classe</span> StationPompage</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">pomper()</span><span class="method-return">→ Ressource</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>isOperationnel() == true</code> ; source d'eau accessible.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>Ressource(EAU_POTABLE, debitPompage)</code>.</div></div>
+  </div>
+</div>
+
+<h3 id="serre"><span class="type-badge type-class">classe</span> Serre</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">cultiver()</span><span class="method-return">→ Ressource</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>isOperationnel() == true</code> ; au moins un <code>FERMIER</code> affecté.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>Ressource(NOURRITURE, rendement)</code>.</div></div>
+  </div>
+</div>
+
+<h3 id="centrale"><span class="type-badge type-class">classe</span> Centrale</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">produireElectricite()</span><span class="method-return">→ Ressource</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>isOperationnel() == true</code> ; combustible disponible si non-renouvelable.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>Ressource(ELECTRICITE, puissance)</code>.</div></div>
+  </div>
+</div>
+
+<h3 id="centrerecherche"><span class="type-badge type-class">classe</span> CentreRecherche</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">produireSciences()</span><span class="method-return">→ int</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>isOperationnel() == true</code> ; <code>arbre != null</code> ; au moins un <code>SCIENTIFIQUE</code> ou <code>INGENIEUR</code> affecté.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>int > 0</code> proportionnel à la productivité cumulée du personnel.</div></div>
+  </div>
+</div>
+
+<h3 id="centrelancement"><span class="type-badge type-class">classe</span> CentreLancement</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">assemblerModule(moduleFusee)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>moduleFusee != null</code> ; <code>isOperationnel() == true</code> ; ressources disponibles ; personnel qualifié affecté.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Le champ de la fusée correspondant (<code>etatPropulseur</code> / <code>etatChargeUtile</code> / <code>etatCommande</code>) progresse vers <code>1.0</code>.</div></div>
+  </div>
+</div>
+
+<!-- ═══ TECHNOLOGIE ═══ -->
+<h2 id="technologie-sec"><span class="section-num">5</span> Technologie</h2>
+
+<h3 id="arbretechnologique"><span class="type-badge type-class">classe</span> ArbreTechnologique</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">lancerRecherche(nom)</span><span class="method-return">→ void <span class="throws-tag">throws RechercheImpossibleException</span></span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>nom != null</code> ; présent dans <code>catalogue</code> ; <code>estDisponible() == true</code> ; <code>rechercheActive == null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>rechercheActive == catalogue.get(nom)</code> ; <code>progressionActuelle == 0</code>. Lève <code>RechercheImpossibleException</code> si prérequis non satisfaits.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">ajouterProgression(points)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>points > 0</code> ; <code>rechercheActive != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>progressionActuelle += points</code> ; si seuil atteint : <code>debloquer()</code> appelé, <code>rechercheActive == null</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getRechercheActive()</span><span class="method-return">→ Technologie</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>rechercheActive</code> (peut être <code>null</code>). État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="technologie"><span class="type-badge type-class">classe</span> Technologie</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">estDisponible()</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> ssi tous les <code>prerequis</code> ont <code>debloquee == true</code> (ou liste vide).</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">debloquer()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>estDisponible() == true</code> ; <code>debloquee == false</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>debloquee == true</code>.</div></div>
+  </div>
+</div>
+
+<!-- ═══ FUSEE ═══ -->
+<h2 id="fusee-sec"><span class="section-num">6</span> Fusée</h2>
+
+<h3 id="fusee"><span class="type-badge type-class">classe</span> Fusee</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">calculerProbabiliteSucces()</span><span class="method-return">→ float</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>float</code> ∈ [0.0, 1.0] issu des trois états de module et de la productivité des ingénieurs. Fusée non modifiée.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">lancer()</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Si probabilité <code>≥ 1.0</code> : retourne <code>true</code> (victoire). Sinon : retourne <code>false</code>, ressources perdues partiellement ou totalement.</div></div>
+  </div>
+</div>
+
+<!-- ═══ EVENEMENTS ═══ -->
+<h2 id="evenements"><span class="section-num">7</span> Événements</h2>
+
+<h3 id="eventbus"><span class="type-badge type-class">classe</span> EventBus</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">sEnregistrer(canal, eventListener)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>canal != null</code> ; <code>eventListener != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>abonnes[canal]</code> contient <code>eventListener</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">seDesinscrire(canal, eventListener)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>canal != null</code> ; <code>eventListener</code> dans <code>abonnes[canal]</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>eventListener</code> absent de <code>abonnes[canal]</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">publier(canal, evenement)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>canal != null</code> ; <code>evenement != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text"><code>onEvent(evenement)</code> appelé sur chaque abonné du canal.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">possedeAbonne(canal)</span><span class="method-return">→ boolean</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>canal != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>true</code> si <code>abonnes[canal]</code> non vide. État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="evenement"><span class="type-badge type-abstract">abstrait</span> Evenement</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getTimestamp()</span><span class="method-return">→ int</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>int timestamp</code> (tick de création). État non modifié.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">getDescription()</span><span class="method-return">→ String</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne <code>String</code> non-null décrivant l'événement. État non modifié.</div></div>
+  </div>
+</div>
+
+<h3 id="generateuraleatoire"><span class="type-badge type-class">classe</span> GenerateurAleatoire</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">genererGisement(carte, typeRessource)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>carte != null</code> ; <code>typeRessource != null</code> ; au moins une case libre.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Un <code>LieuDeRessource</code> du type donné est créé et ajouté à une case pseudo-aléatoire de <code>carte</code>.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">tirageEvenement(difficulte)</span><span class="method-return">→ Evenement</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>difficulte != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Retourne un <code>Evenement</code> non-null pondéré selon la difficulté.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">ajusterSeuilCritique(multiplicateur)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>multiplicateur > 0</code> ; mode <code>DIFFICILE</code> actif.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Seuil de rareté multiplié par <code>multiplicateur</code> pour les prochains tirages.</div></div>
+  </div>
+</div>
+
+<!-- ═══ AFFICHAGE ═══ -->
+<h2 id="affichage-sec"><span class="section-num">8</span> Affichage</h2>
+
+<h3 id="affichage"><span class="type-badge type-class">classe</span> Affichage</h3>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">afficherCarte()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>carte != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Représentation visuelle complète de la carte mise à jour dans l'UI.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">afficherCase(caseAffichee)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>caseAffichee != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Contenu de la case rendu à l'écran.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">afficherTableauDeBord()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>jeu != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Tableau de bord mis à jour avec l'état courant de chaque ouvrier.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">afficherFusee(fusee)</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><code>fusee != null</code>.</div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">États des trois modules affichés dans l'interface centre de lancement.</div></div>
+  </div>
+</div>
+<div class="method-card">
+  <div class="method-header"><span class="method-name">rafraichir()</span><span class="method-return">→ void</span></div>
+  <div class="method-body">
+    <div class="contract-block"><div class="contract-label pre-label">Précondition</div><div class="contract-text"><span class="none-tag">Aucune.</span></div></div>
+    <div class="contract-block"><div class="contract-label post-label">Postcondition</div><div class="contract-text">Tous les composants actifs de l'UI rappelés ; interface reflète l'état courant du jeu.</div></div>
+  </div>
+</div>
+
+<!-- ═══ EXCEPTIONS ═══ -->
+<h2 id="exceptions"><span class="section-num">9</span> Exceptions</h2>
+
+<table class="exception-table">
+  <thead>
+    <tr><th>Classe</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>RessourceInsuffisanteException</td>
+      <td>Levée par <code>Usine.produire()</code> lorsque <code>stock</code> ne contient pas les quantités requises pour une production complète. Hérite de <code>Exception</code>.</td>
+    </tr>
+    <tr>
+      <td>RechercheImpossibleException</td>
+      <td>Levée par <code>ArbreTechnologique.lancerRecherche()</code> lorsque au moins un prérequis de la technologie ciblée n'est pas encore débloqué. Hérite de <code>Exception</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+</main>
+</div>
+
+<script>
+// Active nav link on scroll
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+}, { passive: true });
+function checkInput() {
+    var query = document.getElementById('search').value;
+    window.find(query);
+    return true;
+}
+</script>
+</body>
+</html>
