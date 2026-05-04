@@ -1,19 +1,22 @@
-package Code;
+package code;
 
 public interface Batiment extends Item {
-    
-    // Retourne true si la santé est > 0[cite: 1, 2]
+
+    // État du bâtiment (utile pour faire évoluer certains batiments)
     boolean isOperationnel();
-
-    // Ajoute un ouvrier au personnel si de la place est disponible[cite: 1, 2]
+    int getNiveau();
+    void ameliorer();
+    
+    // Gestion du Personnel
     void affecterPersonnel(Ouvrier ouvrier);
-
-    // Retire un ouvrier et le rend disponible[cite: 1, 2]
     void retirerPersonnel(Ouvrier ouvrier);
+    boolean aDeLaPlace(); // Utile pour savoir si on peut affecter un ouvrier
 
-    // Réduit la santé du bâtiment[cite: 1]
-    void subirDegats(int quantite);
+    // Gestion de l'Énergie
+    int getConsommationEnergie();
+    int getProductionEnergie();
 
-    // Augmente la santé sans dépasser le maximum[cite: 1]
-    void reparer(int quantite);
+    // Logique de temps
+    void mettreAJour(Stock stock, int tempsEcoule);
+
 }
