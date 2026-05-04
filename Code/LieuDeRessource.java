@@ -43,8 +43,7 @@ public class LieuDeRessource implements Batiment {
     @Override public int getNiveau() { return niveau; }
     @Override public void ameliorer() { this.niveau++; }
 
-    // Un gisement ne consomme généralement pas d'énergie au début, 
-    // mais cela pourrait changer à l'Âge Industriel (Pompage profond).
+    // Un gisement ne consomme généralement pas d'énergie au début, mais ptetre que oui si c'est profond
     @Override public int getConsommationEnergie() { return 0; }
     @Override public int getProductionEnergie() { return 0; }
 
@@ -54,7 +53,7 @@ public class LieuDeRessource implements Batiment {
 
     @Override
     public void mettreAJour(Stock stock, int tempsEcoule) {
-        // Optionnel : On pourrait automatiser l'extraction ici si un ouvrier est présent
+        // OFaudrait optimiser le truc si l'ouvrier est présent dedans
     }
 
     @Override

@@ -41,24 +41,17 @@ public class Usine implements Batiment {
     @Override
     public void mettreAJour(Stock stock, int tempsEcoule) {
         if (!isOperationnel() || produitActuel == null) return;
-
-        // 1. Calculer l'efficacité cumulée du personnel
         double efficaciteTotale = 0;
         for (Ouvrier o : personnel) {
             efficaciteTotale += o.getEfficacite();
         }
-
-        // 2. Calculer la progression : (temps / temps_total) * efficacité * 100
         double progressionPoints = ((double) tempsEcoule / TEMPS_BASE_SEC) * efficaciteTotale * 100;
         progresProduction += progressionPoints;
-
-        // 3. Finaliser si on atteint 100%
         if (progresProduction >= 100) {
             try {
                 produire(produitActuel, 1, stock);
                 progresProduction = 0; // Réinitialise pour l'objet suivant
             } catch (RessourceInsuffisanteException e) {
-                // En cas de manque de ressources, on bloque la production à 99%
                 progresProduction = 99.9;
                 System.err.println("[Usine " + nom + "] Production bloquée : " + e.getMessage());
             }
@@ -67,8 +60,6 @@ public class Usine implements Batiment {
 
     public void produire(TypeRessource type, int quantite, Stock stock) throws RessourceInsuffisanteException {
         if (!isOperationnel()) throw new RessourceInsuffisanteException("Usine non opérationnelle.");
-        
-        // On consomme la recette atomiquement
         stock.consommerRecette(recetteActuelle);
         try {
             stock.ajouter(type, quantite);
@@ -78,18 +69,63 @@ public class Usine implements Batiment {
         }
     }
 
-    @Override public boolean isOperationnel() { return !personnel.isEmpty(); }
-    @Override public boolean aDeLaPlace() { return personnel.size() < CAPACITE_MAX; }
-    @Override public void affecterPersonnel(Ouvrier o) { if (aDeLaPlace()) personnel.add(o); }
-    @Override public void retirerPersonnel(Ouvrier o) { personnel.remove(o); }
-    @Override public int getNiveau() { return niveau; }
-    @Override public void ameliorer() { this.niveau++; }
-    @Override public int getConsommationEnergie() { return 10 * niveau; }
-    @Override public int getProductionEnergie() { return 0; }
-    @Override public int getX() { return x; }
-    @Override public int getY() { return y; }
-    @Override public void deplacer(int x, int y) { this.x = x; this.y = y; }
-    @Override public double distance(Item autre) { 
+    @Override 
+    public boolean isOperationnel() { 
+        return !personnel.isEmpty(); 
+    }
+
+    @Override 
+    public boolean aDeLaPlace() { 
+        return personnel.size() < CAPACITE_MAX; 
+    }
+
+    @Override 
+    public void affecterPersonnel(Ouvrier o) { 
+        if (aDeLaPlace()) personnel.add(o); 
+    }
+
+    @Override 
+    public void retirerPersonnel(Ouvrier o) { 
+        personnel.remove(o);
+    }
+
+    @Override 
+    public int getNiveau() {
+        return niveau; 
+    }
+
+    @Override 
+    public void ameliorer() {
+        this.niveau++; 
+    }
+
+    @Override 
+    public int getConsommationEnergie() { 
+        return 10 * niveau; // par contre ça consomme
+    }
+    
+    @Override 
+    public int getProductionEnergie() {
+        return 0; // normalement ça produit pas d'énergie
+    }
+    
+    @Override 
+    public int getX() {
+        return x; 
+    }
+    
+    @Override 
+    public int getY() {
+        return y; 
+    }
+    
+    @Override 
+    public void deplacer(int x, int y) {
+        this.x = x; this.y = y;
+    }
+    
+    @Override 
+    public double distance(Item autre) { 
         return Math.sqrt(Math.pow(autre.getX() - x, 2) + Math.pow(autre.getY() - y, 2)); 
     }
 }

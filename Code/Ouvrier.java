@@ -108,4 +108,9 @@ public class Ouvrier implements Item {
     // Getters pour le debug dans TestUsine
     public String getNom() { return nom; }
     public String getEtat() { return etat; }
+
+    public void setEtat(String nouvelEtat) {
+        this.etat = nouvelEtat;
+    }
+
 }
