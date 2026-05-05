@@ -1,0 +1,32 @@
+# Build output
+out/
+build/
+target/
+
+# JavaFX SDK (à télécharger localement, trop volumineux pour Git)
+rsrc/javafx-sdk-*/
+
+# Fichiers compilés Java
+*.class
+*.jar
+*.war
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.project
+.classpath
+.settings/
+nbproject/
+*.swp
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Linux
+*~
