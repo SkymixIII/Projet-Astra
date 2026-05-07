@@ -9,7 +9,7 @@ public class Carte {
     // Attributs privés selon le diagramme UML
     private Case[][][] matrice;
     private int largeur;
-    private int longueur
+    private int longueur;
     private int hauteur;
 
     /**
@@ -60,7 +60,7 @@ public class Carte {
         List<Case> voisins = new ArrayList<>();
 
         // Coordonnées des voisins potentiels (Nord, Sud, Est, Ouest, Au-dessus, En-dessous)
-        int [] directions = {{0, 1, 0}, {0, -1, 0}, {1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}};
+        int [] [] directions = {{0, 1, 0}, {0, -1, 0}, {1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}};
 
         for (int[] dir : directions) {
             int nx = x + dir[0];
