@@ -1,0 +1,34 @@
+package code;
+
+public enum TypeRessource {
+
+    // Ressources primaires (légères)
+    FER(1),
+    SILICIUM(1),
+    BOIS(1),
+    PIERRE(1),
+    EAU(2),
+    NOURRITURE(2),
+    PETROLE(3),
+
+    // Ressources transformées (plus lourdes)
+    ACIER(4),
+    KÉROSENE(5),
+    PLASTIQUE(2),
+    CARTE_MERE(3),
+    PROCESSEUR_VOL(4),
+    ALLIAGE_THERMIQUE(6),
+    ENERGIE(0); // immatérielle, ne prend pas de place
+
+    // ------------------------------------------------ //
+     /** @param poids unités de volume occupées par 1 exemplaire. */
+    private final int poids; 
+
+    TypeRessource(int poids) {
+        this.poids = poids;
+    }
+
+    public int getPoids() {
+        return poids;
+    }
+}
