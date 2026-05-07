@@ -19,6 +19,54 @@ public class Jeu {
     public static void main(String[] args) {
         Jeu projetAstra = new Jeu();
         // Initialisation de l'affichage et du monde ici
+        Carte carte = new Carte(100, 100, 5); // on a pas discuter de la taille de la map donc je suis parti avec ça dans le doute avec la hauteur qui permet de différencier les types de ressources
+        // --- Spawn joueur : débris de la fusée au centre à coté plus tard mais ce lieu n'est toujours pas coder
+        carte.getTile(50, 50, 0).ajouter(new Joueur());
+        // Pour les nombres de points de ressources j'ai essayé de me baser sur la carte
+        //ça pourrait ressembler à ça
+        // --- Forêts en plaine (z=0) ---
+        carte.getTile(35, 45, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(40, 50, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(45, 55, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(55, 45, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(60, 50, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(50, 60, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(42, 42, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(58, 58, 0).ajouter(new Gisement(TypeRessource.BOIS));
+
+        // --- Fer x7 : en montagne au nord-ouest (z=2) ---
+        carte.getTile(15, 20, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(18, 22, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(20, 18, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(12, 25, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(22, 15, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(25, 20, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(17, 28, 2).ajouter(new Gisement(TypeRessource.FER));
+
+        // --- Silicium x3 : en montagne au nord-ouest (z=2) ---
+        carte.getTile(25, 22, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
+        carte.getTile(15, 28, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
+        carte.getTile(16, 28, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
+
+        // --- Minerai x5 : en colline (z=1) ---
+        carte.getTile(30, 35, 1).ajouter(new Gisement(TypeRessource.PIERRE));
+        carte.getTile(33, 38, 1).ajouter(new Gisement(TypeRessource.PIERRE));
+        carte.getTile(28, 40, 1).ajouter(new Gisement(TypeRessource.PIERRE));
+        carte.getTile(35, 32, 1).ajouter(new Gisement(TypeRessource.PIERRE));
+        carte.getTile(38, 42, 1).ajouter(new Gisement(TypeRessource.PIERRE));
+
+        // --- Pétrole x6 : enfoui en plaine (z=0, creuser requis) ---
+        carte.getTile(60, 40, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+        carte.getTile(65, 45, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+        carte.getTile(62, 50, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+        carte.getTile(70, 42, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+        carte.getTile(68, 55, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+        carte.getTile(72, 48, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+
+        // --- Glace x2 : sur les pics au nord (z=4) ---
+        carte.getTile(20, 10, 4).ajouter(new Gisement(TypeRessource.GLACE));
+        carte.getTile(25, 12, 4).ajouter(new Gisement(TypeRessource.GLACE));
+        
         System.out.println("Lancement du projet Astra...");
     }
 
