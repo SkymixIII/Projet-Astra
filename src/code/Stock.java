@@ -18,10 +18,10 @@ public class Stock {
     // ------------------------------------------------------------------ //
 
     /** @param CAP_PAR_TYPE_FACILE Capacité max par type en mode FACILE (peut être surchargée au run-time). */
-    private static final int CAP_PAR_TYPE_FACILE = 10_000;
+    private static final int CAP_PAR_TYPE_FACILE = 1000;
 
     /** @param CAP_GLOBALE_DIFFICILE Capacité globale en mode DIFFICILE (toutes ressources confondues). */
-    private static final int CAP_GLOBALE_DIFFICILE = 1_000_000;
+    private static final int CAP_GLOBALE_DIFFICILE = 100_000;
 
     // ------------------------------------------------------------------ //
     //  Attributs                                                          //

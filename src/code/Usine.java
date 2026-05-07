@@ -100,7 +100,7 @@ public class Usine implements Batiment {
     }
 
     @Override 
-    public int getConsommationEnergie() { 
+    public int getConsommationEnergie() {
         return 10 * niveau; // par contre ça consomme
     }
     

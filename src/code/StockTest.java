@@ -260,18 +260,18 @@ public class StockTest {
 
     @Test(expected = StockException.class)
     public void modeDifficile_depasserCapaciteGlobale_leveException() throws Exception {
-        stockDifficile.ajouter(TypeRessource.FER, 999_990);
+        stockDifficile.ajouter(TypeRessource.FER, 99_990);
         stockDifficile.ajouter(TypeRessource.ALLIAGE_THERMIQUE, 2);
     }
 
     @Test
     public void modeDifficile_exactementCapaciteMax_autorise() throws Exception {
-        stockDifficile.ajouter(TypeRessource.FER, 1_000_000);
+        stockDifficile.ajouter(TypeRessource.FER, 100_000);
     }
 
     @Test
     public void modeDifficile_apresRetrait_peutAjouterANouveau() throws Exception {
-        stockDifficile.ajouter(TypeRessource.FER, 1_000_000);
+        stockDifficile.ajouter(TypeRessource.FER, 100_000);
         stockDifficile.retirer(TypeRessource.FER, 100);
         stockDifficile.ajouter(TypeRessource.FER, 100);
     }
@@ -283,13 +283,13 @@ public class StockTest {
 
     @Test(expected = StockException.class)
     public void modeFacile_depasserLimiteParType_leveException() throws Exception {
-        stockFacile.ajouter(TypeRessource.FER, 9_999);
+        stockFacile.ajouter(TypeRessource.FER, 999);
         stockFacile.ajouter(TypeRessource.FER, 2);
     }
 
     @Test
     public void modeFacile_autreTypeNonBloque() throws Exception {
-        stockFacile.ajouter(TypeRessource.FER, 10_000);
-        stockFacile.ajouter(TypeRessource.ACIER, 500);
+        stockFacile.ajouter(TypeRessource.FER, 1_000);
+        stockFacile.ajouter(TypeRessource.ACIER, 250);
     }
 }
