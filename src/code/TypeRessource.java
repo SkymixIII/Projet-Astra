@@ -8,10 +8,15 @@ public enum TypeRessource {
     BOIS(1),
     PIERRE(1),
     EAU(2),
+    EAU_POTABLE(2),
+    GRAINE(1),
+    NOURRITURE_BRUTE(2),
     NOURRITURE(2),
     PETROLE(3),
 
     // Ressources transformées (plus lourdes)
+    PIOCHE_PIERRE(5),
+    HACHE_PIERRE(5),
     ACIER(4),
     KÉROSENE(5),
     PLASTIQUE(2),
