@@ -56,10 +56,6 @@ concernée.
     - TestModuleFusee.java
 
 
-- package interface_graphique :
-    - Main.java
-
-
 - package jeu :
     - Difficulte.java
     - Jeu.java
