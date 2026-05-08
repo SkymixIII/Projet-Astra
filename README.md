@@ -17,7 +17,7 @@
 Le SDK JavaFX est volumineux (~50 Mo) et **dépend de l'OS**, donc il n'est **pas versionné** dans le dépôt (voir `.gitignore`). Chacun doit le télécharger localement :
 
 1. Aller sur https://gluonhq.com/products/javafx/
-2. Télécharger la version **21.0.5 SDK** correspondant à votre système :
+2. Télécharger la version **21.0.x* SDK** correspondant à votre système :
    - macOS Apple Silicon (M1/M2/M3) : `osx-aarch64`
    - macOS Intel : `osx-x64`
    - Windows : `windows-x64`
@@ -27,7 +27,7 @@ Le SDK JavaFX est volumineux (~50 Mo) et **dépend de l'OS**, donc il n'est **pa
    ```
    Projet-Astra/
    └── rsrc/
-       └── javafx-sdk-21.0.5/
+       └── javafx-sdk-21.0.x/
            └── lib/
    ```
 

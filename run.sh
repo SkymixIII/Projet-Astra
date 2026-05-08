@@ -3,7 +3,7 @@ set -e
 
 cd "$(dirname "$0")"
 
-JFX_LIB="rsrc/javafx-sdk-21.0.5/lib"
+JFX_LIB=$(echo rsrc/javafx-sdk-21.0.*/lib | awk '{print $1}')
 MODULES="javafx.controls"
 OUT="out"
 
