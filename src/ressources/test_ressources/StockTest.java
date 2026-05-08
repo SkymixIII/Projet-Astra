@@ -1,4 +1,4 @@
-package test_ressources;
+package ressources.test_ressources;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +7,8 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+
+import ressources.*;
 
 public class StockTest {
 
