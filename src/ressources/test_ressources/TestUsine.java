@@ -1,4 +1,4 @@
-package code;
+package test_ressources;
 
 import org.junit.Test;
 import org.junit.Before;

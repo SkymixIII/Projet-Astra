@@ -1,4 +1,4 @@
-package code;
+package ressources;
 
 public interface Batiment extends Item {
 

@@ -1,4 +1,4 @@
-package code;
+package test_ressources;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
