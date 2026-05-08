@@ -1,4 +1,4 @@
-package test_ressources;
+package batiments.test_batiments;
 
 import org.junit.Test;
 import org.junit.Before;
