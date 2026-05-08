@@ -81,6 +81,14 @@ public class RegistreRecettes {
                 e.put(TypeRessource.FER, 1);
                 return new Usine(nom, x, y, TypeRessource.CARTE_MERE, e);
             }
+
+            case "USINE_ELECTRONIQUE_CABLAGE": {
+                Map<TypeRessource, Integer> e = new EnumMap<>(TypeRessource.class);
+                e.put(TypeRessource.SILICIUM, 2);
+                e.put(TypeRessource.PLASTIQUE, 1);
+                return new Usine(nom, x, y, TypeRessource.CABLAGE, e);
+            }
+
             case "USINE_ELECTRONIQUE_PROCESSEUR": {
                 Map<TypeRessource, Integer> e = new EnumMap<>(TypeRessource.class);
                 e.put(TypeRessource.CARTE_MERE, 2);
