@@ -20,6 +20,7 @@ public enum TypeRessource {
     ACIER(4),
     KÉROSENE(5),
     PLASTIQUE(2),
+    CABLAGE(3),
     CARTE_MERE(3),
     PROCESSEUR_VOL(4),
     ALLIAGE_THERMIQUE(6),
