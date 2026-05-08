@@ -14,20 +14,33 @@ public class Jeu {
     private Age age;
 
     /**
+     * Constructeur de la classe.
+     */
+    public Jeu() {
+        this.joueur = new Joueur();
+        this.bus    = new Eventbus();
+        this.fusee  = new Fusee();
+        this.temps  = new Temps();
+        this.age    = new Age();
+        // this.carte est initialisé dans creationMonde()
+    }
+
+
+    /**
      * Point d'entrée principal du simulateur
      */
     public static void main(String[] args) {
         Jeu projetAstra = new Jeu();
         // Initialisation de l'affichage et du monde ici
-        Creation_monde();
+        projetAstra.creationMonde();
         System.out.println("Lancement du projet Astra...");
     }
 
     /**
      * Méthode pour créer la map
      */
-    public void creation_monde() {
-        Carte carte = new Carte(100, 100, 5);
+    public void creationMonde() {
+        this.carte = new Carte(100, 100, 5);
     
         // --- Spawn joueur ---
         carte.getTile(50, 50, 0).ajouter(new Joueur());
