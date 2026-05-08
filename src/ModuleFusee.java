@@ -2,6 +2,7 @@ import java.util.EnumMap;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import ressources.TypeRessource;
 
 /**
  * Modèle commun aux modules de la fusée (Propulseur, ChargeUtile, OrdiDeBord).

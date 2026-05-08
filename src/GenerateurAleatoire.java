@@ -1,4 +1,6 @@
 import java.util.Random;
+import ressources.TypeRessource;
+import ressources.LieuDeRessource;
 
 /**
  * Responsable de la génération procédurale des ressources sur la carte.

@@ -21,7 +21,7 @@ if errorlevel 1 (
 if not exist "%OUT%" mkdir "%OUT%"
 
 echo ==^> Compilation...
-javac --module-path "%JFX_LIB%" --add-modules %MODULES% -d "%OUT%" src\*.java
+javac --module-path "%JFX_LIB%" --add-modules %MODULES% -d "%OUT%" src\*.java src\ressources\*.java
 if errorlevel 1 exit /b 1
 
 echo ==^> Lancement...
