@@ -62,7 +62,6 @@ concernée.
 
 
 - package ressources:
-    
     - Recette.java
     - RegistreRecettes.java
     - Stock.java
@@ -70,3 +69,4 @@ concernée.
 
 - package ressources.test_ressources:
     - StockTest.java
+    - TestRegistreRecettes.java

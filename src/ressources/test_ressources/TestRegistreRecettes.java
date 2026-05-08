@@ -3,6 +3,9 @@ package code;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import batiments.Usine;
+import ressources.*;
+
 public class TestRegistreRecettes {
 
     @Test
