@@ -17,7 +17,7 @@ public class Joueur implements Item {
     /**
      * Constructeur pour initialiser un nouveau joueur avec les ressources de base
      */
-    public Joueur(int xInitial, yInitial) {
+    public Joueur(int xInitial, int yInitial) {
         this.x = xInitial;
         this.y = yInitial;
         this.z = 0;
@@ -70,10 +70,12 @@ public class Joueur implements Item {
     // --- Gestion des ressources ---
 
     public void ajouterRessource(TypeRessource type, int quantite) {
+        assert quantite > 0;
         this.ressources.put(type, this.ressources.get(type) + quantite);
     }
 
     public boolean consommerRessource(TypeRessource type, int quantite) throws RessourceInsuffisanteException {
+        assert quantite > 0;
         int stockActuel = this.ressources.get(type);
         if (stockActuel < quantite) {
             throw new RessourceInsuffisanteException("Manque de " + type + " (" + stockActuel + "/" + quantite + ")");
