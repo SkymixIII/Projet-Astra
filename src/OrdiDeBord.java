@@ -1,7 +1,7 @@
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
-
+import ressources.TypeRessource;
 /**
  * Module Ordinateur de Bord de la fusée.
  *

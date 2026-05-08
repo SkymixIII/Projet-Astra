@@ -1,6 +1,7 @@
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
+import ressources.TypeRessource;
 
 /**
  * Module Propulseur de la fusée.
