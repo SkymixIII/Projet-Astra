@@ -1,4 +1,4 @@
-package code;
+package ressources;
 
 import java.util.Collections;
 import java.util.EnumMap;

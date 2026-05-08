@@ -1,4 +1,4 @@
-package code;
+package ressources;
 
 /**
  * Représente un gisement de ressources (Mine, Forêt, Lac).
