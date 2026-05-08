@@ -1,5 +1,3 @@
-package code;
-
 /**
  * Exception levée lorsqu'une opération nécessite plus de ressources
  * que ce que le stock du joueur contient.

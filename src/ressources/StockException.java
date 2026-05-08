@@ -1,4 +1,4 @@
-package code;
+package ressources;
 
 /**
  * Exception levée quand une opération sur le stock est impossible.
