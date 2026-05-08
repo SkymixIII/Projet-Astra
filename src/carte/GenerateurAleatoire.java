@@ -2,7 +2,7 @@ package carte;
 
 import java.util.Random;
 import ressources.TypeRessource;
-import ressources.LieuDeRessource;
+import batiments.LieuDeRessource;
 import jeu.Difficulte;
 
 /**

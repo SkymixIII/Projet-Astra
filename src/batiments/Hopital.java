@@ -4,7 +4,7 @@ import java.util.Random;
 
 import entites.Ouvrier;
 import ressources.Stock;
-import ressources.Item;
+import carte.Item;
 
 /**
  * Gère le soin des ouvriers malades.
