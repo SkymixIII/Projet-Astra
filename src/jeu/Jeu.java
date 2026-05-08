@@ -3,9 +3,10 @@ package jeu;
 import java.util.List;
 
 import carte.Carte;
-import entites.Joueur;
+import entites.*;
 import fusee.Fusee;
 import ressources.*;
+import batiments.*;
 
 /**
  * Classe orchestratrice principale

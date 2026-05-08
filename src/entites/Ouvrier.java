@@ -1,6 +1,6 @@
 package entites;
 
-import batiment.Batiment;
+import batiments.Batiment;
 import carte.Item;
 import ressources.Stock;
 

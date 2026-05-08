@@ -1,5 +1,6 @@
 package fusee;
 
+import exceptions.LancementImpossibleException;
 /**
  * Fusée — condition de victoire du jeu Astra. Décolle si les 3 modules sont à
  * 100% et qu'un ingénieur est à bord.

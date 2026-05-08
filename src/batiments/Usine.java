@@ -7,7 +7,8 @@ import java.util.Map;
 import carte.Item;
 import entites.Ouvrier;
 import ressources.Stock;
-import exception.RessourceInsuffisanteException;
+import ressources.TypeRessource;
+import exceptions.RessourceInsuffisanteException;
 
 /**
  * Gère la transformation des ressources et le personnel associé.

@@ -9,6 +9,7 @@ import ressources.TypeRessource;
 import carte.Direction;
 import batiments.*;
 import exceptions.RessourceInsuffisanteException;
+import ressources.Item;
 
 /**
  * Représente l'entité contrôlée par l'utilisateur

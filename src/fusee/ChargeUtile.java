@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
 
-import entitesRole;
+import entites.Role;
 import ressources.TypeRessource;
 
 /**

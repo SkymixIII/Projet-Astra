@@ -3,6 +3,7 @@ package batiments;
 import fusee.Fusee;
 import entites.Ouvrier;
 import carte.Item;
+import ressources.Stock;
 
 /**
  * Bâtiment qui permet de lancer la fusée pour terminer le jeu.
