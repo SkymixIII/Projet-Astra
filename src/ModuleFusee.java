@@ -1,5 +1,3 @@
-package code;
-
 import java.util.EnumMap;
 import java.util.Collections;
 import java.util.List;

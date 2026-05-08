@@ -1,5 +1,3 @@
-package code;
-
 /**
  * Exception levée lorsqu'une tentative de lancement de la fusée échoue parce
  * que les conditions ne sont pas remplies.

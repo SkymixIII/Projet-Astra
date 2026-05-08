@@ -1,12 +1,10 @@
-package code;
-
 /**
  * Fusée — condition de victoire du jeu Astra. Décolle si les 3 modules sont à
  * 100% et qu'un ingénieur est à bord.
  *
  * @author Binôme 4 (Hadrien & Théo)
  */
-public class FuseeV3 {
+public class Fusee {
 
     /**
      * État d'assemblage de chaque module, entre 0.0f et 1.0f.
