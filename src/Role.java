@@ -8,20 +8,21 @@ public enum Role {
     BUCHERON,
     TECHNICIEN,
     INGENIEUR,
+    SCIENTIFIQUE;
     /*SOIGNANT,
-    SCIENTIFIQUE,
     FORMATEUR,
     TRANSPORTEUR,
     FERMIER,*///à décommenter pour la V2
 
     public String getPole() {
         return switch (this) {
+            case OUVRIER_NON_SPECIALISE -> "Général";
             case MINEUR, BUCHERON, MACON -> "Production brute";
             case TECHNICIEN, INGENIEUR  -> "Industriel";
+            case SCIENTIFIQUE -> "Recherche";
             /*case TRANSPORTEUR-> "Logistique";
             case FERMIER -> "Subsistance"
             case SOIGNANT -> "Sante/social"
-            case SCIENTIFIQUE -> "Recherche";
             case FORMATEUR -> "Education";*///à décommenter pour la V2
         };
     }
