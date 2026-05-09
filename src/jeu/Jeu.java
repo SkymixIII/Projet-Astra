@@ -3,6 +3,8 @@ package jeu;
 import java.util.List;
 
 import carte.Carte;
+import carte.TypeSol;
+import carte.Sol;
 import entites.*;
 import fusee.Fusee;
 import ressources.*;
@@ -55,7 +57,7 @@ public class Jeu {
      * Initialise tous les composants du jeu.
      */
     public Jeu() {
-        this.joueur = new Joueur();
+        this.joueur = new Joueur(50,50); // spawn initial au centre de la carte
         this.bus    = new Eventbus();
         this.fusee  = new Fusee();
         this.temps  = new Temps();
@@ -88,7 +90,7 @@ public class Jeu {
         this.carte = new Carte(100, 100, 5);
 
         // --- Spawn joueur ---
-        carte.getTile(50, 50, 0).ajouter(new Joueur());
+        carte.getTile(50, 50, 0).ajouter(this.joueur);
 
         // ============================================================
         // SOL z=0 : plaine partout avec île au sud-est
@@ -121,7 +123,7 @@ public class Jeu {
         // ============================================================
         for (int x = 22; x <= 45; x++) {
             for (int y = 28; y <= 48; y++) {
-                if (carte.getTile(x, y, 1).estVide()) {
+                if (!carte.getTile(x, y, 1).estOccupee()) {
                     carte.getTile(x, y, 1).ajouter(new Sol(TypeSol.ROCHE));
                 }
             }
@@ -132,7 +134,7 @@ public class Jeu {
         // ============================================================
         for (int x = 8; x <= 30; x++) {
             for (int y = 10; y <= 32; y++) {
-                if (carte.getTile(x, y, 2).estVide()) {
+                if (!carte.getTile(x, y, 2).estOccupee()) {
                     carte.getTile(x, y, 2).ajouter(new Sol(TypeSol.ROCHE_DURE));
                 }
             }
@@ -190,12 +192,12 @@ public class Jeu {
         carte.getTile(38, 42, 1).ajouter(new LieuDeRessource("Carrière 5", TypeRessource.PIERRE, 900, 38, 42));
 
         // --- Pétrole x6 : enfoui en plaine (z=0) ---
-        carte.getTile(60, 40, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(65, 45, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(62, 50, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(70, 42, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(68, 55, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(72, 48, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+        carte.getTile(60, 40, 0).ajouter(new LieuDeRessource("Gisement de pétrole 1", TypeRessource.PETROLE, 600, 60, 40));
+        carte.getTile(65, 45, 0).ajouter(new LieuDeRessource("Gisement de pétrole 2", TypeRessource.PETROLE, 600, 65, 45));
+        carte.getTile(62, 50, 0).ajouter(new LieuDeRessource("Gisement de pétrole 3", TypeRessource.PETROLE, 600, 62, 50));
+        carte.getTile(70, 42, 0).ajouter(new LieuDeRessource("Gisement de pétrole 4", TypeRessource.PETROLE, 600, 70, 42));
+        carte.getTile(68, 55, 0).ajouter(new LieuDeRessource("Gisement de pétrole 5", TypeRessource.PETROLE, 600, 68, 55));
+        carte.getTile(72, 48, 0).ajouter(new LieuDeRessource("Gisement de pétrole 6", TypeRessource.PETROLE, 600, 72, 48));
 
         // --- Glace x2 : pics enneigés (z=4) ---
         carte.getTile(20, 10, 4).ajouter(new LieuDeRessource("Champ de glace 1", TypeRessource.GLACE, 500, 20, 10));
@@ -252,7 +254,8 @@ public class Jeu {
         bus.traiter(temps, joueur.getStock(), joueur.getOuvriers());
 
         // ── 6. Victoire (uniquement si la fusée est assemblée) ────────── //
-        if (fusee != null && fusee.estAssemblee()) {
+		// cette condition est amenée à changer dans la V2
+        if (fusee != null && fusee.tousModulesAssembles() && fusee.isIngenieurABord()) {
             verifierVictoire();
         }
     }
@@ -271,7 +274,7 @@ public class Jeu {
         for (Batiment b : batiments) {
             if (b instanceof Usine) {
                 Usine u = (Usine) b;
-                if (u.peutProduire()) {
+                if (u.isOperationnel()) {
                     try {
                         u.mettreAJour(joueur.getStock(), 1); // 1 tick écoulé
                     } catch (Exception e) {
