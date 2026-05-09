@@ -1,5 +1,6 @@
 package batiments;
 
+import carte.Direction;
 import carte.Item;
 import entites.Ouvrier;
 import ressources.TypeRessource;
@@ -44,13 +45,19 @@ public class LieuDeRessource implements Batiment {
     @Override public int getX() { return x; }
     @Override public int getY() { return y; }
     public String getNom() { return nom; }
+
+	@Override
+	public TypeBatiment getType() {
+		return TypeBatiment.LIEU_DE_RESSOURCE;
+	}
+	/* Ces méthodes sont a décommenter pour la V2
     @Override public int getNiveau() { return niveau; }
     @Override public void ameliorer() { this.niveau++; }
 
     // Un gisement ne consomme généralement pas d'énergie au début, mais ptetre que oui si c'est profond
     @Override public int getConsommationEnergie() { return 0; }
     @Override public int getProductionEnergie() { return 0; }
-
+	*/
     @Override public void affecterPersonnel(Ouvrier o) { /* Logique à ajouter si besoin */ }
     @Override public void retirerPersonnel(Ouvrier o) { /* Logique à ajouter si besoin */ }
     @Override public boolean aDeLaPlace() { return true; }
@@ -66,6 +73,9 @@ public class LieuDeRessource implements Batiment {
     }
 
     @Override public void deplacer(int x, int y) { /* Immobile */ }
+
+	@Override
+	public void deplacer(Direction dir) { /* Immobile */ }
 
     public int getQuantiteRestante() { return quantite; }
 }

@@ -3,7 +3,9 @@ package batiments;
 import java.util.Random;
 
 import entites.Ouvrier;
+import entites.EtatOuvrier;
 import ressources.Stock;
+import carte.Direction;
 import carte.Item;
 
 /**
@@ -29,9 +31,9 @@ public class Hopital implements Batiment {
      * @param ouvrier L'ouvrier à réparer.
      */
     public void soigner(Ouvrier ouvrier) {
-        if (ouvrier != null && ouvrier.getEtat().equals("MALADE") && isOperationnel()) {
+        if (ouvrier != null && ouvrier.getEtat().equals(EtatOuvrier.MALADE) && isOperationnel()) {
             if (random.nextFloat() <= efficaciteSoins) {
-                ouvrier.setEtat("NORMAL"); // Il retourne au travail en étant normal
+                ouvrier.setEtat(EtatOuvrier.NORMAL); // Il retourne au travail en étant normal
             }
         }
     }
@@ -41,6 +43,7 @@ public class Hopital implements Batiment {
         return true; 
     }
 
+	/* Ces méthodes sont a décommenter pour la V2
     @Override 
     public int getConsommationEnergie() {
         return 15 * niveau;
@@ -55,12 +58,11 @@ public class Hopital implements Batiment {
     public int getNiveau() {
         return niveau;
         }
-    
     @Override 
     public void ameliorer() { 
         this.niveau++; this.efficaciteSoins += 0.1; 
         }
-
+	*/
     public String getNom() { 
         return nom; 
         }
@@ -73,6 +75,11 @@ public class Hopital implements Batiment {
     public int getY() { 
         return y; 
         }
+
+	@Override
+	public TypeBatiment getType() {
+		return TypeBatiment.LIEUX_DE_REPOS;
+	}
 
     @Override 
     public void affecterPersonnel(Ouvrier o) {
@@ -99,6 +106,9 @@ public class Hopital implements Batiment {
     public void deplacer(int x, int y) {
         // ça se déplace pas un hopital jpense
     }
+
+	@Override
+	public void deplacer(Direction dir) { /* Immobile */ }
 
     @Override 
     public double distance(Item autre) {

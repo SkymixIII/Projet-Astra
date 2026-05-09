@@ -3,6 +3,7 @@ package batiments;
 import fusee.Fusee;
 import entites.Ouvrier;
 import carte.Item;
+import carte.Direction;
 import ressources.Stock;
 
 /**
@@ -54,32 +55,39 @@ public class CentreLancement implements Batiment {
     public int getY() { 
         return y; 
     }
-    
-    @Override 
+
+	@Override
+	public TypeBatiment getType() {
+		return TypeBatiment.ZONE_ASSEMBLAGE;
+	}
+	
+    /* Ces méthodes sont a décommenter pour la V2
+	@Override
     public String getNom() { 
         return nom; 
     }
     
-    @Override 
+	@Override
     public int getNiveau() { 
         return niveau; 
     }
     
-    @Override 
+	@Override
     public void ameliorer() { 
         this.niveau++; 
     }
     
-    @Override 
+	@Override
     public int getConsommationEnergie() { 
         return 100; // à changer si nécessaire
     } 
     
-    @Override 
+	@Override
     public int getProductionEnergie() { 
         return 0; 
     }
-    
+    */
+
     @Override public void affecterPersonnel(Ouvrier o) {/* pas nécessaire */}
     @Override public void retirerPersonnel(Ouvrier o) {/* pas nécessaire */}
     @Override public boolean aDeLaPlace() { return true; /* puisque pas d'ouvrier, toujours vrai */ }
@@ -89,4 +97,7 @@ public class CentreLancement implements Batiment {
     @Override public double distance(Item autre) {
         return Math.sqrt(Math.pow(autre.getX() - x, 2) + Math.pow(autre.getY() - y, 2));
     }
+
+	@Override
+	public void deplacer(Direction dir) { /* Immobile */ }
 }
