@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import batiments.Hopital;
 import entites.Ouvrier;
+import entites.EtatOuvrier;
 
 public class TestHopital {
     private Hopital hopital;
@@ -20,24 +21,24 @@ public class TestHopital {
 
     @Test
     public void testSoignerSuccess() {
-        patient.setEtat("MALADE"); // On force l'état malade
+        patient.setEtat(EtatOuvrier.MALADE); // On force l'état malade
         hopital.soigner(patient);
-        assertEquals("L'ouvrier devrait être guéri (NORMAL)", "NORMAL", patient.getEtat());
+        assertEquals("L'ouvrier devrait être guéri (NORMAL)", EtatOuvrier.NORMAL, patient.getEtat());
     }
 
     @Test
     public void testSoignerEchecCondition() {
-        patient.setEtat("FATIGUE"); // Pas l'état MALADE
+        patient.setEtat(EtatOuvrier.FATIGUE); // Pas l'état MALADE
         hopital.soigner(patient);
-        assertEquals("L'état ne doit pas changer s'il n'est pas MALADE", "FATIGUE", patient.getEtat());
+        assertEquals("L'état ne doit pas changer s'il n'est pas MALADE", EtatOuvrier.FATIGUE, patient.getEtat());
     }
 
     @Test
     public void testProbabiliteEchec() {
         // Hôpital avec 0% d'efficacité genre caca
         Hopital mauvaisHopital = new Hopital("hopital NUL", 0, 0, 0.0f);
-        patient.setEtat("MALADE");
+        patient.setEtat(EtatOuvrier.MALADE);
         mauvaisHopital.soigner(patient);
-        assertEquals("L'ouvrier doit rester MALADE avec 0% d'efficacité", "MALADE", patient.getEtat());
+        assertEquals("L'ouvrier doit rester MALADE avec 0% d'efficacité", EtatOuvrier.MALADE, patient.getEtat());
     }
 }

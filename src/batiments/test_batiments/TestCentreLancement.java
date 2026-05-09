@@ -7,7 +7,7 @@ import org.junit.Test;
 import batiments.CentreLancement;
 import fusee.Fusee;
 
-public class CentreLancementTest {
+public class TestCentreLancement {
     private CentreLancement centre;
     private Fusee fuseeDeTest;
 

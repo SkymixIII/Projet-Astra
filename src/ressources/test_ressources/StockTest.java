@@ -107,7 +107,7 @@ public class StockTest {
 
     @Test(expected = RessourceInsuffisanteException.class)
     public void retirer_stockVide_leveException() throws Exception {
-        stockFacile.retirer(TypeRessource.KÉROSENE, 1);
+        stockFacile.retirer(TypeRessource.KEROSENE, 1);
     }
 
     @Test(expected = IllegalArgumentException.class)
