@@ -390,8 +390,17 @@ public class Jeu {
      * Seuil minimum : prob >= 70 pour que le bouton soit actif (doc p.13).
      */
     private void verifierVictoire() {
-        try {
-            double prob = fusee.calculerProbabiliteSucces();
+        
+        double prob = fusee.calculerProbabiliteSucces();
+		if (prob >= 70) {
+            System.out.println("[Victoire] Lancement possible ! Probabilité : " + prob + "%");
+            // TODO : activer le bouton de lancement dans l'interface
+        } else {
+			System.out.println("[Défaite] Lancement impossible : probabilité de succès insuffisante (" + prob + "%)");
+			// TODO : garder le bouton de lancement grisé
+		}
+		/* A décommenter pour la V2
+		try {
             if (prob >= 70) {
                 System.out.println("[Victoire] Lancement possible ! Probabilité : " + prob + "%");
                 // TODO : activer le bouton de lancement dans l'interface
@@ -399,7 +408,7 @@ public class Jeu {
         } catch (LancementImpossibleException e) {
             // Conditions non remplies → bouton grisé, pas d'erreur critique
             System.out.println("[Fusée] " + e.getMessage());
-        }
+        }*/
     }
 
     // ------------------------------------------------------------------ //
