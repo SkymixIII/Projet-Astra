@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
+import exceptions.RessourceInsuffisanteException;
+import exceptions.StockException;
+
 /**
  * Gère l'inventaire du joueur sous forme de Map<TypeRessource, Integer>.
  *
