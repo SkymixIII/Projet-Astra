@@ -9,6 +9,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 import ressources.*;
+import exceptions.*;
 
 public class StockTest {
 
@@ -251,8 +252,8 @@ public class StockTest {
 
     @Test
     public void totalActuel_coherent_kerosene() throws Exception {
-        stockDifficile.ajouter(TypeRessource.KÉROSENE, 3);
-        assertEquals(3 * TypeRessource.KÉROSENE.getPoids(), stockDifficile.totalActuel());
+        stockDifficile.ajouter(TypeRessource.KEROSENE, 3);
+        assertEquals(3 * TypeRessource.KEROSENE.getPoids(), stockDifficile.totalActuel());
     }
 
 

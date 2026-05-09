@@ -94,7 +94,7 @@ public class TestModuleFusee {
         Map<TypeRessource, Integer> r = p.getRecette();
 
         assertEquals(Integer.valueOf(10), r.get(TypeRessource.ACIER));
-        assertEquals(Integer.valueOf(20), r.get(TypeRessource.KÉROSENE));
+        assertEquals(Integer.valueOf(20), r.get(TypeRessource.KEROSENE));
         assertEquals(Integer.valueOf(5), r.get(TypeRessource.ALLIAGE_THERMIQUE));
     }
 

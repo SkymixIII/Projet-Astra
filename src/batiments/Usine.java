@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import carte.Direction;
 import carte.Item;
 import entites.Ouvrier;
 import ressources.Stock;
 import ressources.TypeRessource;
-import exceptions.RessourceInsuffisanteException;
+import exceptions.*;
 
 /**
  * Gère la transformation des ressources et le personnel associé.
@@ -95,6 +96,7 @@ public class Usine implements Batiment {
         personnel.remove(o);
     }
 
+	/* à décommenter pour la V2
     @Override 
     public int getNiveau() {
         return niveau; 
@@ -114,6 +116,7 @@ public class Usine implements Batiment {
     public int getProductionEnergie() {
         return 0; // normalement ça produit pas d'énergie
     }
+	*/
     
     @Override 
     public int getX() {
@@ -125,11 +128,18 @@ public class Usine implements Batiment {
         return y; 
     }
     
+	@Override
+	public TypeBatiment getType() {
+		return TypeBatiment.USINE;
+	}
     @Override 
     public void deplacer(int x, int y) {
         this.x = x; this.y = y;
     }
-    
+
+    @Override
+	public void deplacer(Direction dir) { /* Immobile */ }
+	
     @Override 
     public double distance(Item autre) { 
         return Math.sqrt(Math.pow(autre.getX() - x, 2) + Math.pow(autre.getY() - y, 2)); 

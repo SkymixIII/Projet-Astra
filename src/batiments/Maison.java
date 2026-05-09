@@ -3,6 +3,7 @@ package batiments;
 import java.util.ArrayList;
 import java.util.List;
 
+import carte.Direction;
 import carte.Item;
 import entites.Ouvrier;
 import ressources.Stock;
@@ -40,8 +41,9 @@ public class Maison implements Batiment {
 
     @Override
     public void mettreAJour(Stock stock, int tempsEcoule) {
+		//TODO prendre en compte le temps écoulé pour la fatigue
         for (Ouvrier o : occupants) {
-            o.seReposer(tempsEcoule); 
+            o.recupererNuit(); 
         }
     }
 
@@ -74,7 +76,16 @@ public class Maison implements Batiment {
     public String getNom() {
         return nom;
         }
+	
+	@Override
+	public TypeBatiment getType() {
+		return TypeBatiment.LIEUX_DE_REPOS;
+	}
 
+	public int getCapaciteDisponible() {
+    	return capaciteMax - occupants.size();
+	}
+	/* Ces méthodes sont a décommenter pour la V2
     @Override 
     public int getNiveau() {
         return niveau;
@@ -85,11 +96,14 @@ public class Maison implements Batiment {
         }
     @Override public int getConsommationEnergie() { return 2 * niveau; }
     @Override public int getProductionEnergie() { return 0; }
-
+		*/
     @Override
     public double distance(Item autre) {
         return Math.sqrt(Math.pow(autre.getX() - x, 2) + Math.pow(autre.getY() - y, 2));
     }
+
+	@Override
+	public void deplacer(Direction dir) { /* Immobile */ }
 
     @Override 
     public void deplacer(int x, int y) { /* immobile donc jsp */ }

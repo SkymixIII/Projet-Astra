@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import fusee.*;
+import exceptions.LancementImpossibleException;
 
 /**
  * Tests unitaires de la classe {@link Fusee}.
