@@ -10,6 +10,7 @@ import fusee.Fusee;
 import ressources.*;
 import batiments.*;
 import exceptions.*;
+import evenements.*;
 
 /**
  * Classe orchestratrice principale.
@@ -37,10 +38,10 @@ public class Jeu {
 
     private Joueur   joueur;
     private Carte    carte;
-    private Eventbus bus;
+    private EventBus bus;
     private Fusee    fusee;
     private Temps    temps;
-    private Age      age;
+    //private Age      age;
 
     /** Compteur interne de ticks dans la demi-journée courante (0 à 899). */
     private int ticksDemiJournee = 0;
@@ -58,10 +59,10 @@ public class Jeu {
      */
     public Jeu() {
         this.joueur = new Joueur(50,50); // spawn initial au centre de la carte
-        this.bus    = new Eventbus();
+        this.bus    = new EventBus();
         this.fusee  = new Fusee();
         this.temps  = new Temps();
-        this.age    = new Age();
+        //this.age    = new Age();
         // this.carte est initialisé dans creationMonde()
     }
 
@@ -438,6 +439,6 @@ public class Jeu {
     public Joueur   getJoueur() { return joueur; }
     public Carte    getCarte()  { return carte; }
     public Fusee    getFusee()  { return fusee; }
-    public Age      getAge()    { return age; }
+    //public Age      getAge()    { return age; }
     public Temps    getTemps()  { return temps; }
 }

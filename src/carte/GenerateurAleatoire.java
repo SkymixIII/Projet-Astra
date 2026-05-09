@@ -4,6 +4,7 @@ import java.util.Random;
 import ressources.TypeRessource;
 import batiments.LieuDeRessource;
 import jeu.Difficulte;
+import evenements.*;
 
 /**
  * Responsable de la génération procédurale des ressources sur la carte.
