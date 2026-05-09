@@ -8,7 +8,9 @@ import java.util.Map;
 
 import batiments.Usine;
 import ressources.Stock;
-import ressrouces.TypeRessource;
+import ressources.TypeRessource;
+import exceptions.*;
+import entites.*;
 
 public class TestUsine {
     private Stock stock;

@@ -8,7 +8,7 @@ import carte.Item;
 import entites.Ouvrier;
 import ressources.Stock;
 import ressources.TypeRessource;
-import exceptions.RessourceInsuffisanteException;
+import exceptions.*;
 
 /**
  * Gère la transformation des ressources et le personnel associé.

@@ -21,7 +21,7 @@ public class Propulseur extends ModuleFusee {
         // EnumMap : plus performant qu'un HashMap pour des clés enum
         Map<TypeRessource, Integer> r = new EnumMap<>(TypeRessource.class);
         r.put(TypeRessource.ACIER, 10);            // TODO V2 : POUTRE
-        r.put(TypeRessource.KÉROSENE, 20);
+        r.put(TypeRessource.KEROSENE, 20);
         r.put(TypeRessource.ALLIAGE_THERMIQUE, 5);
         return r;
     }

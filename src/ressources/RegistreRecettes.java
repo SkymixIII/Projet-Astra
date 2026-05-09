@@ -3,7 +3,6 @@ package ressources;
 import java.util.EnumMap;
 import java.util.Map;
 
-import ressources.TypeRessource;
 import batiments.Usine;
 /**
  * RegistreRecettes — fabrique des Usines préconfigurées.
@@ -62,7 +61,7 @@ public class RegistreRecettes {
                 Map<TypeRessource, Integer> e = new EnumMap<>(TypeRessource.class);
                 e.put(TypeRessource.PETROLE, 5);
                 e.put(TypeRessource.SILICIUM, 1);
-                return new Usine(nom, x, y, TypeRessource.KÉROSENE, e);
+                return new Usine(nom, x, y, TypeRessource.KEROSENE, e);
             }
             case "RAFFINERIE_PLASTIQUE": {
                 Map<TypeRessource, Integer> e = new EnumMap<>(TypeRessource.class);

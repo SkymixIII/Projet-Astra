@@ -3,6 +3,7 @@ package entites;
 import batiments.Batiment;
 import carte.Item;
 import ressources.Stock;
+import metiers.Metier;
 
 /**
  * Représente un travailleur de la colonie.

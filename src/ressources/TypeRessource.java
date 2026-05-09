@@ -8,11 +8,12 @@ public enum TypeRessource {
     SILICIUM(1),
     BOIS(1),
     PIERRE(1),
-    //EAU(2),
-    //EAU_POTABLE(2),
-    //GRAINE(1),
-    //NOURRITURE_BRUTE(2),
-    //NOURRITURE(2),
+    EAU(2),
+    EAU_POTABLE(2),
+	GLACE(2),
+    GRAINE(1),
+    NOURRITURE_BRUTE(2),
+    NOURRITURE(2),
     PETROLE(3),
 
     // Ressources transformées (plus lourdes)

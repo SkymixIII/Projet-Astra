@@ -46,7 +46,7 @@ public class GenerateurAleatoire {
             if (tile != null && !tile.estOccupee()) {
                 int quantiteInitiale = 5 + random.nextInt(15); // Entre 5 et 20 unités
 
-                LieuDeRessource gisement = new LieuDeRessource(type, x, y, quantiteInitiale);
+                LieuDeRessource gisement = new LieuDeRessource(null, type, quantiteInitiale, x, y);
                 tile.ajouter(gisement);
             } else {
                 // Si la case est occupée, on tente de placer ailleurs (décrémenter i pour compenser)
