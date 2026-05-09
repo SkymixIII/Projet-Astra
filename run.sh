@@ -15,7 +15,11 @@ fi
 mkdir -p "$OUT"
 
 echo "==> Compilation..."
-javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" src/*.java src/*/*.java
+# Pour l'instant on ne compile que la partie visuelle ; le reste du repo
+# (jeu, batiments, etc.) référence encore des classes en chantier qui
+# bloquent javac. À élargir quand ces classes seront en place.
+javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" \
+    src/Main.java src/RenduCarte.java src/GestionInputs.java
 
 
 echo "==> Lancement..."

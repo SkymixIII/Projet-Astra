@@ -6,26 +6,45 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 
 /**
- * Construit un terrain 3D à partir d'une heightmap (int[x][y] = hauteur).
+ * Construit un terrain 3D à partir d'une matrice 3D voxelisée.
  *
- * Stratégie : les sommets vivent aux COINS des cases, pas au centre.
- * La hauteur d'un coin = moyenne des (1 à 4) cases qui le touchent.
- * Conséquence :
- *   - 4 cases voisines à la même hauteur → leur coin commun = cette hauteur
- *     → le quad rendu pour chacune est plat.
- *   - hauteurs qui diffèrent → coins à hauteurs différentes → quad incliné = pente.
+ * Format attendu : map[z][x][y] (z = couche du sol au sommet).
+ * Une valeur != 0 signifie qu'un bloc est présent. La couleur dépend du
+ * code (1=HERBE, 2=SABLE, 3=EAU, 4=ROCHE, 5=NEIGE, 6=BOIS, 7=FER).
+ *
+ * Stratégie de rendu : un quad par case (x,y), avec une hauteur égale à
+ * la couche la plus haute occupée. Les coins du quad reprennent la
+ * moyenne des hauteurs des cases voisines pour produire des pentes
+ * douces là où l'altitude change.
  */
 public class RenduCarte {
 
     public static final double TAILLE_CASE = 50.0;
     public static final double ECHELLE_HAUTEUR = 30.0;
 
-    public static Group creerTerrain(int[][] heightmap) {
-        int largeur = heightmap.length;
-        int longueur = heightmap[0].length;
+    public static Group creerTerrain(int[][][] map3d) {
+        int hauteur  = map3d.length;
+        int largeur  = map3d[0].length;
+        int longueur = map3d[0][0].length;
+
+        int[][] heightmap = new int[largeur][longueur];
+        int[][] typeTop   = new int[largeur][longueur];
+        for (int i = 0; i < largeur; i++) {
+            for (int j = 0; j < longueur; j++) {
+                int top = 0;
+                int type = 0;
+                for (int k = 0; k < hauteur; k++) {
+                    if (map3d[k][i][j] != 0) {
+                        top = k + 1;
+                        type = map3d[k][i][j];
+                    }
+                }
+                heightmap[i][j] = top;
+                typeTop[i][j]   = type;
+            }
+        }
 
         Group group = new Group();
-        int total = largeur * longueur;
 
         for (int i = 0; i < largeur; i++) {
             for (int j = 0; j < longueur; j++) {
@@ -52,16 +71,27 @@ public class RenduCarte {
                     0, 0, 1, 0, 3, 0
                 );
 
-                int idx = i * longueur + j;
-                double hue = (idx * 360.0 / total) % 360.0;
                 MeshView vue = new MeshView(mesh);
-                vue.setMaterial(new PhongMaterial(Color.hsb(hue, 0.7, 0.9)));
+                vue.setMaterial(new PhongMaterial(couleurType(typeTop[i][j])));
                 vue.setCullFace(CullFace.NONE);
                 group.getChildren().add(vue);
             }
         }
 
         return group;
+    }
+
+    private static Color couleurType(int type) {
+        switch (type) {
+            case 1: return Color.rgb( 90, 160,  70); // HERBE
+            case 2: return Color.rgb(230, 210, 140); // SABLE
+            case 3: return Color.rgb( 50, 110, 190); // EAU
+            case 4: return Color.rgb(140, 130, 120); // ROCHE
+            case 5: return Color.rgb(240, 245, 250); // NEIGE
+            case 6: return Color.rgb( 30, 110,  40); // BOIS
+            case 7: return Color.rgb(170,  80,  60); // FER
+            default: return Color.DARKGRAY;          // 0 = vide
+        }
     }
 
     private static double hauteurCoin(int[][] heightmap, int sx, int sy) {
