@@ -81,6 +81,10 @@ public class Maison implements Batiment {
 	public TypeBatiment getType() {
 		return TypeBatiment.LIEUX_DE_REPOS;
 	}
+
+	public int getCapaciteDisponible() {
+    	return capaciteMax - occupants.size();
+	}
 	/* Ces méthodes sont a décommenter pour la V2
     @Override 
     public int getNiveau() {
