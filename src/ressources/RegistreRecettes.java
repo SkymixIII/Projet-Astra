@@ -1,8 +1,10 @@
-package ressources;
+package ressources.test_ressources;
 
 import java.util.EnumMap;
 import java.util.Map;
 
+import ressources.TypeRessource;
+import batiments.Usine;
 /**
  * RegistreRecettes — fabrique des Usines préconfigurées.
  * compatible avec le constructeur Usine(nom, x, y, produit, recette).

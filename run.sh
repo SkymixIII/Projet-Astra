@@ -15,7 +15,7 @@ fi
 mkdir -p "$OUT"
 
 echo "==> Compilation..."
-javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" src/*.java src/ressources/*.java
+javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" src/*.java src/*/*.java
 
 
 echo "==> Lancement..."
