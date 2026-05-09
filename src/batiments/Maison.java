@@ -41,8 +41,9 @@ public class Maison implements Batiment {
 
     @Override
     public void mettreAJour(Stock stock, int tempsEcoule) {
+		//TODO prendre en compte le temps écoulé pour la fatigue
         for (Ouvrier o : occupants) {
-            o.seReposer(tempsEcoule); 
+            o.recupererNuit(); 
         }
     }
 

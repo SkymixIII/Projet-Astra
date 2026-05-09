@@ -52,6 +52,11 @@ public class Ouvrier implements Item {
     private Metier metier;
     private Batiment posteActuel;
 
+	 // Besoins vitaux (doc p.2-3)
+    private double  moral = 1.0;         // [0.0 – 1.0], source de vérité pour mettreAJourEtat
+    private boolean aUnLit = false;
+    private boolean aMangeEtBu = false;  // remis à false à chaque demi-journée
+
     // -------------------------------------------------------------------------
     // CONSTRUCTEUR
     // -------------------------------------------------------------------------
@@ -150,5 +155,82 @@ public class Ouvrier implements Item {
     public String getNom() { return nom; }
     public EtatOuvrier getEtat() { return etat; }
 
+	// -------------------------------------------------------------------------
+    // BESOINS VITAUX & MORAL (appelés par Jeu)
+    // -------------------------------------------------------------------------
+
+    /** Identifiant lisible (nom) — alias demandé par Jeu. */
+    public String getIdentifiant() { return nom; }
+
+    /**
+     * Signale un manque de nourriture : dégrade l'état d'un cran (doc p.3).
+     * Marque également que les besoins ne sont pas satisfaits.
+     */
+    public void signalerManqueNourriture() {
+        modifierMoral(-0.10);
+        mettreAJourEtat();
+        aMangeEtBu = false;
+    }
+
+    /**
+     * Signale un manque d'eau : dégrade l'état d'un cran (doc p.3).
+     */
+    public void signalerManqueEau() {
+        modifierMoral(-0.10);
+        mettreAJourEtat();
+        aMangeEtBu = false;
+    }
+
+
+    /**
+     * Modifie le moral (borné [0.0 – 1.0]).
+     * mettreAJourEtat() synchronise ensuite l'EtatOuvrier selon les seuils :
+     *   moral >= 0.9 → TRES_MOTIVE  (×1.7)
+     *   moral >= 0.7 → MOTIVE       (×1.2)
+     *   moral >= 0.5 → NORMAL       (×1.0)
+     *   moral >= 0.3 → FATIGUE      (×0.8)
+     *   moral >= 0.1 → TRES_FATIGUE (×0.3)
+     *   moral <  0.1 → MALADE       (×0.01)
+     */
+    public void modifierMoral(double delta) {
+        moral = Math.max(0.0, Math.min(1.0, moral + delta));
+    }
+
+    public double getMoral() { return moral; }
+
+    /**
+     * Synchronise l'EtatOuvrier depuis le moral courant (doc p.3).
+     * Appelé par Jeu après chaque modifierMoral().
+     */
+    public void mettreAJourEtat() {
+        if      (moral >= 0.9) etat = EtatOuvrier.TRES_MOTIVE;
+        else if (moral >= 0.7) etat = EtatOuvrier.MOTIVE;
+        else if (moral >= 0.5) etat = EtatOuvrier.NORMAL;
+        else if (moral >= 0.3) etat = EtatOuvrier.FATIGUE;
+        else if (moral >= 0.1) etat = EtatOuvrier.TRES_FATIGUE;
+        else                   etat = EtatOuvrier.MALADE;
+    }
+
+    /**
+     * Récupération nocturne : améliore l'état d'un cran après une nuit complète (doc p.3).
+     * Réinitialise le flag aMangeEtBu pour la demi-journée suivante.
+     */
+    public void recupererNuit() {
+        modifierMoral(+0.10);
+        mettreAJourEtat();
+        aMangeEtBu = false;
+    }
+
+    /** @return true si les besoins (nourriture + eau) ont été satisfaits cette demi-journée. */
+    public boolean aMangeEtBu() { return aMangeEtBu; }
+
+    /** Appelé par Joueur après distribution réussie nourriture + eau. */
+    public void setAMangeEtBu(boolean valeur) { this.aMangeEtBu = valeur; }
+
+    /** @return true si l'ouvrier dispose d'un lit. */
+    public boolean aUnLit() { return aUnLit; }
+
+    /** Mis à jour par Joueur selon les lits disponibles. */
+    public void setAUnLit(boolean valeur) { this.aUnLit = valeur; }
 
 }

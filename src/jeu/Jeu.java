@@ -344,7 +344,8 @@ public class Jeu {
         boolean surpopulation = (double) totalOuvriers / Math.max(litsDisponibles, 1) > 0.95;
 
         for (Ouvrier o : equipage) {
-            // Facteurs positifs (doc p.3)
+            // Facteurs positifs (doc p.3)*
+			//TODO à reprendre pour la V2, j'ai arangé avec Ouvrier mais c'est incomplet
             if (o.aMangeEtBu()) {
                 o.modifierMoral(+0.05); // besoins satisfaits
             }

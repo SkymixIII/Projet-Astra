@@ -56,9 +56,12 @@ public class Mineur implements Metier {
     @Override
     public boolean peutTravaillerDans(Batiment batiment) {
         TypeBatiment type = batiment.getType();
+		return type == TypeBatiment.LIEU_DE_RESSOURCE;
+		/* TODO : valeurs pour la V2
         return type == TypeBatiment.MINE
             || type == TypeBatiment.CARRIERE
             || type == TypeBatiment.PUITS_PETROLE;
+			*/
     }
 
     /**
