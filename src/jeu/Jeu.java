@@ -155,7 +155,7 @@ public class Jeu {
 	    };
 	
 	    for (int[] p : sommets) {
-	        carte.getTile(p[0], p[1], 4).ajouter(new Sol(TypeSol.NEIGE));
+	        carte.getTile(p[0], p[1], 4).ajouter(new Sol(TypeSol.NEIGE, x, y));
 	    }
 	
 	    // ============================================================
