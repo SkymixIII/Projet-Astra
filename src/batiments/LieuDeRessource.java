@@ -50,6 +50,11 @@ public class LieuDeRessource implements Batiment {
 	public TypeBatiment getType() {
 		return TypeBatiment.LIEU_DE_RESSOURCE;
 	}
+
+	/** Type de ressource extraite par ce gisement. */
+	public TypeRessource getRessource() {
+		return this.type;
+	}
 	/* Ces méthodes sont a décommenter pour la V2
     @Override public int getNiveau() { return niveau; }
     @Override public void ameliorer() { this.niveau++; }

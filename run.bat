@@ -21,9 +21,7 @@ if errorlevel 1 (
 if not exist "%OUT%" mkdir "%OUT%"
 
 echo ==^> Compilation...
-rem On ne compile que la partie visuelle pour l'instant ; le reste du repo
-rem (jeu, batiments, etc.) reference des classes en chantier.
-javac --module-path "%JFX_LIB%" --add-modules %MODULES% -d "%OUT%" src\Main.java src\RenduCarte.java src\GestionInputs.java
+javac --module-path "%JFX_LIB%" --add-modules %MODULES% -d "%OUT%" src\*.java src\*\*.java
 if errorlevel 1 exit /b 1
 
 echo ==^> Lancement...
