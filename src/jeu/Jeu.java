@@ -79,9 +79,6 @@ public class Jeu {
 
    	public void creationMonde() {
 		this.carte = new Carte(100, 100, 5);
-		// --- Spawn joueur (centre de la plaine) ---
-	    carte.getTile(50, 60, 0).ajouter(this.joueur);
-	
 	    // ============================================================
 	    // SOL z=0 : île principale + île secondaire
 	    // ============================================================
