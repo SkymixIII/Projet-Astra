@@ -4,11 +4,13 @@ public enum TypeRessource {
 
     // Ressources primaires (légères)
     FER(1),
+    MINERAI_FER(1),
     SILICIUM(1),
     BOIS(1),
     PIERRE(1),
     EAU(2),
     EAU_POTABLE(2),
+	GLACE(2),
     GRAINE(1),
     NOURRITURE_BRUTE(2),
     NOURRITURE(2),
@@ -18,12 +20,14 @@ public enum TypeRessource {
     PIOCHE_PIERRE(5),
     HACHE_PIERRE(5),
     ACIER(4),
-    KÉROSENE(5),
+    PLAQUE_ACIER (4),
+    KEROSENE(5),
     PLASTIQUE(2),
     CABLAGE(3),
     CARTE_MERE(3),
     PROCESSEUR_VOL(4),
     ALLIAGE_THERMIQUE(6),
+    POUTRE(3),
     ENERGIE(0); // immatérielle, ne prend pas de place
 
     // ------------------------------------------------ //

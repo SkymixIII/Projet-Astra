@@ -15,6 +15,7 @@ concernée.
     - LieuDeRessource.java
     - Maison.java
     - Usine.java
+    - TypeBatiment.java
 
 - package batiments.test_batiments :
     - TestCentreLancement.java
@@ -60,6 +61,14 @@ concernée.
     - Difficulte.java
     - Jeu.java
 
+    
+- package metiers :
+    - Bucheron.java
+    - Ingenieur.java
+    - Macon.java
+    - Metier.java
+    - Mineur.java
+    - Technicien.java
 
 - package ressources:
     - Recette.java
