@@ -61,7 +61,7 @@ public class Ouvrier implements Item {
     private int ticksAccumules;
 
     // Etat de l'ouvrier
-    private EtatOuvrier;
+    private EtatOuvrier etat;
 
     /*Le compteur dexpérience repart à 0 au changement de métier.
     * null = ouvrier non spécialisé (état de départ des 6 ouvriers initiaux).
@@ -154,10 +154,7 @@ public class Ouvrier implements Item {
 
     // Getters pour le debug dans TestUsine
     public String getNom() { return nom; }
-    public String getEtat() { return etat; }
+    public EtatOuvrier getEtat() { return etat; }
 
-    public void setEtat(String nouvelEtat) {
-        this.etat = nouvelEtat;
-    }
 
 }
