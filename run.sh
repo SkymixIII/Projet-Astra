@@ -3,7 +3,7 @@ set -e
 
 cd "$(dirname "$0")"
 
-JFX_LIB="rsrc/javafx-sdk-21.0.5/lib"
+JFX_LIB=$(echo rsrc/javafx-sdk-21.0.*/lib | awk '{print $1}')
 MODULES="javafx.controls"
 OUT="out"
 
@@ -15,7 +15,8 @@ fi
 mkdir -p "$OUT"
 
 echo "==> Compilation..."
-javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" src/*.java
+javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" src/*.java src/*/*.java
+
 
 echo "==> Lancement..."
 java --module-path "$JFX_LIB" --add-modules "$MODULES" -cp "$OUT" Main
