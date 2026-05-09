@@ -1,4 +1,4 @@
-package ressources.test_ressources;
+package ressources;
 
 import java.util.EnumMap;
 import java.util.Map;

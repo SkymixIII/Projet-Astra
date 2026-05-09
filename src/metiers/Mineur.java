@@ -1,4 +1,13 @@
-package ressources;
+package metiers;
+
+import batiments.Batiment;
+import batiments.TypeBatiment;
+import entites.Ouvrier;
+import entites.Role;
+import ressources.Stock;
+import ressources.TypeRessource;
+import exceptions.RessourceInsuffisanteException;
+import exceptions.StockException;
 
 /**
  * Métier : MINEUR
@@ -33,8 +42,8 @@ public class Mineur implements Metier {
     // -------------------------------------------------------------------------
 
     @Override
-    public Ouvrier.TypeMetier getType() {
-        return Ouvrier.TypeMetier.MINEUR;
+    public Role getType() {
+        return Role.MINEUR;
     }
 
     @Override

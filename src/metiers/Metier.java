@@ -1,10 +1,16 @@
-package ressources;
+package metiers;
+
+import batiments.Batiment;
+import entites.Ouvrier;
+import entites.Role;
+import ressources.Stock;
+
 
 /**
  * Interface commune à tous les métiers.
  *
  * Chaque métier :
- * - possède un type (enum TypeMetier)
+ * - possède un type (enum Role)
  * - peut travailler dans certains bâtiments
  * - possède une action principale
  */
@@ -13,7 +19,7 @@ public interface Metier {
     /**
      * Retourne le type du métier.
      */
-    Ouvrier.TypeMetier getType();
+    Role getType();
 
     /**
      * Vérifie si ce métier peut travailler dans le bâtiment donné.

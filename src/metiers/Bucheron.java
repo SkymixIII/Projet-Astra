@@ -1,4 +1,12 @@
-package ressources;
+package metiers;
+
+import batiments.Batiment;
+import batiments.TypeBatiment;
+import entites.Ouvrier;
+import entites.Role;
+import ressources.Stock;
+import ressources.TypeRessource;
+import exceptions.StockException;
 
 /**
  * Métier : BUCHERON
@@ -16,8 +24,8 @@ public class Bucheron implements Metier {
     // -------------------------------------------------------------------------
 
     @Override
-    public Ouvrier.TypeMetier getType() {
-        return Ouvrier.TypeMetier.BUCHERON;
+    public Role getType() {
+        return Role.BUCHERON;
     }
 
     @Override

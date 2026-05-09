@@ -48,15 +48,6 @@ public class Ouvrier implements Item {
         }
     }
 
-    public enum TypeMetier {
-        MINEUR,
-        BUCHERON,
-        MACON,
-        FERMIER,
-        TECHNICIEN,
-        INGENIEUR
-    }
-    
     private String nom;
     private int x, y;
     

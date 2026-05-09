@@ -1,7 +1,16 @@
-package ressources;
+package metiers;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import batiments.Batiment;
+import batiments.TypeBatiment;
+import entites.Ouvrier;
+import entites.Role;
+import ressources.Stock;
+import ressources.TypeRessource;
+import exceptions.RessourceInsuffisanteException;
+import exceptions.StockException;
 
 /**
  * Métier : MACON
@@ -28,8 +37,8 @@ public class Macon implements Metier {
     // -------------------------------------------------------------------------
 
     @Override
-    public Ouvrier.TypeMetier getType() {
-        return Ouvrier.TypeMetier.MACON;
+    public Role getType() {
+        return Role.MACON;
     }
 
     @Override

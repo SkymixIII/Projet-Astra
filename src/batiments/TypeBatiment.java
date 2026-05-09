@@ -1,4 +1,4 @@
-package ressources;
+package batiments;
 
 public enum TypeBatiment {
 
