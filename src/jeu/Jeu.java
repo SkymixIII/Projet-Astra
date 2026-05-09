@@ -43,12 +43,6 @@ public class Jeu {
     private Temps    temps;
     //private Age      age;
 
-    /** Compteur interne de ticks dans la demi-journée courante (0 à 899). */
-    private int ticksDemiJournee = 0;
-
-    /** Compteur interne de ticks dans la nuit courante (0 à 599). */
-    private int ticksNuit = 0;
-
     // ------------------------------------------------------------------ //
     //  Constructeur                                                       //
     // ------------------------------------------------------------------ //
@@ -228,22 +222,17 @@ public class Jeu {
         // ── 2. Production (bloquée la nuit) ─────────────────────────── //
         if (!temps.estNuit()) {
             mettreAJourProduction();
-            ticksDemiJournee++;
 
             // ── 3. Besoins vitaux — une fois par demi-journée ─────────── //
-            // 900 ticks de travail écoulés = fin d'une demi-journée
-            if (ticksDemiJournee >= TICKS_DEMI_JOURNEE) {
+            if (temps.estFinDemiJournee()) {
                 consommerBesoinsVitaux();
                 mettreAJourMoral();
-                ticksDemiJournee = 0;
             }
 
         } else {
             // ── Nuit : récupération de fatigue ───────────────────────── //
-            ticksNuit++;
-            if (ticksNuit >= TICKS_NUIT) {
+            if (temps.estFinNuit()) {
                 recupererFatigue();
-                ticksNuit = 0;
             }
         }
 
