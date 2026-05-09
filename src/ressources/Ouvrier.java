@@ -1,92 +1,138 @@
-package ressources;
+package code;
 
 /**
  * Représente un travailleur de la colonie.
  * Son efficacité dépend de son expérience et de ses besoins vitaux.
  */
 public class Ouvrier implements Item {
+
+    public enum NiveauExp {
+        DEBUTANT (0.7,  600),
+        APPRENTI (0.9,  1200),
+        CONFIRME (1.2,  1800),
+        EXPERT   (1.5,  3000),
+        MAITRE   (2.0,  Integer.MAX_VALUE); // niveau max, jamais dépassé
+
+        public final double multiplicateur;
+        public final int ticksPourMonter;
+
+        NiveauExp(double multiplicateur, int ticksPourMonter) {
+            this.multiplicateur = multiplicateur;
+            this.ticksPourMonter = ticksPourMonter;
+        }
+
+        public double getMultiplicateur() {
+            return multiplicateur;
+        }
+
+        public int getTicksPourMonter() {
+            return ticksPourMonter;
+        }
+    }
+
+    public enum EtatOuvrier {
+        TRES_FATIGUE (0.3),
+        FATIGUE      (0.8),
+        NORMAL       (1.0),
+        MOTIVE       (1.2),
+        TRES_MOTIVE  (1.7);
+
+        public final double multiplicateur;
+
+        EtatOuvrier(double multiplicateur) {
+            this.multiplicateur = multiplicateur;
+        }
+    }
+
+    public enum TypeMetier {
+        MINEUR,
+        BUCHERON,
+        MACON,
+        FERMIER,
+        TECHNICIEN,
+        INGENIEUR
+    }
+    
     private String nom;
     private int x, y;
     
-    // Besoins vitaux (0 à 100)
-    private double faim = 100.0;
-    private double soif = 100.0;
-    
     // Système d'expérience
-    // Débutant (0,7) -> Apprenti (0,9) -> Confirmé (1,2) -> Expert (1,5) -> Maître (2)
-    private double experienceCoeff = 0.7; 
-    private int minutesTravaillees = 0;
-    
-    private String etat = "NORMAL"; // NORMAL, FATIGUE, MOTIVE
+    private NiveauExp niveau;
+    private int ticksAccumules;
+
+    // Etat de l'ouvrier
+    private EtatOuvrier;
+
+    /*Le compteur dexpérience repart à 0 au changement de métier.
+    * null = ouvrier non spécialisé (état de départ des 6 ouvriers initiaux).
+    */
+    private TypeMetier metier;
     private Batiment posteActuel;
+
+    // -------------------------------------------------------------------------
+    // CONSTRUCTEUR
+    // -------------------------------------------------------------------------
 
     public Ouvrier(String nom, int x, int y) {
         this.nom = nom;
         this.x = x;
         this.y = y;
+        this.etat = EtatOuvrier.NORMAL;
+        this.niveau = NiveauExp.DEBUTANT;
+        this.ticksAccumules = 0;
+        this.metier = null;
+        this.posteActuel = null;
     }
 
-    /**
-     * Calcule l'efficacité réelle utilisée par l'usine.
-     * Formule : efficacité = expérience * état
-     */
-    public double getEfficacite() {
-        double multiplicateurEtat = 1.0;
-        
-        switch (etat) {
-            case "FATIGUE": multiplicateurEtat = 0.8; break;
-            case "TRES_FATIGUE": multiplicateurEtat = 0.3; break;
-            case "MOTIVE": multiplicateurEtat = 1.2; break;
-            case "TRES_MOTIVE": multiplicateurEtat = 1.7; break;
-            default: multiplicateurEtat = 1.0; // NORMAL
-        }
-        
-        return experienceCoeff * multiplicateurEtat;
+    // Calcule l'efficacité réelle utilisée par l'usine. Formule : efficacité = expérience * état
+
+     public double getEfficacite() {
+        return niveau.multiplicateur * etat.multiplicateur;
     }
 
-    /**
-     * Simule la consommation de ressources et la fatigue.
-     */
-    public void consommerBesoins(Stock stock) {
-        // Diminution passive des besoins
-        faim -= 0.5;
-        soif -= 0.8;
+    //Compte le nombre d'heure de travail d'un ouvirer pour le farie progresser
+    public void travailler(int ticks) {
+        if (metier == null) return; // pas de métier = pas d'expérience
 
-        // Mise à jour de l'état selon les besoins
-        if (faim < 20 || soif < 20) {
-            this.etat = "FATIGUE";
-        } else if (faim <= 0 || soif <= 0) {
-            this.etat = "TRES_FATIGUE";
+        ticksAccumules += ticks;
+
+        // Progression séquentielle : on monte d'un niveau si le seuil est atteint
+        if (niveau != NiveauExp.MAITRE && ticksAccumules >= niveau.ticksPourMonter) {
+            ticksAccumules = 0; // repart à 0 pour le niveau suivant
+            niveau = NiveauExp.values()[niveau.ordinal() + 1];
         }
     }
 
+    //Affecte l'ouvrier à un bâtiment.
+    public void affecterPoste(Batiment batiment) {
+        this.posteActuel = batiment;
+    }
+
     /**
-     * Fait progresser l'expérience de l'ouvrier.
+     * Assigne un nouveau métier.
+     *
+     * Si changement de métier :
+     * - expérience remise à zéro
+     * - retour niveau débutant
      */
-    public void travailler(int minutes) {
-        this.minutesTravaillees += minutes;
-        
-        // Logique de montée en niveau simplifiée 
-        if (minutesTravaillees > 60 && experienceCoeff < 1.5) {
-            experienceCoeff = 1.2; // Devient Confirmé
+    public void setMetier(Metier nouveauMetier) {
+
+        if (nouveauMetier == null) {
+            this.metier = null;
+        } else {
+            if (this.metier == null || this.metier.getType() != nouveauMetier.getType()) {
+            this.ticksAccumules = 0;
+            this.niveau = NiveauExp.DEBUTANT;
+        }
+        this.metier = nouveauMetier;
         }
     }
 
-    public void affecterPoste(Batiment b) {
-        this.posteActuel = b;
-    }
-
-    /**
-     * Augmente le repos de l'ouvrier lorsqu'il est logé dans une maison.
-     * @param tempsEcoule Temps passé à se reposer.
+     /**
+     * Modifie l'état de l'ouvrier.
      */
-    public void seReposer(int tempsEcoule) {
-        // On restaure l'état à NORMAL dès qu'il passe par une maison.
-        // Tu pourras complexifier en ajoutant une jauge de repos (0-100) plus tard.
-        this.etat = "NORMAL"; 
-        
-        // Optionnel : on peut imaginer que le repos soigne un peu la faim/soif
-        this.faim = Math.min(100.0, this.faim + (tempsEcoule * 0.05));
+    public void setEtat(EtatOuvrier etat) {
+        this.etat = etat;
     }
 
     // --- Implémentation de Item ---
@@ -104,6 +150,7 @@ public class Ouvrier implements Item {
         this.x = x;
         this.y = y;
     }
+
 
     // Getters pour le debug dans TestUsine
     public String getNom() { return nom; }
