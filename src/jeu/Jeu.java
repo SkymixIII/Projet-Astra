@@ -144,7 +144,7 @@ public class Jeu {
 	    };
 	
 	    for (int[] p : flancs) {
-	        carte.getTile(p[0], p[1], 3).ajouter(new Sol(TypeSol.ROCHE_DURE, x, y));
+	        carte.getTile(p[0], p[1], 3).ajouter(new Sol(TypeSol.ROCHE_DURE, p[0], p[1]));
 	    }
 	
 	    // ============================================================
@@ -155,7 +155,7 @@ public class Jeu {
 	    };
 	
 	    for (int[] p : sommets) {
-	        carte.getTile(p[0], p[1], 4).ajouter(new Sol(TypeSol.NEIGE, x, y));
+	        carte.getTile(p[0], p[1], 4).ajouter(new Sol(TypeSol.NEIGE, p[0], p[1]));
 	    }
 	
 	    // ============================================================

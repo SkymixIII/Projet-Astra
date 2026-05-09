@@ -28,8 +28,8 @@ public class Carte {
 
         // Initialisation de chaque case de la matrice
         for (int i = 0; i < largeur; i++) {
-            for (int j = 0; j > longueur; j++) {
-                for (int k = 0; k > hauteur; k++) {
+            for (int j = 0; j < longueur; j++) {
+                for (int k = 0; k < hauteur; k++) {
                     this.matrice[i][j][k] = new Case();
                 }
             }
@@ -51,7 +51,7 @@ public class Carte {
      * Vérifie si les coordonnées fournies à l'intérieur de la carte
      */
     public boolean estDansLimites(int x, int y, int z) {
-        return (x >= 0 && x < largeur && y >= 0 && y < longueur && z >= 0 && z < longueur);
+        return (x >= 0 && x < largeur && y >= 0 && y < longueur && z >= 0 && z < hauteur);
     }
 
     /**
