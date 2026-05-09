@@ -140,7 +140,9 @@ public class Stock {
         // Vérification d'abord (tout ou rien)
         if (!contientTout(recette)) {
             throw new RessourceInsuffisanteException(
-                "Ressources insuffisantes pour cette recette : " + recette
+                 "Ressource manquante : " + e.getKey()
+                    + " (besoin=" + e.getValue()
+                    + ", stock=" + getQuantite(e.getKey()) + ")"
             );
         }
         // Retrait effectif
@@ -148,6 +150,7 @@ public class Stock {
             retirer(entree.getKey(), entree.getValue());
         }
     }
+
 
     /**
      * Retourne la quantité disponible d'une ressource.
@@ -166,7 +169,7 @@ public class Stock {
                     //  ^quantité stockée    ^poids associé au type
         }
         return total;
-}
+    }
 
     /**
      * Retourne une vue non-modifiable du stock (utile pour l'affichage UI).
@@ -187,7 +190,11 @@ public class Stock {
             }
         }
         if (modeDifficile) {
-            sb.append(String.format("  TOTAL : %d / %d%n", totalActuel(), CAP_GLOBALE_DIFFICILE));
+            sb.append(String.format("  VOLUME TOTAL : %d / %d%n",
+                totalActuel(), CAP_GLOBALE_DIFFICILE));
+        } else {
+            sb.append(String.format("  (mode facile — limite par type : %d)%n",
+                CAP_PAR_TYPE_FACILE));
         }
         return sb.toString();
     }
