@@ -1,4 +1,4 @@
-package code;
+package jeu;
 
 /**
  * Classe Temps — gère le cycle journalier de la simulation.

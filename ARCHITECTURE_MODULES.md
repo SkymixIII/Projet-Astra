@@ -14,8 +14,8 @@ concernée.
     - Hopital.java
     - LieuDeRessource.java
     - Maison.java
+	- TypeBatiment.java
     - Usine.java
-    - TypeBatiment.java
 
 - package batiments.test_batiments :
     - TestCentreLancement.java
@@ -31,12 +31,23 @@ concernée.
     - Direction.java
     - GenerateurAleatoire.java
     - Item.java
+	- Sol.java
+	- TypeSol.java
 
 
 - package entites :
+	- EtatOuvrier.java
     - Joueur.java
     - Ouvrier.java
     - Role.java
+
+
+- package evenements :
+	- Canal.java
+	- Evenement.java
+	- EventBus.java
+	- EventListener.java
+	- Tempete.java
     
 
 - package exceptions :
@@ -60,6 +71,7 @@ concernée.
 - package jeu :
     - Difficulte.java
     - Jeu.java
+	- Temps.java
 
     
 - package metiers :
