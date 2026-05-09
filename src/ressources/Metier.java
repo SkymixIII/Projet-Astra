@@ -7,9 +7,6 @@ package ressources;
  * - possède un type (enum TypeMetier)
  * - peut travailler dans certains bâtiments
  * - possède une action principale
- *
- * Cette interface permet d'éviter les gros switch/case
- * partout dans le code.
  */
 public interface Metier {
 
@@ -19,18 +16,17 @@ public interface Metier {
     Ouvrier.TypeMetier getType();
 
     /**
-     * Vérifie si ce métier peut travailler
-     * dans le bâtiment donné.
+     * Vérifie si ce métier peut travailler dans le bâtiment donné.
      */
     boolean peutTravaillerDans(Batiment batiment);
 
     /**
-     * Action principale du métier.
+     * Action principale du métier, appelée à chaque tick.
      *
-     * Exemple :
-     * - Mineur -> extrait minerai/pierre
-     * - Bucheron -> coupe du bois
-     * - Technicien -> fabrique des ressources transformées
+     * @param ouvrier   l'ouvrier qui travaille
+     * @param batiment  le bâtiment où il travaille
+     * @param stock     le stock global de la colonie
+     * @param ticks     nombre de ticks écoulés depuis le dernier appel
      */
     void travailler(Ouvrier ouvrier, Batiment batiment, Stock stock, int ticks);
 
@@ -38,7 +34,4 @@ public interface Metier {
      * Nom affiché dans l'UI.
      */
     String getNomAffichage();
-
-
-    boolean peutTravaillerDans(Batiment batiment);
 }

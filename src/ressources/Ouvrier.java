@@ -66,7 +66,7 @@ public class Ouvrier implements Item {
     /*Le compteur dexpérience repart à 0 au changement de métier.
     * null = ouvrier non spécialisé (état de départ des 6 ouvriers initiaux).
     */
-    private TypeMetier metier;
+    private Metier metier;
     private Batiment posteActuel;
 
     // -------------------------------------------------------------------------
@@ -116,15 +116,16 @@ public class Ouvrier implements Item {
      * - retour niveau débutant
      */
     public void setMetier(Metier nouveauMetier) {
-
         if (nouveauMetier == null) {
             this.metier = null;
         } else {
-            if (this.metier == null || this.metier.getType() != nouveauMetier.getType()) {
-            this.ticksAccumules = 0;
-            this.niveau = NiveauExp.DEBUTANT;
-        }
-        this.metier = nouveauMetier;
+            // Changement de TYPE de métier → remise à zéro de l'expérience
+            if (this.metier == null
+                    || this.metier.getType() != nouveauMetier.getType()) {
+                this.ticksAccumules = 0;
+                this.niveau         = NiveauExp.DEBUTANT;
+            }
+            this.metier = nouveauMetier;
         }
     }
 
@@ -139,6 +140,10 @@ public class Ouvrier implements Item {
 
     @Override public int getX() { return x; }
     @Override public int getY() { return y; }
+
+    public NiveauExp getNiveau() { return niveau; }
+    public Metier    getMetier() { return metier; }
+    public Batiment  getPosteActuel() { return posteActuel; }
     
     @Override 
     public double distance(Item autreItem) {

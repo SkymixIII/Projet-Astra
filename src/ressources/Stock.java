@@ -138,17 +138,21 @@ public class Stock {
     public void consommerRecette(Map<TypeRessource, Integer> recette)
             throws RessourceInsuffisanteException {
         // Vérification d'abord (tout ou rien)
-        if (!contientTout(recette)) {
-            throw new RessourceInsuffisanteException(
-                 "Ressource manquante : " + e.getKey()
+        for (Map.Entry<TypeRessource, Integer> e : recette.entrySet()) {
+            if (!contient(e.getKey(), e.getValue())) {
+                throw new RessourceInsuffisanteException(
+                    "Ressource manquante : " + e.getKey()
                     + " (besoin=" + e.getValue()
                     + ", stock=" + getQuantite(e.getKey()) + ")"
-            );
+                );
+            }
         }
+
         // Retrait effectif
         for (Map.Entry<TypeRessource, Integer> entree : recette.entrySet()) {
             retirer(entree.getKey(), entree.getValue());
         }
+
     }
 
 
