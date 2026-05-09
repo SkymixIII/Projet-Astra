@@ -3,11 +3,14 @@ package jeu;
 import java.util.List;
 
 import carte.Carte;
+import carte.TypeSol;
+import carte.Sol;
 import entites.*;
 import fusee.Fusee;
 import ressources.*;
 import batiments.*;
 import exceptions.*;
+import evenements.*;
 
 /**
  * Classe orchestratrice principale.
@@ -35,10 +38,10 @@ public class Jeu {
 
     private Joueur   joueur;
     private Carte    carte;
-    private Eventbus bus;
+    private EventBus bus;
     private Fusee    fusee;
     private Temps    temps;
-    private Age      age;
+    //private Age      age;
 
     /** Compteur interne de ticks dans la demi-journée courante (0 à 899). */
     private int ticksDemiJournee = 0;
@@ -55,11 +58,11 @@ public class Jeu {
      * Initialise tous les composants du jeu.
      */
     public Jeu() {
-        this.joueur = new Joueur();
-        this.bus    = new Eventbus();
+        this.joueur = new Joueur(50,50); // spawn initial au centre de la carte
+        this.bus    = new EventBus();
         this.fusee  = new Fusee();
         this.temps  = new Temps();
-        this.age    = new Age();
+        //this.age    = new Age();
         // this.carte est initialisé dans creationMonde()
     }
 
@@ -82,13 +85,13 @@ public class Jeu {
 
     /**
      * Méthode pour créer la map.
-     * Génère le terrain, les reliefs et les gisements de ressources.
+     * Génère le terrain, les reliefs et les LieuDeRessources de ressources.
      */
     public void creationMonde() {
         this.carte = new Carte(100, 100, 5);
 
         // --- Spawn joueur ---
-        carte.getTile(50, 50, 0).ajouter(new Joueur());
+        carte.getTile(50, 50, 0).ajouter(this.joueur);
 
         // ============================================================
         // SOL z=0 : plaine partout avec île au sud-est
@@ -121,7 +124,7 @@ public class Jeu {
         // ============================================================
         for (int x = 22; x <= 45; x++) {
             for (int y = 28; y <= 48; y++) {
-                if (carte.getTile(x, y, 1).estVide()) {
+                if (!carte.getTile(x, y, 1).estOccupee()) {
                     carte.getTile(x, y, 1).ajouter(new Sol(TypeSol.ROCHE));
                 }
             }
@@ -132,7 +135,7 @@ public class Jeu {
         // ============================================================
         for (int x = 8; x <= 30; x++) {
             for (int y = 10; y <= 32; y++) {
-                if (carte.getTile(x, y, 2).estVide()) {
+                if (!carte.getTile(x, y, 2).estOccupee()) {
                     carte.getTile(x, y, 2).ajouter(new Sol(TypeSol.ROCHE_DURE));
                 }
             }
@@ -159,47 +162,47 @@ public class Jeu {
         // ============================================================
 
         // --- Forêts en plaine (z=0) ---
-        carte.getTile(35, 45, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(40, 50, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(45, 55, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(55, 45, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(60, 50, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(50, 60, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(42, 42, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(58, 58, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(35, 45, 0).ajouter(new LieuDeRessource("Forêt 1", TypeRessource.BOIS, 1000, 35, 45));
+        carte.getTile(40, 50, 0).ajouter(new LieuDeRessource("Forêt 2", TypeRessource.BOIS, 1000, 40, 50));
+        carte.getTile(45, 55, 0).ajouter(new LieuDeRessource("Forêt 3", TypeRessource.BOIS, 1000, 45, 55));
+        carte.getTile(55, 45, 0).ajouter(new LieuDeRessource("Forêt 4", TypeRessource.BOIS, 1000, 55, 45));
+        carte.getTile(60, 50, 0).ajouter(new LieuDeRessource("Forêt 5", TypeRessource.BOIS, 1000, 60, 50));
+        carte.getTile(50, 60, 0).ajouter(new LieuDeRessource("Forêt 6", TypeRessource.BOIS, 1000, 50, 60));
+        carte.getTile(42, 42, 0).ajouter(new LieuDeRessource("Forêt 7", TypeRessource.BOIS, 1000, 42, 42));
+        carte.getTile(58, 58, 0).ajouter(new LieuDeRessource("Forêt 8", TypeRessource.BOIS, 1000, 58, 58));
 
         // --- Fer x7 : montagne nord-ouest (z=2) ---
-        carte.getTile(15, 20, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(18, 22, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(20, 18, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(12, 25, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(22, 15, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(25, 20, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(17, 28, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(15, 20, 2).ajouter(new LieuDeRessource("Mine de fer 1", TypeRessource.FER, 800, 15, 20));
+        carte.getTile(18, 22, 2).ajouter(new LieuDeRessource("Mine de fer 2", TypeRessource.FER, 800, 18, 22));
+        carte.getTile(20, 18, 2).ajouter(new LieuDeRessource("Mine de fer 3", TypeRessource.FER, 800, 20, 18));
+        carte.getTile(12, 25, 2).ajouter(new LieuDeRessource("Mine de fer 4", TypeRessource.FER, 800, 12, 25));
+        carte.getTile(22, 15, 2).ajouter(new LieuDeRessource("Mine de fer 5", TypeRessource.FER, 800, 22, 15));
+        carte.getTile(25, 20, 2).ajouter(new LieuDeRessource("Mine de fer 6", TypeRessource.FER, 800, 25, 20));
+        carte.getTile(17, 28, 2).ajouter(new LieuDeRessource("Mine de fer 7", TypeRessource.FER, 800, 17, 28));
 
         // --- Silicium x3 : montagne nord-ouest (z=2) ---
-        carte.getTile(25, 22, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
-        carte.getTile(15, 28, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
-        carte.getTile(16, 28, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
+        carte.getTile(25, 22, 2).ajouter(new LieuDeRessource("Gisement de silicium 1", TypeRessource.SILICIUM, 600, 25, 22));
+        carte.getTile(15, 28, 2).ajouter(new LieuDeRessource("Gisement de silicium 2", TypeRessource.SILICIUM, 600, 15, 28));
+        carte.getTile(16, 28, 2).ajouter(new LieuDeRessource("Gisement de silicium 3", TypeRessource.SILICIUM, 600, 16, 28));
 
         // --- Pierre x5 : collines (z=1) ---
-        carte.getTile(30, 35, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(33, 38, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(28, 40, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(35, 32, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(38, 42, 1).ajouter(new Gisement(TypeRessource.PIERRE));
+        carte.getTile(30, 35, 1).ajouter(new LieuDeRessource("Carrière 1", TypeRessource.PIERRE, 900, 30, 35));
+        carte.getTile(33, 38, 1).ajouter(new LieuDeRessource("Carrière 2", TypeRessource.PIERRE, 900, 33, 38));
+        carte.getTile(28, 40, 1).ajouter(new LieuDeRessource("Carrière 3", TypeRessource.PIERRE, 900, 28, 40));
+        carte.getTile(35, 32, 1).ajouter(new LieuDeRessource("Carrière 4", TypeRessource.PIERRE, 900, 35, 32));
+        carte.getTile(38, 42, 1).ajouter(new LieuDeRessource("Carrière 5", TypeRessource.PIERRE, 900, 38, 42));
 
         // --- Pétrole x6 : enfoui en plaine (z=0) ---
-        carte.getTile(60, 40, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(65, 45, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(62, 50, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(70, 42, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(68, 55, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
-        carte.getTile(72, 48, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
+        carte.getTile(60, 40, 0).ajouter(new LieuDeRessource("Gisement de pétrole 1", TypeRessource.PETROLE, 600, 60, 40));
+        carte.getTile(65, 45, 0).ajouter(new LieuDeRessource("Gisement de pétrole 2", TypeRessource.PETROLE, 600, 65, 45));
+        carte.getTile(62, 50, 0).ajouter(new LieuDeRessource("Gisement de pétrole 3", TypeRessource.PETROLE, 600, 62, 50));
+        carte.getTile(70, 42, 0).ajouter(new LieuDeRessource("Gisement de pétrole 4", TypeRessource.PETROLE, 600, 70, 42));
+        carte.getTile(68, 55, 0).ajouter(new LieuDeRessource("Gisement de pétrole 5", TypeRessource.PETROLE, 600, 68, 55));
+        carte.getTile(72, 48, 0).ajouter(new LieuDeRessource("Gisement de pétrole 6", TypeRessource.PETROLE, 600, 72, 48));
 
         // --- Glace x2 : pics enneigés (z=4) ---
-        carte.getTile(20, 10, 4).ajouter(new Gisement(TypeRessource.GLACE));
-        carte.getTile(25, 12, 4).ajouter(new Gisement(TypeRessource.GLACE));
+        carte.getTile(20, 10, 4).ajouter(new LieuDeRessource("Champ de glace 1", TypeRessource.GLACE, 500, 20, 10));
+        carte.getTile(25, 12, 4).ajouter(new LieuDeRessource("Champ de glace 2", TypeRessource.GLACE, 500, 25, 12));
     }
 
     // ------------------------------------------------------------------ //
@@ -252,7 +255,8 @@ public class Jeu {
         bus.traiter(temps, joueur.getStock(), joueur.getOuvriers());
 
         // ── 6. Victoire (uniquement si la fusée est assemblée) ────────── //
-        if (fusee != null && fusee.estAssemblee()) {
+		// cette condition est amenée à changer dans la V2
+        if (fusee != null && fusee.tousModulesAssembles() && fusee.isIngenieurABord()) {
             verifierVictoire();
         }
     }
@@ -271,7 +275,7 @@ public class Jeu {
         for (Batiment b : batiments) {
             if (b instanceof Usine) {
                 Usine u = (Usine) b;
-                if (u.peutProduire()) {
+                if (u.isOperationnel()) {
                     try {
                         u.mettreAJour(joueur.getStock(), 1); // 1 tick écoulé
                     } catch (Exception e) {
@@ -279,7 +283,7 @@ public class Jeu {
                     }
                 }
             } else if (b instanceof LieuDeRessource) {
-                ((LieuDeRessource) b).extraire();
+                b.mettreAJour(joueur.getStock(), 1);
             }
         }
     }
@@ -341,7 +345,8 @@ public class Jeu {
         boolean surpopulation = (double) totalOuvriers / Math.max(litsDisponibles, 1) > 0.95;
 
         for (Ouvrier o : equipage) {
-            // Facteurs positifs (doc p.3)
+            // Facteurs positifs (doc p.3)*
+			//TODO à reprendre pour la V2, j'ai arangé avec Ouvrier mais c'est incomplet
             if (o.aMangeEtBu()) {
                 o.modifierMoral(+0.05); // besoins satisfaits
             }
@@ -385,8 +390,17 @@ public class Jeu {
      * Seuil minimum : prob >= 70 pour que le bouton soit actif (doc p.13).
      */
     private void verifierVictoire() {
-        try {
-            double prob = fusee.calculerProbabiliteSucces();
+        
+        double prob = fusee.calculerProbabiliteSucces();
+		if (prob >= 70) {
+            System.out.println("[Victoire] Lancement possible ! Probabilité : " + prob + "%");
+            // TODO : activer le bouton de lancement dans l'interface
+        } else {
+			System.out.println("[Défaite] Lancement impossible : probabilité de succès insuffisante (" + prob + "%)");
+			// TODO : garder le bouton de lancement grisé
+		}
+		/* A décommenter pour la V2
+		try {
             if (prob >= 70) {
                 System.out.println("[Victoire] Lancement possible ! Probabilité : " + prob + "%");
                 // TODO : activer le bouton de lancement dans l'interface
@@ -394,7 +408,7 @@ public class Jeu {
         } catch (LancementImpossibleException e) {
             // Conditions non remplies → bouton grisé, pas d'erreur critique
             System.out.println("[Fusée] " + e.getMessage());
-        }
+        }*/
     }
 
     // ------------------------------------------------------------------ //
@@ -434,6 +448,6 @@ public class Jeu {
     public Joueur   getJoueur() { return joueur; }
     public Carte    getCarte()  { return carte; }
     public Fusee    getFusee()  { return fusee; }
-    public Age      getAge()    { return age; }
+    //public Age      getAge()    { return age; }
     public Temps    getTemps()  { return temps; }
 }

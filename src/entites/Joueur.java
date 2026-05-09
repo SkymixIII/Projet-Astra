@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ressources.Stock;
 import ressources.TypeRessource;
 import carte.Direction;
 import batiments.*;
@@ -21,6 +22,7 @@ public class Joueur implements Item {
     private Map<TypeRessource, Integer> ressources;
     private List<Ouvrier> ouvriers;
     private List<Batiment> batiments;
+	private Stock stock;
 
     /**
      * Constructeur pour initialiser un nouveau joueur avec les ressources de base
@@ -33,6 +35,7 @@ public class Joueur implements Item {
         this.ressources = new HashMap<>();
         this.ouvriers = new ArrayList<>();
         this.batiments = new ArrayList<>();
+		this.stock = new Stock(false); // mode facile par défaut
 
         // Initialisation de l'inventaire vide pour chaque type de ressource
         for(TypeRessource type : TypeRessource.values()) {
@@ -40,6 +43,18 @@ public class Joueur implements Item {
         }
     }
 
+	public Stock getStock() { return stock; }
+
+	public int getNombreLitsDisponibles() {
+		int total = 0;
+		for (Batiment b : batiments) {
+			if (b instanceof Maison && b.aDeLaPlace()) {
+				total += ((Maison) b).getCapaciteDisponible();
+			}
+		}
+		return total;
+	}
+	
     // --- Implémentation des méthodes de l'interface Item ---
 
     @Override
