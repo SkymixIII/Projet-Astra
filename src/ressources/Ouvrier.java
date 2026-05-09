@@ -1,4 +1,4 @@
-package code;
+package ressources;
 
 /**
  * Représente un travailleur de la colonie.
