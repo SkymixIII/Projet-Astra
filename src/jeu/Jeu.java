@@ -82,7 +82,7 @@ public class Jeu {
 
     /**
      * Méthode pour créer la map.
-     * Génère le terrain, les reliefs et les gisements de ressources.
+     * Génère le terrain, les reliefs et les LieuDeRessources de ressources.
      */
     public void creationMonde() {
         this.carte = new Carte(100, 100, 5);
@@ -159,35 +159,35 @@ public class Jeu {
         // ============================================================
 
         // --- Forêts en plaine (z=0) ---
-        carte.getTile(35, 45, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(40, 50, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(45, 55, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(55, 45, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(60, 50, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(50, 60, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(42, 42, 0).ajouter(new Gisement(TypeRessource.BOIS));
-        carte.getTile(58, 58, 0).ajouter(new Gisement(TypeRessource.BOIS));
+        carte.getTile(35, 45, 0).ajouter(new LieuDeRessource("Forêt 1", TypeRessource.BOIS, 1000, 35, 45));
+        carte.getTile(40, 50, 0).ajouter(new LieuDeRessource("Forêt 2", TypeRessource.BOIS, 1000, 40, 50));
+        carte.getTile(45, 55, 0).ajouter(new LieuDeRessource("Forêt 3", TypeRessource.BOIS, 1000, 45, 55));
+        carte.getTile(55, 45, 0).ajouter(new LieuDeRessource("Forêt 4", TypeRessource.BOIS, 1000, 55, 45));
+        carte.getTile(60, 50, 0).ajouter(new LieuDeRessource("Forêt 5", TypeRessource.BOIS, 1000, 60, 50));
+        carte.getTile(50, 60, 0).ajouter(new LieuDeRessource("Forêt 6", TypeRessource.BOIS, 1000, 50, 60));
+        carte.getTile(42, 42, 0).ajouter(new LieuDeRessource("Forêt 7", TypeRessource.BOIS, 1000, 42, 42));
+        carte.getTile(58, 58, 0).ajouter(new LieuDeRessource("Forêt 8", TypeRessource.BOIS, 1000, 58, 58));
 
         // --- Fer x7 : montagne nord-ouest (z=2) ---
-        carte.getTile(15, 20, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(18, 22, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(20, 18, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(12, 25, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(22, 15, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(25, 20, 2).ajouter(new Gisement(TypeRessource.FER));
-        carte.getTile(17, 28, 2).ajouter(new Gisement(TypeRessource.FER));
+        carte.getTile(15, 20, 2).ajouter(new LieuDeRessource("Mine de fer 1", TypeRessource.FER, 800, 15, 20));
+        carte.getTile(18, 22, 2).ajouter(new LieuDeRessource("Mine de fer 2", TypeRessource.FER, 800, 18, 22));
+        carte.getTile(20, 18, 2).ajouter(new LieuDeRessource("Mine de fer 3", TypeRessource.FER, 800, 20, 18));
+        carte.getTile(12, 25, 2).ajouter(new LieuDeRessource("Mine de fer 4", TypeRessource.FER, 800, 12, 25));
+        carte.getTile(22, 15, 2).ajouter(new LieuDeRessource("Mine de fer 5", TypeRessource.FER, 800, 22, 15));
+        carte.getTile(25, 20, 2).ajouter(new LieuDeRessource("Mine de fer 6", TypeRessource.FER, 800, 25, 20));
+        carte.getTile(17, 28, 2).ajouter(new LieuDeRessource("Mine de fer 7", TypeRessource.FER, 800, 17, 28));
 
         // --- Silicium x3 : montagne nord-ouest (z=2) ---
-        carte.getTile(25, 22, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
-        carte.getTile(15, 28, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
-        carte.getTile(16, 28, 2).ajouter(new Gisement(TypeRessource.SILICIUM));
+        carte.getTile(25, 22, 2).ajouter(new LieuDeRessource("Gisement de silicium 1", TypeRessource.SILICIUM, 600, 25, 22));
+        carte.getTile(15, 28, 2).ajouter(new LieuDeRessource("Gisement de silicium 2", TypeRessource.SILICIUM, 600, 15, 28));
+        carte.getTile(16, 28, 2).ajouter(new LieuDeRessource("Gisement de silicium 3", TypeRessource.SILICIUM, 600, 16, 28));
 
         // --- Pierre x5 : collines (z=1) ---
-        carte.getTile(30, 35, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(33, 38, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(28, 40, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(35, 32, 1).ajouter(new Gisement(TypeRessource.PIERRE));
-        carte.getTile(38, 42, 1).ajouter(new Gisement(TypeRessource.PIERRE));
+        carte.getTile(30, 35, 1).ajouter(new LieuDeRessource("Carrière 1", TypeRessource.PIERRE, 900, 30, 35));
+        carte.getTile(33, 38, 1).ajouter(new LieuDeRessource("Carrière 2", TypeRessource.PIERRE, 900, 33, 38));
+        carte.getTile(28, 40, 1).ajouter(new LieuDeRessource("Carrière 3", TypeRessource.PIERRE, 900, 28, 40));
+        carte.getTile(35, 32, 1).ajouter(new LieuDeRessource("Carrière 4", TypeRessource.PIERRE, 900, 35, 32));
+        carte.getTile(38, 42, 1).ajouter(new LieuDeRessource("Carrière 5", TypeRessource.PIERRE, 900, 38, 42));
 
         // --- Pétrole x6 : enfoui en plaine (z=0) ---
         carte.getTile(60, 40, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
@@ -198,8 +198,8 @@ public class Jeu {
         carte.getTile(72, 48, 0).ajouter(new GisementEnfoui(TypeRessource.PETROLE));
 
         // --- Glace x2 : pics enneigés (z=4) ---
-        carte.getTile(20, 10, 4).ajouter(new Gisement(TypeRessource.GLACE));
-        carte.getTile(25, 12, 4).ajouter(new Gisement(TypeRessource.GLACE));
+        carte.getTile(20, 10, 4).ajouter(new LieuDeRessource("Champ de glace 1", TypeRessource.GLACE, 500, 20, 10));
+        carte.getTile(25, 12, 4).ajouter(new LieuDeRessource("Champ de glace 2", TypeRessource.GLACE, 500, 25, 12));
     }
 
     // ------------------------------------------------------------------ //
@@ -279,7 +279,7 @@ public class Jeu {
                     }
                 }
             } else if (b instanceof LieuDeRessource) {
-                ((LieuDeRessource) b).extraire();
+                b.mettreAJour(joueur.getStock(), 1);
             }
         }
     }

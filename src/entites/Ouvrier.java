@@ -2,7 +2,7 @@ package entites;
 
 import batiments.Batiment;
 import carte.Item;
-import ressources.Stock;
+import carte.Direction;
 import metiers.Metier;
 
 /**
@@ -146,10 +146,16 @@ public class Ouvrier implements Item {
         return Math.sqrt(Math.pow(autreItem.getX() - this.x, 2) + Math.pow(autreItem.getY() - this.y, 2));
     }
 
-    @Override 
+    @Override
     public void deplacer(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    @Override
+    public void deplacer(Direction direction) {
+        this.x += direction.getDx();
+        this.y += direction.getDy();
     }
 
 
