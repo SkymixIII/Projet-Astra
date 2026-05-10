@@ -20,9 +20,18 @@ javafx {
 application {
     mainClass = 'astra.Main'
     applicationDefaultJvmArgs = [
-        '--module-path', file("build/install/${project.name}/lib").absolutePath,
+        '--module-path', '../lib',
         '--add-modules', 'javafx.graphics'
     ]
+}
+
+startScripts {
+    doLast {
+        windowsScript.text = windowsScript.text.replace(
+            'set DEFAULT_JVM_OPTS=',
+            'set DEFAULT_JVM_OPTS="--module-path" "..\\lib" "--add-modules" "javafx.graphics" '
+        )
+    }
 }
 
 repositories {
