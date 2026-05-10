@@ -1,4 +1,4 @@
-package fusee.test_fusee;
+package fusee;
 
 import static org.junit.Assert.*;
 import org.junit.Test;

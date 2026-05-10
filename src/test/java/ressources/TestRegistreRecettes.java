@@ -1,4 +1,4 @@
-package ressources.test_ressources;
+package ressources;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
