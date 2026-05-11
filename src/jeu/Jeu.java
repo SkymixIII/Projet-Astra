@@ -73,121 +73,121 @@ public class Jeu {
         System.out.println("Lancement du projet Astra...");
     }
 
- public void creationMonde() {
-    this.carte = new Carte(100, 100, 5);
-    
-    // --- Spawn joueur (près des débris de la fusée au centre-est) ---
-    carte.getTile(60, 45, 0).ajouter(this.joueur);
+    public void creationMonde() {
+        this.carte = new Carte(100, 100, 5);
+            
+        // --- Spawn joueur (près des débris de la fusée au centre-est) ---
+        carte.getTile(60, 45, 0).ajouter(this.joueur);
 
-    // ============================================================
-    // SOL z=0 : Îles et Eau
-    // ============================================================
-    for (int x = 0; x < 100; x++) {
-        for (int y = 0; y < 100; y++) {
-            
-            // 1. Île principale (un peu décalée vers le haut/droite)
-            boolean ilePrincipale = (Math.pow((x - 60) / 35.0, 2) + Math.pow((y - 50) / 35.0, 2) < 1);
-            
-            // 2. Île Sud-Ouest (nouvelle île séparée)
-            boolean ileSO = (Math.pow((x - 25) / 15.0, 2) + Math.pow((y - 25) / 12.0, 2) < 1);
-            
-            // 3. Petite île de lancement (Sud-Est)
-            boolean ileLancement = (Math.pow(x - 85, 2) + Math.pow(y - 15, 2) < 25);
+        // ============================================================
+        // SOL z=0 : Îles et Eau
+        // ============================================================
+        for (int x = 0; x < 100; x++) {
+                for (int y = 0; y < 100; y++) {
+                            
+                        // 1. Île principale (un peu décalée vers le haut/droite)
+                        boolean ilePrincipale = (Math.pow((x - 60) / 35.0, 2) + Math.pow((y - 50) / 35.0, 2) < 1);
+                            
+                        // 2. Île Sud-Ouest (nouvelle île séparée)
+                        boolean ileSO = (Math.pow((x - 25) / 15.0, 2) + Math.pow((y - 25) / 12.0, 2) < 1);
+                            
+                        // 3. Petite île de lancement (Sud-Est)
+                        boolean ileLancement = (Math.pow(x - 85, 2) + Math.pow(y - 15, 2) < 25);
 
-            // Gestion du Sable (bordure de 2 pixels autour des îles)
-            boolean bordureSable = 
-                (Math.pow((x - 60) / 37.0, 2) + Math.pow((y - 50) / 37.0, 2) < 1 && !ilePrincipale) ||
-                (Math.pow((x - 25) / 17.0, 2) + Math.pow((y - 25) / 14.0, 2) < 1 && !ileSO) ||
-                (Math.pow(x - 85, 2) + Math.pow(y - 15, 2) < 40 && !ileLancement);
+                        // Gestion du Sable (bordure de 2 pixels autour des îles)
+                        boolean bordureSable =    
+                                (Math.pow((x - 60) / 37.0, 2) + Math.pow((y - 50) / 37.0, 2) < 1 && !ilePrincipale) ||
+                                (Math.pow((x - 25) / 17.0, 2) + Math.pow((y - 25) / 14.0, 2) < 1 && !ileSO) ||
+                                (Math.pow(x - 85, 2) + Math.pow(y - 15, 2) < 40 && !ileLancement);
 
-            TypeSol sol;
-            if (ilePrincipale || ileSO || ileLancement) sol = TypeSol.HERBE;
-            else if (bordureSable) sol = TypeSol.SABLE;
-            else sol = TypeSol.EAU;
+                        TypeSol sol;
+                        if (ilePrincipale || ileSO || ileLancement) sol = TypeSol.HERBE;
+                        else if (bordureSable) sol = TypeSol.SABLE;
+                        else sol = TypeSol.EAU;
 
-            carte.getTile(x, y, 0).ajouter(new Sol(sol, x, y));
-        }
-    }
+                        carte.getTile(x, y, 0).ajouter(new Sol(sol, x, y));
+                }
+        }
 
-    // ============================================================
-    // RELIEF (Z=1 à Z=4)
-    // ============================================================
+        // ============================================================
+        // RELIEF (Z=1 à Z=4)
+        // ============================================================
 
-    // PIERRE (z=1) : Colline sur l'île Sud-Ouest + base Montagne Nord
-    for (int x = 0; x < 100; x++) {
-        for (int y = 0; y < 100; y++) {
-            // Colline SO
-            if (Math.pow(x - 25, 2) + Math.pow(y - 25, 2) < 50) {
-                carte.getTile(x, y, 1).ajouter(new Sol(TypeSol.ROCHE, x, y));
-            }
-            // Base Montagne Nord
-            if (Math.pow((x - 50) / 15.0, 2) + Math.pow((y - 80) / 10.0, 2) < 1) {
-                carte.getTile(x, y, 1).ajouter(new Sol(TypeSol.ROCHE, x, y));
-            }
-        }
-    }
+        // PIERRE (z=1) : Colline sur l'île Sud-Ouest + base Montagne Nord
+        for (int x = 0; x < 100; x++) {
+                for (int y = 0; y < 100; y++) {
+                        // Colline SO
+                        if (Math.pow(x - 25, 2) + Math.pow(y - 25, 2) < 50) {
+                                carte.getTile(x, y, 1).ajouter(new Sol(TypeSol.ROCHE, x, y));
+                        }
+                        // Base Montagne Nord
+                        if (Math.pow((x - 50) / 15.0, 2) + Math.pow((y - 80) / 10.0, 2) < 1) {
+                                carte.getTile(x, y, 1).ajouter(new Sol(TypeSol.ROCHE, x, y));
+                        }
+                }
+        }
 
-    // MONTAGNE (z=2 & 3) : Fer et Silicium
-    for (int x = 40; x <= 60; x++) {
-        for (int y = 75; y <= 85; y++) {
-            if (Math.pow((x - 50) / 10.0, 2) + Math.pow((y - 80) / 6.0, 2) < 1) {
-                carte.getTile(x, y, 2).ajouter(new Sol(TypeSol.ROCHE_DURE, x, y));
-                // Étage supérieur réduit
-                if (Math.pow((x - 50) / 6.0, 2) + Math.pow((y - 80) / 4.0, 2) < 1) {
-                    carte.getTile(x, y, 3).ajouter(new Sol(TypeSol.ROCHE_DURE, x, y));
-                }
-            }
-        }
-    }
+        // MONTAGNE (z=2 & 3) : Fer et Silicium
+        for (int x = 40; x <= 60; x++) {
+                for (int y = 75; y <= 85; y++) {
+                        if (Math.pow((x - 50) / 10.0, 2) + Math.pow((y - 80) / 6.0, 2) < 1) {
+                                carte.getTile(x, y, 2).ajouter(new Sol(TypeSol.ROCHE_DURE, x, y));
+                                // Étage supérieur réduit
+                                if (Math.pow((x - 50) / 6.0, 2) + Math.pow((y - 80) / 4.0, 2) < 1) {
+                                        carte.getTile(x, y, 3).ajouter(new Sol(TypeSol.ROCHE_DURE, x, y));
+                                }
+                        }
+                }
+        }
 
-    // SOMMET NEIGE (z=4) : Glace
-    carte.getTile(50, 80, 4).ajouter(new Sol(TypeSol.NEIGE, 50, 80));
-    carte.getTile(51, 80, 4).ajouter(new Sol(TypeSol.NEIGE, 51, 80));
+        // SOMMET NEIGE (z=4) : Glace
+        carte.getTile(50, 80, 4).ajouter(new Sol(TypeSol.NEIGE, 50, 80));
+        carte.getTile(51, 80, 4).ajouter(new Sol(TypeSol.NEIGE, 51, 80));
 
-    // ============================================================
-    // RESSOURCES 
-    // ============================================================
+        // ============================================================
+        // RESSOURCES 
+        // ============================================================
 
- // --- FORÊTS (Z=0) ---
-    int[][] forets = {
-        {65, 60}, {70, 55}, {75, 45}, {80, 50}, // Est
-        {20, 25}, {25, 30}, {30, 20},           // Île Sud-Ouest
-        {45, 40}, {50, 35},                     // Centre
-        {60, 70}, {65, 75}, {70, 80},           // NOUVEAU : Bordure forêt Nord-Est
-        {40, 25}, {45, 20}                      // NOUVEAU : Petit bosquet central sud
-    };
-    for (int i = 0; i < forets.length; i++) {
-        int x = forets[i][0], y = forets[i][1];
-        carte.getTile(x, y, 0).ajouter(new LieuDeRessource("Forêt", TypeRessource.BOIS, 1000, x, y));
-    }
+    // --- FORÊTS (Z=0) ---
+        int[][] forets = {
+                {65, 60}, {70, 55}, {75, 45}, {80, 50}, // Est
+                {20, 25}, {25, 30}, {30, 20},                        // Île Sud-Ouest
+                {45, 40}, {50, 35},                                            // Centre
+                {60, 70}, {65, 75}, {70, 80},                        // NOUVEAU : Bordure forêt Nord-Est
+                {40, 25}, {45, 20}                                            // NOUVEAU : Petit bosquet central sud
+        };
+        for (int i = 0; i < forets.length; i++) {
+                int x = forets[i][0], y = forets[i][1];
+                carte.getTile(x, y, 0).ajouter(new LieuDeRessource("Forêt", TypeRessource.BOIS, 1000, x, y));
+        }
 
-    // --- PÉTROLE (Z=0) ---
-    int[][] petrole = { {40, 45}, {35, 35}, {60, 30}, {75, 30}, {25, 15} };
-    for (int[] p : petrole) {
-        carte.getTile(p[0], p[1], 0).ajouter(new LieuDeRessource("Pétrole", TypeRessource.PETROLE, 800, p[0], p[1]));
-    }
+        // --- PÉTROLE (Z=0) ---
+        int[][] petrole = { {40, 45}, {35, 35}, {60, 30}, {75, 30}, {25, 15} };
+        for (int[] p : petrole) {
+                carte.getTile(p[0], p[1], 0).ajouter(new LieuDeRessource("Pétrole", TypeRessource.PETROLE, 800, p[0], p[1]));
+        }
 
-    // --- FER & SILICIUM (Z=2 & 3) ---
-    int[][] minerais = { 
-        {48, 80}, {52, 80}, {50, 78}, {50, 82}, // Sommet montagne
-        {45, 78}, {55, 82}, {46, 82}, {54, 78}  // NOUVEAU : Filons sur les flancs de la montagne
-    };
-    for (int[] p : minerais) {
-        carte.getTile(p[0], p[1], 2).ajouter(new LieuDeRessource("Fer", TypeRessource.FER, 700, p[0], p[1]));
-        carte.getTile(p[0], p[1], 3).ajouter(new LieuDeRessource("Silicium", TypeRessource.SILICIUM, 500, p[0], p[1]));
-    }
+        // --- FER & SILICIUM (Z=2 & 3) ---
+        int[][] minerais = {    
+                {48, 80}, {52, 80}, {50, 78}, {50, 82}, // Sommet montagne
+                {45, 78}, {55, 82}, {46, 82}, {54, 78}    // NOUVEAU : Filons sur les flancs de la montagne
+        };
+        for (int[] p : minerais) {
+                carte.getTile(p[0], p[1], 2).ajouter(new LieuDeRessource("Fer", TypeRessource.FER, 700, p[0], p[1]));
+                carte.getTile(p[0], p[1], 3).ajouter(new LieuDeRessource("Silicium", TypeRessource.SILICIUM, 500, p[0], p[1]));
+        }
 
-    // --- PIERRE (Z=1) ---
-    int[][] pierres = { 
-        {25, 25}, {27, 23}, {50, 75}, {55, 78},
-        {22, 28}, {28, 22}, {24, 24},           // NOUVEAU : Plus de roches sur l'île SO
-        {45, 80}, {55, 80}                      // NOUVEAU : Base de la montagne Nord
-    };
-    for (int[] p : pierres) {
-        carte.getTile(p[0], p[1], 1).ajouter(new LieuDeRessource("Pierre", TypeRessource.PIERRE, 900, p[0], p[1]));
-    }
-    // --- GLACE (Z=4) ---
-    carte.getTile(50, 80, 4).ajouter(new LieuDeRessource("Glace", TypeRessource.GLACE, 400, 50, 80));
+        // --- PIERRE (Z=1) ---
+        int[][] pierres = {    
+                {25, 25}, {27, 23}, {50, 75}, {55, 78},
+                {22, 28}, {28, 22}, {24, 24},                        // NOUVEAU : Plus de roches sur l'île SO
+                {45, 80}, {55, 80}                                            // NOUVEAU : Base de la montagne Nord
+        };
+        for (int[] p : pierres) {
+                carte.getTile(p[0], p[1], 1).ajouter(new LieuDeRessource("Pierre", TypeRessource.PIERRE, 900, p[0], p[1]));
+        }
+        // --- GLACE (Z=4) ---
+        carte.getTile(50, 80, 4).ajouter(new LieuDeRessource("Glace", TypeRessource.GLACE, 400, 50, 80));
 }
 
     // ------------------------------------------------------------------ //
