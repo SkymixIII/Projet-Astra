@@ -26,6 +26,12 @@ JAVA_HOME = C:\Program Files\Eclipse Adoptium\jdk-21.x.x.x-hotspot
 PATH      = %JAVA_HOME%\bin;%PATH%
 ```
 
+**Machine de l'ENSEEIHT** -- dans `~/.bashrc` :
+```
+export PATH=/lib/jvm/java-21-openjdk-amd64/bin:${PATH}
+export JAVA_HOME=/lib/jvm/java-21-openjdk-amd64/
+```
+
 ---
 
 ## 3. Préparer (Linux/macOS uniquement)
