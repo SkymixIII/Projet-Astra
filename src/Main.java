@@ -31,13 +31,15 @@ public class Main extends Application {
 
         Group contenu3D = new Group(terrain, ambient);
 
-        // Caméra en hauteur, inclinée vers le bas → on voit la map à plat.
-        Rotate camRotX = new Rotate(35, Rotate.X_AXIS);
+        // Caméra placée au-dessus du centre de l'île de départ (cellule (60,50)),
+        // à 5 cases de hauteur, orientée à l'horizontale.
+        Rotate camRotX = new Rotate(0, Rotate.X_AXIS);
         Rotate camRotY = new Rotate(0,  Rotate.Y_AXIS);
         PerspectiveCamera camera = new PerspectiveCamera(true);
         camera.getTransforms().addAll(camRotY, camRotX);
-        camera.setTranslateY(-500);
-        camera.setTranslateZ(-700);
+        camera.setTranslateX(84);
+        camera.setTranslateY(-30);
+        camera.setTranslateZ(4);
         camera.setNearClip(0.1);
         camera.setFarClip(20000);
         camera.setFieldOfView(60);
@@ -60,7 +62,7 @@ public class Main extends Application {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                inputs.miseAJour();
+                inputs.miseAJour(now);
             }
         }.start();
 
