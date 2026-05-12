@@ -249,4 +249,32 @@ public class Ouvrier implements Item {
     /** Mis à jour par Joueur selon les lits disponibles. */
     public void setAUnLit(boolean valeur) { this.aUnLit = valeur; }
 
+
+	// -------------------------------------------------------------------------
+    // MISE A JOUR DE L'OUVRIER
+    // -------------------------------------------------------------------------
+
+	/**
+ * Met à jour les besoins et l'expérience de l'ouvrier en fonction du temps.
+ * @param time Temps écoulé en secondes (ou ticks).
+ */
+	public void mettreAJour(int time) {
+    	// Maj expérience
+    	if (this.posteActuel != null && this.metier != null) {
+        	this.travailler(time);
+    	}
+    	// Maj faim et soif ( ici 1.0 / 600 donne 100% en 10 minutes)
+	    double vitesseErosion = (double) time / 600.0;
+	    if (!aMangeEtBu) {
+	        this.faim = Math.min(1.0, this.faim + vitesseErosion);
+	        this.soif = Math.min(1.0, this.soif + (vitesseErosion * 1.2)); // un peu plus rapide que nourriture
+	    }
+		// Maj moral
+	    if (!aUnLit) {
+	        modifierMoral(-0.1 * ((double) time / 3600.0));
+	    }
+		// recalcul du moral
+	    mettreAJourEtat();
+	}
+
 }
