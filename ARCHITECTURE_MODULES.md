@@ -14,9 +14,14 @@ fichier .java de la classe.
 ### Packages de l'application dans src/main/java/
 
 - package astra :
+	- CoordMonde.java
+	- EtiquettesOuvriers.java
+	- GestionCollisions.java
     - GestionInput.java
     - Main.java
     - RenduCarte.java
+	- RenduMonde.java
+	- RenduOuvriers.java
 
 - package batiments :
     - Batiment.java
