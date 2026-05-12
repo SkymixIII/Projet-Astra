@@ -18,7 +18,7 @@ import carte.Sol;
  *   - chaque colonne du terrain donne une AABB qui s'étend du sommet visible
  *     vers le bas (sol "plein") ;
  *   - la caméra est représentée par une AABB de 0,25 case de large (base
- *     carrée) et 0,5 case de haut, centrée sur la position de la caméra ;
+ *     carrée) et 3 cases de haut, centrée sur la position de la caméra ;
  *   - n'importe quel autre élément affiché (bâtiment, ressource, etc.) peut
  *     être ajouté via {@link #ajouterObstacle(BoiteCollision)}.
  *
@@ -31,13 +31,17 @@ public class GestionCollisions {
     public static final double TAILLE_CASE = RenduCarte.TAILLE_CASE;
     public static final double ECHELLE_HAUTEUR = RenduCarte.ECHELLE_HAUTEUR;
 
-    // Dimensions de la caméra exprimées en cases (base carrée 0,25 x 0,25, hauteur 0,5).
+    // Dimensions de la caméra exprimées en cases (base carrée 0,25 x 0,25, hauteur 3).
     public static final double LARGEUR_CAMERA_CASE = 0.25;
-    public static final double HAUTEUR_CAMERA_CASE = 0.5;
+    public static final double HAUTEUR_CAMERA_CASE = 3.0;
 
     // Conversion en coordonnées monde JavaFX.
     public static final double DEMI_LARGEUR_CAMERA = (LARGEUR_CAMERA_CASE * TAILLE_CASE) / 2.0;
     public static final double DEMI_HAUTEUR_CAMERA = (HAUTEUR_CAMERA_CASE * ECHELLE_HAUTEUR) / 2.0;
+
+    // Hauteur maximale d'une "marche" que la caméra peut gravir automatiquement
+    // (différence de niveau entre deux cases voisines). Au-delà, c'est un mur.
+    public static final double HAUTEUR_MARCHE_MAX = 1.0 * ECHELLE_HAUTEUR;
 
     // Y "fond du monde" : valeur largement positive pour rendre les colonnes
     // de terrain solides vers le bas (en JavaFX, +Y pointe vers le bas).
@@ -139,14 +143,68 @@ public class GestionCollisions {
      * le déplacement sur X, puis Y, puis Z, et chaque composante est rejetée
      * indépendamment si elle entraîne une collision. Cela permet de glisser
      * le long d'un mur au lieu d'être complètement bloqué.
+     *
+     * Si un déplacement horizontal (X ou Z) bute sur un obstacle qui dépasse
+     * d'au plus {@link #HAUTEUR_MARCHE_MAX} au-dessus des pieds de la caméra,
+     * on monte la caméra juste ce qu'il faut pour passer : on glisse sur la
+     * pente en montant.
      */
     public Point3D resoudreDeplacementCamera(double x, double y, double z,
                                               double dx, double dy, double dz) {
         double nx = x, ny = y, nz = z;
-        if (dx != 0 && !cameraEnCollision(nx + dx, ny, nz)) nx += dx;
+        if (dx != 0) {
+            if (!cameraEnCollision(nx + dx, ny, nz)) {
+                nx += dx;
+            } else {
+                double yMarche = essayerMarche(nx + dx, ny, nz);
+                if (yMarche != ny) {
+                    nx += dx;
+                    ny = yMarche;
+                }
+            }
+        }
+        if (dz != 0) {
+            if (!cameraEnCollision(nx, ny, nz + dz)) {
+                nz += dz;
+            } else {
+                double yMarche = essayerMarche(nx, ny, nz + dz);
+                if (yMarche != ny) {
+                    nz += dz;
+                    ny = yMarche;
+                }
+            }
+        }
         if (dy != 0 && !cameraEnCollision(nx, ny + dy, nz)) ny += dy;
-        if (dz != 0 && !cameraEnCollision(nx, ny, nz + dz)) nz += dz;
         return new Point3D(nx, ny, nz);
+    }
+
+    /**
+     * Cherche la plus petite remontée Y qui permette de placer la caméra en
+     * (x, ?, z) sans collision. Renvoie la valeur Y résultante, ou {@code y}
+     * inchangé si la marche serait trop haute ou si la position remontée est
+     * elle-même bloquée (plafond).
+     *
+     * En JavaFX, +Y descend : "remonter" la caméra signifie diminuer Y, donc
+     * on cherche le {@code minY} d'obstacle le plus haut (le plus petit en
+     * valeur numérique) parmi ceux qui bloquent la trajectoire.
+     */
+    private double essayerMarche(double x, double y, double z) {
+        BoiteCollision boite = boiteCamera(x, y, z);
+        double yRequis = y;
+        boolean bloque = false;
+        for (BoiteCollision o : obstacles) {
+            if (!boite.entreEnCollision(o)) continue;
+            bloque = true;
+            // Pour que le bas de la caméra (y + DEMI_HAUTEUR_CAMERA) soit
+            // pile sur le sommet de l'obstacle (o.minY), il faut
+            // y = o.minY - DEMI_HAUTEUR_CAMERA.
+            double yCandidat = o.minY - DEMI_HAUTEUR_CAMERA;
+            if (yCandidat < yRequis) yRequis = yCandidat;
+        }
+        if (!bloque) return y;
+        if (y - yRequis > HAUTEUR_MARCHE_MAX) return y;
+        if (cameraEnCollision(x, yRequis, z)) return y;
+        return yRequis;
     }
 
     /**
