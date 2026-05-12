@@ -52,7 +52,10 @@ public class Main extends Application {
         Group root = new Group(sub);
         Scene scene = new Scene(root, WIDTH, HEIGHT);
 
-        GestionInputs inputs = new GestionInputs(scene, camera, camRotX, camRotY);
+        GestionCollisions collisions = new GestionCollisions();
+        collisions.construireDepuisCarte(jeu.getCarte());
+
+        GestionInputs inputs = new GestionInputs(scene, camera, camRotX, camRotY, collisions);
 
         new AnimationTimer() {
             @Override
