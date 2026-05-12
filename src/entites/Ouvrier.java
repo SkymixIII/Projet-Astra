@@ -57,6 +57,11 @@ public class Ouvrier implements Item {
     private boolean aUnLit = false;
     private boolean aMangeEtBu = false;  // remis à false à chaque demi-journée
 
+    // Jauges continues — augmentent quand un besoin n'est pas satisfait,
+    // retombent à 0 quand l'ouvrier mange et boit.
+    private double faim = 0.0;           // [0.0 = repu — 1.0 = affamé]
+    private double soif = 0.0;           // [0.0 = hydraté — 1.0 = déshydraté]
+
     // -------------------------------------------------------------------------
     // CONSTRUCTEUR
     // -------------------------------------------------------------------------
@@ -168,6 +173,7 @@ public class Ouvrier implements Item {
      */
     public void signalerManqueNourriture() {
         modifierMoral(-0.10);
+        faim = Math.min(1.0, faim + 0.25);
         mettreAJourEtat();
         aMangeEtBu = false;
     }
@@ -177,6 +183,7 @@ public class Ouvrier implements Item {
      */
     public void signalerManqueEau() {
         modifierMoral(-0.10);
+        soif = Math.min(1.0, soif + 0.25);
         mettreAJourEtat();
         aMangeEtBu = false;
     }
@@ -225,7 +232,16 @@ public class Ouvrier implements Item {
     public boolean aMangeEtBu() { return aMangeEtBu; }
 
     /** Appelé par Joueur après distribution réussie nourriture + eau. */
-    public void setAMangeEtBu(boolean valeur) { this.aMangeEtBu = valeur; }
+    public void setAMangeEtBu(boolean valeur) {
+        this.aMangeEtBu = valeur;
+        if (valeur) { // besoins satisfaits → jauges remises à zéro
+            this.faim = 0.0;
+            this.soif = 0.0;
+        }
+    }
+
+    public double getFaim() { return faim; }
+    public double getSoif() { return soif; }
 
     /** @return true si l'ouvrier dispose d'un lit. */
     public boolean aUnLit() { return aUnLit; }

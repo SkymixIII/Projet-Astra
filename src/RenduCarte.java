@@ -23,9 +23,6 @@ import ressources.TypeRessource;
  */
 public class RenduCarte {
 
-    public static final double TAILLE_CASE = 8.0;
-    public static final double ECHELLE_HAUTEUR = 6.0;
-
     public static Group creerTerrain(Carte carte) {
         int largeur  = carte.getLargeur();
         int longueur = carte.getLongueur();
@@ -69,15 +66,15 @@ public class RenduCarte {
 
         for (int i = 0; i < largeur; i++) {
             for (int j = 0; j < longueur; j++) {
-                float x0 = (float) ((i     - largeur  / 2.0) * TAILLE_CASE);
-                float x1 = (float) ((i + 1 - largeur  / 2.0) * TAILLE_CASE);
-                float z0 = (float) ((j     - longueur / 2.0) * TAILLE_CASE);
-                float z1 = (float) ((j + 1 - longueur / 2.0) * TAILLE_CASE);
+                float x0 = (float) CoordMonde.worldXCoin(i,     largeur);
+                float x1 = (float) CoordMonde.worldXCoin(i + 1, largeur);
+                float z0 = (float) CoordMonde.worldZCoin(j,     longueur);
+                float z1 = (float) CoordMonde.worldZCoin(j + 1, longueur);
 
-                float y00 = (float) (-hauteurCoin(heightmap, i,     j)     * ECHELLE_HAUTEUR);
-                float y01 = (float) (-hauteurCoin(heightmap, i,     j + 1) * ECHELLE_HAUTEUR);
-                float y10 = (float) (-hauteurCoin(heightmap, i + 1, j)     * ECHELLE_HAUTEUR);
-                float y11 = (float) (-hauteurCoin(heightmap, i + 1, j + 1) * ECHELLE_HAUTEUR);
+                float y00 = (float) (-hauteurCoin(heightmap, i,     j)     * CoordMonde.ECHELLE_HAUTEUR);
+                float y01 = (float) (-hauteurCoin(heightmap, i,     j + 1) * CoordMonde.ECHELLE_HAUTEUR);
+                float y10 = (float) (-hauteurCoin(heightmap, i + 1, j)     * CoordMonde.ECHELLE_HAUTEUR);
+                float y11 = (float) (-hauteurCoin(heightmap, i + 1, j + 1) * CoordMonde.ECHELLE_HAUTEUR);
 
                 TriangleMesh mesh = new TriangleMesh();
                 mesh.getPoints().addAll(
