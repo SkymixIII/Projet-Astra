@@ -1,4 +1,4 @@
-package batiments.test_batiments;
+package batiments;
 
 import org.junit.Test;
 import org.junit.Before;

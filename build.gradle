@@ -1,0 +1,64 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.projet'
+version = '1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+javafx {
+    version = '21'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+application {
+    mainClass = 'astra.Main'
+    applicationDefaultJvmArgs = [
+        '--module-path', '../lib',
+        '--add-modules', 'javafx.graphics'
+    ]
+}
+
+startScripts {
+    doLast {
+        windowsScript.text = windowsScript.text.replace(
+            'set DEFAULT_JVM_OPTS=',
+            'set DEFAULT_JVM_OPTS="--module-path" "..\\lib" "--add-modules" "javafx.graphics" '
+        )
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JUnit 4
+    testImplementation 'junit:junit:4.13.2'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'Main'
+    }
+}
+
+test {
+    useJUnit()
+
+    testLogging {
+        events 'passed', 'failed', 'skipped'
+    }
+}
+
+run {
+    jvmArgs = [
+        "-Dprism.forceGPU=true",
+    ]
+}

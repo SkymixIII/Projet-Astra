@@ -15,8 +15,8 @@ fi
 mkdir -p "$OUT"
 
 echo "==> Compilation..."
-javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" src/*.java src/*/*.java
+javac --module-path "$JFX_LIB" --add-modules "$MODULES" -d "$OUT" src/main/java/*/*.java
 
 
 echo "==> Lancement..."
-java --module-path "$JFX_LIB" --add-modules "$MODULES" -cp "$OUT" Main
+java --module-path "$JFX_LIB" --add-modules "$MODULES" -cp "$OUT" astra.Main

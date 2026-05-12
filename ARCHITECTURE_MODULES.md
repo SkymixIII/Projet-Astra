@@ -7,6 +7,21 @@ Pour importer une classe maclasse contenue dans le package monpaquet,
 il faut ajouter 'import monpaquet.maclasse;' au début de la classe
 concernée.
 
+Pour ajouter une classe à un package il faut la positionner dans le
+dossier du même nom et ajouter 'package monpaquet;' au plus haut du
+fichier .java de la classe.
+
+### Packages de l'application dans src/main/java/
+
+- package astra :
+	- CoordMonde.java
+	- EtiquettesOuvriers.java
+	- GestionCollisions.java
+    - GestionInput.java
+    - Main.java
+    - RenduCarte.java
+	- RenduMonde.java
+	- RenduOuvriers.java
 
 - package batiments :
     - Batiment.java
@@ -16,14 +31,6 @@ concernée.
     - Maison.java
 	- TypeBatiment.java
     - Usine.java
-
-- package batiments.test_batiments :
-    - TestCentreLancement.java
-    - TestHopital.java
-    - TestLieuDeRessource.java
-    - TestMaison.java
-    - TestUsine.java
-
 
 - package carte :
     - Carte.java
@@ -63,10 +70,6 @@ concernée.
     - OrdiDeBord.java
     - Propulseur.java
 
-- package fusee.test_fusee :
-    - TestFusee.java
-    - TestModuleFusee.java
-
 
 - package jeu :
     - Difficulte.java
@@ -88,6 +91,20 @@ concernée.
     - Stock.java
     - TypeRessource.java
 
-- package ressources.test_ressources:
+### Packages de test dans src/test/java :    
+
+- package batiments :
+    - TestCentreLancement.java
+    - TestHopital.java
+    - TestLieuDeRessource.java
+    - TestMaison.java
+    - TestUsine.java
+    
+
+- package fusee :
+    - TestFusee.java
+    - TestModuleFusee.java
+
+- package ressources :
     - StockTest.java
     - TestRegistreRecettes.java

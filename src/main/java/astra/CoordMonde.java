@@ -1,3 +1,5 @@
+package astra;
+
 import carte.Carte;
 import carte.Case;
 import carte.Item;

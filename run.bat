@@ -21,8 +21,8 @@ if errorlevel 1 (
 if not exist "%OUT%" mkdir "%OUT%"
 
 echo ==^> Compilation...
-javac --module-path "%JFX_LIB%" --add-modules %MODULES% -d "%OUT%" src\*.java src\*\*.java
+javac --module-path "%JFX_LIB%" --add-modules %MODULES% -d "%OUT%" src\main\java\*\*.java
 if errorlevel 1 exit /b 1
 
 echo ==^> Lancement...
-java --module-path "%JFX_LIB%" --add-modules %MODULES% -cp "%OUT%" Main
+java --module-path "%JFX_LIB%" --add-modules %MODULES% -cp "%OUT%" astra.Main

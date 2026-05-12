@@ -14,7 +14,10 @@ rsrc/javafx-sdk-*/
 # IDE
 .idea/
 .vscode/
+*.code-workspace
 *.iml
+*.iws
+*.ipr
 .project
 .classpath
 .settings/
@@ -30,3 +33,12 @@ desktop.ini
 
 # Linux
 *~
+
+# Gradle
+.gradle/
+
+# Ne pas ignorer le wrapper — il doit être commité
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+!gradlew
+!gradlew.bat
