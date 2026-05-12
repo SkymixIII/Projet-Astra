@@ -1,6 +1,7 @@
 package astra;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javafx.geometry.Point3D;
@@ -27,9 +28,9 @@ import carte.Sol;
  */
 public class GestionCollisions {
 
-    // Dimensions du moteur de rendu (1 case = TAILLE_CASE en X/Z, ECHELLE_HAUTEUR en Y).
-    public static final double TAILLE_CASE = RenduCarte.TAILLE_CASE;
-    public static final double ECHELLE_HAUTEUR = RenduCarte.ECHELLE_HAUTEUR;
+    // Dimensions du moteur de rendu (cf. {@link CoordMonde}).
+    public static final double TAILLE_CASE     = CoordMonde.TAILLE_CASE;
+    public static final double ECHELLE_HAUTEUR = CoordMonde.ECHELLE_HAUTEUR;
 
     // Dimensions de la caméra exprimées en cases (base carrée 0,25 x 0,25, hauteur 3).
     public static final double LARGEUR_CAMERA_CASE = 0.25;
@@ -74,16 +75,23 @@ public class GestionCollisions {
         }
     }
 
-    private final List<BoiteCollision> obstacles = new ArrayList<>();
+    /** Obstacles du terrain (statiques, construits une fois depuis la carte). */
+    private final List<BoiteCollision> obstaclesTerrain = new ArrayList<>();
 
     /**
-     * (Re)construit la liste des boîtes de collision à partir de la carte.
-     * Pour chaque colonne (i, j), on cherche la hauteur du dernier {@link Sol}
-     * (comme dans {@link RenduCarte}) et on crée une AABB allant du sommet
-     * visible jusqu'au "fond du monde".
+     * Obstacles dynamiques (entités mobiles : ouvriers, bâtiments mobiles…).
+     * Reconstruits à chaque frame par {@link RenduMonde}.
+     */
+    private final List<BoiteCollision> obstaclesDynamiques = new ArrayList<>();
+
+    /**
+     * (Re)construit la liste des boîtes de collision du terrain à partir de la
+     * carte. Pour chaque colonne (i, j), on cherche la hauteur du dernier
+     * {@link Sol} (comme dans {@link RenduCarte}) et on crée une AABB allant
+     * du sommet visible jusqu'au "fond du monde".
      */
     public void construireDepuisCarte(Carte carte) {
-        obstacles.clear();
+        obstaclesTerrain.clear();
         int largeur  = carte.getLargeur();
         int longueur = carte.getLongueur();
         int hauteur  = carte.getHauteur();
@@ -112,9 +120,18 @@ public class GestionCollisions {
                 double yHaut = -top * ECHELLE_HAUTEUR;
                 double yBas  = Y_FOND_DU_MONDE;
 
-                obstacles.add(new BoiteCollision(x0, yHaut, z0, x1, yBas, z1));
+                obstaclesTerrain.add(new BoiteCollision(x0, yHaut, z0, x1, yBas, z1));
             }
         }
+    }
+
+    /**
+     * Remplace l'intégralité des obstacles dynamiques. À appeler à chaque
+     * frame par la couche graphique avec les AABB courantes des entités.
+     */
+    public void setObstaclesDynamiques(Collection<BoiteCollision> boites) {
+        obstaclesDynamiques.clear();
+        obstaclesDynamiques.addAll(boites);
     }
 
     /** Construit la boîte de collision de la caméra centrée sur (x, y, z). */
@@ -125,9 +142,12 @@ public class GestionCollisions {
         );
     }
 
-    /** True si la boîte donnée intersecte au moins un obstacle. */
+    /** True si la boîte donnée intersecte au moins un obstacle (terrain ou dynamique). */
     public boolean enCollision(BoiteCollision boite) {
-        for (BoiteCollision o : obstacles) {
+        for (BoiteCollision o : obstaclesTerrain) {
+            if (boite.entreEnCollision(o)) return true;
+        }
+        for (BoiteCollision o : obstaclesDynamiques) {
             if (boite.entreEnCollision(o)) return true;
         }
         return false;
@@ -192,12 +212,15 @@ public class GestionCollisions {
         BoiteCollision boite = boiteCamera(x, y, z);
         double yRequis = y;
         boolean bloque = false;
-        for (BoiteCollision o : obstacles) {
+        for (BoiteCollision o : obstaclesTerrain) {
             if (!boite.entreEnCollision(o)) continue;
             bloque = true;
-            // Pour que le bas de la caméra (y + DEMI_HAUTEUR_CAMERA) soit
-            // pile sur le sommet de l'obstacle (o.minY), il faut
-            // y = o.minY - DEMI_HAUTEUR_CAMERA.
+            double yCandidat = o.minY - DEMI_HAUTEUR_CAMERA;
+            if (yCandidat < yRequis) yRequis = yCandidat;
+        }
+        for (BoiteCollision o : obstaclesDynamiques) {
+            if (!boite.entreEnCollision(o)) continue;
+            bloque = true;
             double yCandidat = o.minY - DEMI_HAUTEUR_CAMERA;
             if (yCandidat < yRequis) yRequis = yCandidat;
         }
@@ -208,21 +231,19 @@ public class GestionCollisions {
     }
 
     /**
-     * Ajoute une boîte de collision arbitraire (bâtiment, ressource, fusée…).
-     * Tout objet affiché qui n'est pas issu directement de la heightmap doit
-     * passer par ce point d'entrée pour rester cohérent avec la règle
-     * "tout ce qui est affiché est une collision".
+     * Ajoute une boîte de collision arbitraire au terrain statique
+     * (bâtiment fixe, décor…). Pour les entités mobiles, préférer
+     * {@link #setObstaclesDynamiques(Collection)} reconstruit chaque frame.
      */
-    public void ajouterObstacle(BoiteCollision boite) {
-        obstacles.add(boite);
+    public void ajouterObstacleTerrain(BoiteCollision boite) {
+        obstaclesTerrain.add(boite);
     }
 
-    /** Vide la liste des obstacles (utile pour reconstruire la carte). */
-    public void vider() {
-        obstacles.clear();
+    /** Vide la liste des obstacles terrain. */
+    public void viderTerrain() {
+        obstaclesTerrain.clear();
     }
 
-    public List<BoiteCollision> getObstacles() {
-        return obstacles;
-    }
+    public List<BoiteCollision> getObstaclesTerrain()     { return obstaclesTerrain; }
+    public List<BoiteCollision> getObstaclesDynamiques()  { return obstaclesDynamiques; }
 }

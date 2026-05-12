@@ -188,6 +188,22 @@ public class Jeu {
         }
         // --- GLACE (Z=4) ---
         carte.getTile(50, 80, 4).ajouter(new LieuDeRessource("Glace", TypeRessource.GLACE, 400, 50, 80));
+
+        // ============================================================
+        // OUVRIERS (6 initiaux, autour du joueur)
+        // ============================================================
+        int[][] positionsOuvriers = {
+                {58, 44}, {59, 44}, {61, 44},
+                {58, 46}, {59, 46}, {61, 46}
+        };
+        String[] nomsOuvriers = {"Alice", "Bob", "Charlie", "Diana", "Emile", "Fanny"};
+        for (int i = 0; i < positionsOuvriers.length; i++) {
+                int ox = positionsOuvriers[i][0];
+                int oy = positionsOuvriers[i][1];
+                Ouvrier o = new Ouvrier(nomsOuvriers[i], ox, oy);
+                this.joueur.getOuvriers().add(o);
+                carte.getTile(ox, oy, 0).ajouter(o);
+        }
 }
 
     // ------------------------------------------------------------------ //
