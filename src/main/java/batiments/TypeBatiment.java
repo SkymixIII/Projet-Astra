@@ -8,6 +8,7 @@ public enum TypeBatiment {
     MINE,
     CARRIERE,
     PUITS_PETROLE,
+	ENTREPOT,
 
     // Usines
 	USINE, //valeur provisoire, on n'a pas implémenté les différents types d'usines pour l'instant
@@ -19,4 +20,6 @@ public enum TypeBatiment {
 
 	// Bâtiments de soutien
 	LIEUX_DE_REPOS,
+	CENTRE_RECHERCHE,
+	CENTRE_LANCEMENT,
 }
