@@ -18,15 +18,18 @@ public class GestionInputs {
     private final PerspectiveCamera camera;
     private final Rotate camRotX;
     private final Rotate camRotY;
+    private final GestionCollisions collisions;
 
     private final double initX;
     private final double initY;
     private final double initZ;
 
-    public GestionInputs(Scene scene, PerspectiveCamera camera, Rotate camRotX, Rotate camRotY) {
+    public GestionInputs(Scene scene, PerspectiveCamera camera, Rotate camRotX, Rotate camRotY,
+                         GestionCollisions collisions) {
         this.camera = camera;
         this.camRotX = camRotX;
         this.camRotY = camRotY;
+        this.collisions = collisions;
         this.initX = camera.getTranslateX();
         this.initY = camera.getTranslateY();
         this.initZ = camera.getTranslateZ();
@@ -48,9 +51,17 @@ public class GestionInputs {
         if (pressed.contains(KeyCode.SHIFT)) dy += 1;
 
         if (dx != 0 || dy != 0 || dz != 0) {
-            camera.setTranslateX(camera.getTranslateX() + dx * VITESSE_DEPLACEMENT);
-            camera.setTranslateY(camera.getTranslateY() + dy * VITESSE_DEPLACEMENT);
-            camera.setTranslateZ(camera.getTranslateZ() + dz * VITESSE_DEPLACEMENT);
+            double cx = camera.getTranslateX();
+            double cy = camera.getTranslateY();
+            double cz = camera.getTranslateZ();
+            Point3D resolu = collisions.resoudreDeplacementCamera(
+                cx, cy, cz,
+                dx * VITESSE_DEPLACEMENT,
+                dy * VITESSE_DEPLACEMENT,
+                dz * VITESSE_DEPLACEMENT);
+            camera.setTranslateX(resolu.getX());
+            camera.setTranslateY(resolu.getY());
+            camera.setTranslateZ(resolu.getZ());
         }
 
         if (pressed.contains(KeyCode.LEFT))  camRotY.setAngle(camRotY.getAngle() - VITESSE_ROTATION);
