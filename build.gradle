@@ -21,7 +21,11 @@ application {
     mainClass = 'astra.Main'
     applicationDefaultJvmArgs = [
         '--module-path', '../lib',
-        '--add-modules', 'javafx.graphics'
+        '--add-modules', 'javafx.controls,javafx.fxml,javafx.graphics',
+        '--add-exports', 'javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED',
+        '--add-exports', 'javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED',
+        '--add-opens', 'javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED',
+        '--add-opens', 'javafx.base/com.sun.javafx.logging=ALL-UNNAMED'
     ]
 }
 
@@ -29,10 +33,15 @@ startScripts {
     doLast {
         windowsScript.text = windowsScript.text.replace(
             'set DEFAULT_JVM_OPTS=',
-            'set DEFAULT_JVM_OPTS="--module-path" "..\\lib" "--add-modules" "javafx.graphics" '
+            'set DEFAULT_JVM_OPTS="--module-path" "..\\lib" "--add-modules" "javafx.controls,javafx.fxml,javafx.graphics" "--add-exports" "javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED" "--add-exports" "javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED" "--add-opens" "javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED" "--add-opens" "javafx.base/com.sun.javafx.logging=ALL-UNNAMED" '
+        )
+        unixScript.text = unixScript.text.replace(
+            'DEFAULT_JVM_OPTS=""',
+            'DEFAULT_JVM_OPTS="--module-path ../lib --add-modules javafx.controls,javafx.fxml,javafx.graphics --add-exports javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-opens javafx.base/com.sun.javafx.logging=ALL-UNNAMED"'
         )
     }
 }
+
 
 repositories {
     mavenCentral()
