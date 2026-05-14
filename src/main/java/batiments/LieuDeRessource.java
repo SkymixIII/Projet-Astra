@@ -5,6 +5,7 @@ import carte.Item;
 import entites.Ouvrier;
 import ressources.TypeRessource;
 import ressources.Stock;
+
 /**
  * Représente un gisement de ressources (Mine, Forêt, Lac).
  * Contrairement à l'Usine, il ne transforme pas mais fournit une ressource brute.
@@ -26,7 +27,7 @@ public class LieuDeRessource implements Batiment {
 
     /**
      * Extrait une quantité de ressource du gisement.
-     * @param quantite Demandée par l'ouvrier ou le système.
+     * @param quantiteDemandee Demandée par l'ouvrier ou le système.
      * @return La quantité réellement extraite.
      */
     public int exploiter(int quantiteDemandee) {
@@ -39,37 +40,54 @@ public class LieuDeRessource implements Batiment {
 
     @Override
     public boolean isOperationnel() {
-        return this.quantite > 0; // Un gisement épuisé n'est plus opérationnel
+        return this.quantite > 0; // Un gisement épuisé est dead
     }
 
     @Override public int getX() { return x; }
     @Override public int getY() { return y; }
     public String getNom() { return nom; }
 
-	@Override
-	public TypeBatiment getType() {
-		return TypeBatiment.LIEU_DE_RESSOURCE;
-	}
+    @Override
+    public TypeBatiment getType() {
+        if (this.type == null) {
+            return TypeBatiment.LIEU_DE_RESSOURCE;
+        }
+        // On adapte dynamiquement le TypeBatiment selon la ressource brute du gisement
+        switch (this.type) {
+            case BOIS:
+                return TypeBatiment.FORET;
+            case FER:
+                return TypeBatiment.MINE;
+            case PIERRE:
+                return TypeBatiment.CARRIERE;
+            case PETROLE:
+                return TypeBatiment.PUITS_PETROLE;
+            default:
+                return TypeBatiment.LIEU_DE_RESSOURCE;
+        }
+    }
 
-	/** Type de ressource extraite par ce gisement. */
-	public TypeRessource getRessource() {
-		return this.type;
-	}
-	/* Ces méthodes sont a décommenter pour la V2
+    /** Type de ressource extraite par ce gisement. */
+    public TypeRessource getRessource() {
+        return this.type;
+    }
+
+    /* Ces méthodes sont à décommenter pour la V2
     @Override public int getNiveau() { return niveau; }
     @Override public void ameliorer() { this.niveau++; }
 
-    // Un gisement ne consomme généralement pas d'énergie au début, mais ptetre que oui si c'est profond
+    // Un gisement ne consomme généralement pas d'énergie ? 
     @Override public int getConsommationEnergie() { return 0; }
     @Override public int getProductionEnergie() { return 0; }
-	*/
+    */
+    
     @Override public void affecterPersonnel(Ouvrier o) { /* Logique à ajouter si besoin */ }
     @Override public void retirerPersonnel(Ouvrier o) { /* Logique à ajouter si besoin */ }
     @Override public boolean aDeLaPlace() { return true; }
 
     @Override
     public void mettreAJour(Stock stock, int tempsEcoule) {
-        // OFaudrait optimiser le truc si l'ouvrier est présent dedans
+        // Faudrait optimiser le truc si l'ouvrier est présent dedans
     }
 
     @Override
@@ -79,8 +97,7 @@ public class LieuDeRessource implements Batiment {
 
     @Override public void deplacer(int x, int y) { /* Immobile */ }
 
-	@Override
-	public void deplacer(Direction dir) { /* Immobile */ }
+    @Override public void deplacer(Direction dir) { /* Immobile */ }
 
     public int getQuantiteRestante() { return quantite; }
 }
