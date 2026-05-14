@@ -2,6 +2,7 @@
 out/
 build/
 target/
+bin/
 
 # JavaFX SDK (à télécharger localement, trop volumineux pour Git)
 rsrc/javafx-sdk-*/
