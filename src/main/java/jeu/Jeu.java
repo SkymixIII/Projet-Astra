@@ -43,6 +43,8 @@ public class Jeu {
     private Temps    temps;
     //private Age      age;
 
+    private boolean partieTerminee = false;
+
     // ------------------------------------------------------------------ //
     //  Constructeur                                                       //
     // ------------------------------------------------------------------ //
@@ -70,7 +72,355 @@ public class Jeu {
     public static void main(String[] args) {
         Jeu projetAstra = new Jeu();
         projetAstra.creationMonde();
-        System.out.println("Lancement du projet Astra...");
+                Jeu jeu = new Jeu();
+        jeu.creationMonde();
+ 
+        // Remplir le stock de départ pour pouvoir tester la production
+        jeu.initialiserStockDeDepart();
+ 
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("╔══════════════════════════════════════════════╗");
+        System.out.println("║                PROJET ASTRA                  ║");
+        System.out.println("╚══════════════════════════════════════════════╝");
+        afficherAide();
+        while (!jeu.isPartieTerminee()) {
+            System.out.print("\n> Commande : ");
+            String ligne = scanner.nextLine().trim();
+            if (ligne.isEmpty()) continue;
+ 
+            String[] parts = ligne.split("\\s+");
+            String cmd = parts[0].toLowerCase();
+ 
+            switch (cmd) {
+ 
+                // ── Avancer le temps ─────────────────────────────────── //
+                case "tick": {
+                    // [AJOUT] "tick [n]" — exécute n ticks (défaut : 1)
+                    int n = 1;
+                    if (parts.length >= 2) {
+                        try { n = Integer.parseInt(parts[1]); }
+                        catch (NumberFormatException e) {
+                            System.out.println("[Erreur] Usage : tick [nombre]");
+                            break;
+                        }
+                    }
+                    for (int i = 0; i < n && !jeu.isPartieTerminee(); i++) {
+                        jeu.processTick();
+                    }
+                    System.out.println("[Temps] " + jeu.getTemps());
+                    break;
+                }
+                
+                // ── Placer une usine ──────────────────────────────────── //
+                case "construire": {
+                    // [AJOUT] "construire <type> <x> <y>"
+                    // Types disponibles : MENUISERIE, FONDERIE, RAFFINERIE,
+                    //                     ELECTRONIQUE, ASSEMBLAGE
+                    if (parts.length < 4) {
+                        System.out.println("[Erreur] Usage : construire <type> <x> <y>");
+                        System.out.println("  Types : MENUISERIE  FONDERIE  RAFFINERIE  ELECTRONIQUE  ASSEMBLAGE");
+                        break;
+                    }
+                    try {
+                        int bx = Integer.parseInt(parts[2]);
+                        int by = Integer.parseInt(parts[3]);
+                        jeu.construireUsine(parts[1].toUpperCase(), bx, by);
+                    } catch (NumberFormatException e) {
+                        System.out.println("[Erreur] Les coordonnées doivent être des entiers.");
+                    }
+                    break;
+                }
+                
+                // ── Affecter un ouvrier à une usine ───────────────────── //
+                case "affecter": {
+                    // [AJOUT] "affecter <nomOuvrier> <indexBatiment>"
+                    // indexBatiment : numéro affiché par "etat"
+                    if (parts.length < 3) {
+                        System.out.println("[Erreur] Usage : affecter <nomOuvrier> <indexBatiment>");
+                        break;
+                    }
+                    try {
+                        int idx = Integer.parseInt(parts[2]);
+                        jeu.affecterOuvrier(parts[1], idx);
+                    } catch (NumberFormatException e) {
+                        System.out.println("[Erreur] L'index doit être un entier.");
+                    }
+                    break;
+                }
+ 
+                // ── Retirer un ouvrier d'une usine ────────────────────── //
+                case "retirer": {
+                    // [AJOUT] "retirer <nomOuvrier> <indexBatiment>"
+                    if (parts.length < 3) {
+                        System.out.println("[Erreur] Usage : retirer <nomOuvrier> <indexBatiment>");
+                        break;
+                    }
+                    try {
+                        int idx = Integer.parseInt(parts[2]);
+                        jeu.retirerOuvrier(parts[1], idx);
+                    } catch (NumberFormatException e) {
+                        System.out.println("[Erreur] L'index doit être un entier.");
+                    }
+                    break;
+                }
+ 
+                // ── Afficher l'état complet ───────────────────────────── //
+                case "etat": {
+                    jeu.afficherEtat();
+                    break;
+                }
+ 
+                // ── Afficher uniquement le stock ──────────────────────── //
+                case "stock": {
+                    jeu.afficherStock();
+                    break;
+                }
+ 
+                // ── Aide ─────────────────────────────────────────────── //
+                case "aide":
+                case "help": {
+                    afficherAide();
+                    break;
+                }
+ 
+                // ── Quitter ───────────────────────────────────────────── //
+                case "quitter":
+                case "quit":
+                case "exit": {
+                    System.out.println("Au revoir.");
+                    scanner.close();
+                    return;
+                }
+ 
+                default: {
+                    System.out.println("[?] Commande inconnue. Tapez 'aide' pour la liste.");
+                }
+            }
+        }
+ 
+        // Fin de partie (victoire déclenchée dans verifierVictoire)
+        System.out.println("\nPartie terminée. Merci d'avoir joué !");
+        scanner.close();
+    }
+
+    /**
+     *Remplit le stock de départ avec des ressources de base
+     * pour permettre de tester la production sans extraction préalable.
+     *
+     * Stock de départ (débris de fusée, doc §2.2) :
+     *   BOIS 200, PIERRE 100, FER 100, PETROLE 60, SILICIUM 40
+     */
+
+    private void initialiserStockDeDepart() {
+        Stock s = joueur.getStock();
+        s.ajouter(TypeRessource.BOIS,     200);
+        s.ajouter(TypeRessource.PIERRE,   100);
+        s.ajouter(TypeRessource.FER,      100);
+        s.ajouter(TypeRessource.PETROLE,   60);
+        s.ajouter(TypeRessource.SILICIUM,  40);
+        System.out.println("[Init] Stock de départ chargé.");
+    }
+
+    /**
+     * Construit une usine du type demandé aux coordonnées (x, y)
+     * et l'ajoute à la liste des bâtiments du joueur.
+     *
+     * Recettes conformes au doc §6.2 (version fonctionnelle).
+     *
+     * @param type  Nom du type parmi : MENUISERIE, FONDERIE, RAFFINERIE,
+     *              ELECTRONIQUE, ASSEMBLAGE
+     * @param x     Coordonnée X sur la carte (z=0)
+     * @param y     Coordonnée Y sur la carte (z=0)
+     */
+    public void construireUsine(String type, int x, int y) {
+        TypeRessource produit;
+        Map<TypeRessource, Integer> recette = new HashMap<>();
+ 
+        switch (type) {
+            case "MENUISERIE":
+                produit = TypeRessource.POUTRE;
+                recette.put(TypeRessource.BOIS, 10);      // 10 bois → 1 poutre
+                break;
+            case "FONDERIE":
+                produit = TypeRessource.PLAQUE_ACIER;
+                recette.put(TypeRessource.FER, 10);        // 10 minerai → 1 plaque
+                break;
+            case "RAFFINERIE":
+                produit = TypeRessource.KEROSENE;
+                recette.put(TypeRessource.PETROLE, 10);    // 10 pétrole → 1 kérosène
+                break;
+            case "ELECTRONIQUE":
+                produit = TypeRessource.CARTE_MERE;
+                recette.put(TypeRessource.SILICIUM, 5);    // 5 silicium + 2 plaques → 1 carte mère
+                recette.put(TypeRessource.PLAQUE_ACIER, 2);
+                break;
+            case "ASSEMBLAGE":
+                // La zone d'assemblage est gérée par la classe Fusee ;
+                // on crée quand même une usine marqueur pour la carte.
+                produit = TypeRessource.POUTRE; // placeholder
+                recette.put(TypeRessource.POUTRE, 1);
+                break;
+            default:
+                System.out.println("[Erreur] Type inconnu : " + type);
+                System.out.println("  Types valides : MENUISERIE  FONDERIE  RAFFINERIE  ELECTRONIQUE  ASSEMBLAGE");
+                return;
+        }
+ 
+        Usine usine = new Usine(type, x, y, produit, recette);
+        joueur.getBatiments().add(usine);
+        carte.getTile(x, y, 0).ajouter(usine);
+ 
+        System.out.println("[Construction] Usine " + type
+                + " placée en (" + x + "," + y + ")."
+                + " Index : " + (joueur.getBatiments().size() - 1));
+    }
+ 
+
+    /**
+     * Affecte l'ouvrier nommé {@code nomOuvrier} au bâtiment
+     * à l'index {@code indexBatiment} dans la liste du joueur.
+     *
+     * L'ouvrier est aussi notifié de son nouveau poste (via affecterPoste).
+     */
+    public void affecterOuvrier(String nomOuvrier, int indexBatiment) {
+        Ouvrier ouvrier = trouverOuvrier(nomOuvrier);
+        if (ouvrier == null) {
+            System.out.println("[Erreur] Ouvrier introuvable : " + nomOuvrier);
+            return;
+        }
+ 
+        List<Batiment> batiments = joueur.getBatiments();
+        if (indexBatiment < 0 || indexBatiment >= batiments.size()) {
+            System.out.println("[Erreur] Index bâtiment invalide : " + indexBatiment
+                    + " (0 à " + (batiments.size() - 1) + ")");
+            return;
+        }
+ 
+        Batiment bat = batiments.get(indexBatiment);
+        if (!bat.aDeLaPlace()) {
+            System.out.println("[Erreur] Le bâtiment #" + indexBatiment + " est plein (5 ouvriers max).");
+            return;
+        }
+ 
+        bat.affecterPersonnel(ouvrier);
+        ouvrier.affecterPoste(bat);
+        System.out.println("[Affectation] " + nomOuvrier + " → bâtiment #" + indexBatiment
+                + " (" + bat.getType() + " en " + bat.getX() + "," + bat.getY() + ")");
+    }
+
+    /**
+     * Retire l'ouvrier nommé {@code nomOuvrier} du bâtiment
+     * à l'index {@code indexBatiment}.
+     */
+    public void retirerOuvrier(String nomOuvrier, int indexBatiment) {
+        Ouvrier ouvrier = trouverOuvrier(nomOuvrier);
+        if (ouvrier == null) {
+            System.out.println("[Erreur] Ouvrier introuvable : " + nomOuvrier);
+            return;
+        }
+ 
+        List<Batiment> batiments = joueur.getBatiments();
+        if (indexBatiment < 0 || indexBatiment >= batiments.size()) {
+            System.out.println("[Erreur] Index bâtiment invalide : " + indexBatiment);
+            return;
+        }
+ 
+        batiments.get(indexBatiment).retirerPersonnel(ouvrier);
+        ouvrier.affecterPoste(null);
+        System.out.println("[Retrait] " + nomOuvrier + " retiré du bâtiment #" + indexBatiment);
+    }
+ 
+    /**
+     *Cherche un ouvrier par son nom (insensible à la casse).
+     * @return l'Ouvrier trouvé, ou null si absent.
+     */
+    private Ouvrier trouverOuvrier(String nom) {
+        for (Ouvrier o : joueur.getOuvriers()) {
+            if (o.getNom().equalsIgnoreCase(nom)) return o;
+        }
+        return null;
+    }
+
+        // ------------------------------------------------------------------ //
+    //  Affichage console                                         //
+    // ------------------------------------------------------------------ //
+ 
+    /**
+     *  Affiche l'état complet du jeu : temps, ouvriers, bâtiments.
+     */
+    public void afficherEtat() {
+        System.out.println("\n══════════════ ÉTAT DU JEU ══════════════");
+        System.out.println("  " + temps);
+ 
+        // Ouvriers
+        System.out.println("\n── Ouvriers (" + joueur.getOuvriers().size() + ") ──");
+        for (Ouvrier o : joueur.getOuvriers()) {
+            String poste = (o.getPosteActuel() != null)
+                    ? "→ " + o.getPosteActuel().getType()
+                               + " (" + o.getPosteActuel().getX()
+                               + "," + o.getPosteActuel().getY() + ")"
+                    : "→ sans poste";
+            System.out.printf("  %-10s  %-10s  exp:%-9s  %s%n",
+                    o.getNom(),
+                    o.getEtat(),
+                    o.getNiveau(),
+                    poste);
+        }
+ 
+        // Bâtiments
+        System.out.println("\n── Bâtiments (" + joueur.getBatiments().size() + ") ──");
+        List<Batiment> bats = joueur.getBatiments();
+        for (int i = 0; i < bats.size(); i++) {
+            Batiment b = bats.get(i);
+            String op = b.isOperationnel() ? "ACTIF" : "inactif";
+            System.out.printf("  [%2d]  %-14s  (%3d,%3d)  %s%n",
+                    i, b.getType(), b.getX(), b.getY(), op);
+        }
+ 
+        // Stock résumé
+        System.out.println();
+        afficherStock();
+        System.out.println("═════════════════════════════════════════");
+    }
+
+    /**
+     * Affiche uniquement les ressources non nulles du stock.
+     */
+    public void afficherStock() {
+        System.out.println("── Stock ──");
+        Stock s = joueur.getStock();
+        boolean vide = true;
+        for (TypeRessource t : TypeRessource.values()) {
+            int qte = s.getQuantite(t);
+            if (qte > 0) {
+                System.out.printf("  %-22s : %d%n", t, qte);
+                vide = false;
+            }
+        }
+        if (vide) System.out.println("  (vide)");
+    }
+ 
+        /**
+     * Affiche la liste des commandes disponibles.
+     */
+    private static void afficherAide() {
+        System.out.println("\n── Commandes disponibles ──────────────────────────────────────");
+        System.out.println("  tick [n]                      Avance de n ticks (défaut : 1)");
+        System.out.println("  construire <type> <x> <y>     Place une usine");
+        System.out.println("    types : MENUISERIE  FONDERIE  RAFFINERIE  ELECTRONIQUE  ASSEMBLAGE");
+        System.out.println("  affecter <nom> <index>        Affecte un ouvrier à un bâtiment");
+        System.out.println("  retirer  <nom> <index>        Retire un ouvrier d'un bâtiment");
+        System.out.println("  etat                          Affiche ouvriers + bâtiments + stock");
+        System.out.println("  stock                         Affiche uniquement le stock");
+        System.out.println("  aide                          Cette aide");
+        System.out.println("  quitter                       Quitte le jeu");
+        System.out.println("───────────────────────────────────────────────────────────────");
+        System.out.println("  Exemple de partie rapide :");
+        System.out.println("    construire MENUISERIE 62 45");
+        System.out.println("    affecter Alice 0");
+        System.out.println("    tick 300");
+        System.out.println("    stock");
+        System.out.println("───────────────────────────────────────────────────────────────");
     }
 
     public void creationMonde() {
@@ -223,6 +573,8 @@ public class Jeu {
      */
     public void processTick() {
 
+        if (partieTerminee) return; //Stoppe le tick si victoire
+
         // ── 1. Avancer le temps ──────────────────────────────────────── //
         this.temps.augmenterHeure();
 
@@ -230,14 +582,7 @@ public class Jeu {
         if (!temps.estNuit()) {
             mettreAJourProduction();
 
-            // ── 3. Besoins vitaux — une fois par demi-journée ─────────── //
-            if (temps.estFinDemiJournee()) {
-                consommerBesoinsVitaux();
-                mettreAJourMoral();
-            }
-
-        } else {
-            // ── Nuit : récupération de fatigue ───────────────────────── //
+            // ── 3 Nuit : récupération de fatigue ───────────────────────── //
             if (temps.estFinNuit()) {
                 recupererFatigue();
             }
@@ -251,10 +596,7 @@ public class Jeu {
         bus.traiter(temps, joueur.getStock(), joueur.getOuvriers());
 
         // ── 6. Victoire (uniquement si la fusée est assemblée) ────────── //
-		// cette condition est amenée à changer dans la V2
-        if (fusee != null && fusee.tousModulesAssembles() && fusee.isIngenieurABord()) {
-            verifierVictoire();
-        }
+        verifierVictoire();
     }
 
     // ------------------------------------------------------------------ //
@@ -285,85 +627,6 @@ public class Jeu {
     }
 
     // ------------------------------------------------------------------ //
-    //  Besoins vitaux — une fois par demi-journée (doc p.2)              //
-    // ------------------------------------------------------------------ //
-
-    /**
-     * Consomme nourriture et eau pour chaque ouvrier.
-     * Déclenché une fois par demi-journée travaillée (900 ticks).
-     *
-     * Consommation par ouvrier par demi-journée (doc p.2) :
-     *   - Nourriture : 2 unités
-     *   - Eau        : 3 unités
-     */
-    public void consommerBesoinsVitaux() {
-        List<Ouvrier> equipage = this.joueur.getOuvriers();
-        Stock stock = this.joueur.getStock();
-
-        for (Ouvrier o : equipage) {
-            // Nourriture
-            try {
-                stock.retirer(TypeRessource.NOURRITURE, 2);
-            } catch (RessourceInsuffisanteException e) {
-                o.signalerManqueNourriture(); // baisse moral -0.10 (doc p.3)
-                System.err.println("[Besoins] Nourriture insuffisante pour " + o.getIdentifiant());
-            }
-
-            // Eau potable
-            try {
-                stock.retirer(TypeRessource.EAU_POTABLE, 3);
-            } catch (RessourceInsuffisanteException e) {
-                o.signalerManqueEau(); // baisse moral -0.10 (doc p.3)
-                System.err.println("[Besoins] Eau insuffisante pour " + o.getIdentifiant());
-            }
-
-            // Mise à jour état de l'ouvrier selon son moral
-            // Si l'ouvrier n'est plus en état (STRESSE ou FATIGUE), cela
-            // affectera sa productivité lors du prochain tick
-            o.mettreAJourEtat();
-        }
-    }
-
-    // ------------------------------------------------------------------ //
-    //  Moral — une fois par demi-journée (doc p.3)                       //
-    // ------------------------------------------------------------------ //
-
-    /**
-     * Applique les facteurs de montée/descente de moral (doc p.3).
-     * Appelée en même temps que consommerBesoinsVitaux().
-     */
-    private void mettreAJourMoral() {
-        List<Ouvrier> equipage  = this.joueur.getOuvriers();
-        int litsDisponibles     = this.joueur.getNombreLitsDisponibles();
-        int totalOuvriers       = equipage.size();
-
-        // Taux d'occupation des lits (doc p.3 : surpopulation > 95%)
-        boolean surpopulation = (double) totalOuvriers / Math.max(litsDisponibles, 1) > 0.95;
-
-        for (Ouvrier o : equipage) {
-            // Facteurs positifs (doc p.3)*
-			//TODO à reprendre pour la V2, j'ai arangé avec Ouvrier mais c'est incomplet
-            if (o.aMangeEtBu()) {
-                o.modifierMoral(+0.05); // besoins satisfaits
-            }
-            if (o.aUnLit()) {
-                o.modifierMoral(+0.02); // lit disponible
-            }
-
-            // Facteurs négatifs (doc p.3)
-            if (!o.aUnLit()) {
-                o.modifierMoral(-0.05); // pas de lit
-            }
-            if (surpopulation) {
-                o.modifierMoral(-0.03); // surpopulation
-            }
-
-            // Mise à jour de l'état selon le nouveau moral
-            o.mettreAJourEtat();
-        }
-    }
-
-    // ------------------------------------------------------------------ //
     //  Nuit — récupération (doc p.2)                                     //
     // ------------------------------------------------------------------ //
 
@@ -387,24 +650,16 @@ public class Jeu {
      */
     private void verifierVictoire() {
         
-        double prob = fusee.calculerProbabiliteSucces();
-		if (prob >= 70) {
-            System.out.println("[Victoire] Lancement possible ! Probabilité : " + prob + "%");
-            // TODO : activer le bouton de lancement dans l'interface
-        } else {
-			System.out.println("[Défaite] Lancement impossible : probabilité de succès insuffisante (" + prob + "%)");
-			// TODO : garder le bouton de lancement grisé
-		}
-		/* A décommenter pour la V2
-		try {
-            if (prob >= 70) {
-                System.out.println("[Victoire] Lancement possible ! Probabilité : " + prob + "%");
-                // TODO : activer le bouton de lancement dans l'interface
-            }
-        } catch (LancementImpossibleException e) {
-            // Conditions non remplies → bouton grisé, pas d'erreur critique
-            System.out.println("[Fusée] " + e.getMessage());
-        }*/
+        if (fusee == null) return;
+ 
+        if (fusee.tousModulesAssembles() && fusee.isIngenieurABord()) {
+            partieTerminee = true;
+            System.out.println("==============================================");
+            System.out.println("[VICTOIRE] Tous les modules sont assemblés !");
+            System.out.println("           La fusée décolle automatiquement.");
+            System.out.println("==============================================");
+            // TODO : déclencher l'écran de victoire dans l'interface graphique
+        }
     }
 
     // ------------------------------------------------------------------ //
