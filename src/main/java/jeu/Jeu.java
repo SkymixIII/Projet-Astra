@@ -1,16 +1,23 @@
 package jeu;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
+import batiments.Batiment;
+import batiments.LieuDeRessource;
+import batiments.Usine;
 import carte.Carte;
-import carte.TypeSol;
 import carte.Sol;
-import entites.*;
+import carte.TypeSol;
+import entites.Joueur;
+import entites.Ouvrier;
+import evenements.EventBus;
+import exceptions.StockException;
 import fusee.Fusee;
-import ressources.*;
-import batiments.*;
-import exceptions.*;
-import evenements.*;
+import ressources.Stock;
+import ressources.TypeRessource;
 
 /**
  * Classe orchestratrice principale.
@@ -213,12 +220,16 @@ public class Jeu {
 
     private void initialiserStockDeDepart() {
         Stock s = joueur.getStock();
-        s.ajouter(TypeRessource.BOIS,     200);
-        s.ajouter(TypeRessource.PIERRE,   100);
-        s.ajouter(TypeRessource.FER,      100);
-        s.ajouter(TypeRessource.PETROLE,   60);
-        s.ajouter(TypeRessource.SILICIUM,  40);
-        System.out.println("[Init] Stock de départ chargé.");
+		try {
+			s.ajouter(TypeRessource.BOIS,     200);
+			s.ajouter(TypeRessource.PIERRE,   100);
+			s.ajouter(TypeRessource.FER,      100);
+			s.ajouter(TypeRessource.PETROLE,   60);
+			s.ajouter(TypeRessource.SILICIUM,  40);
+        	System.out.println("[Init] Stock de départ chargé.");
+		} catch (StockException e) {
+			System.err.println("[Erreur] Impossible d'initialiser le stock de départ : " + e.getMessage());
+		}
     }
 
     /**
@@ -701,4 +712,6 @@ public class Jeu {
     public Fusee    getFusee()  { return fusee; }
     //public Age      getAge()    { return age; }
     public Temps    getTemps()  { return temps; }
+
+    public boolean isPartieTerminee() { return partieTerminee; }
 }
