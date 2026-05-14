@@ -1,11 +1,9 @@
-package batiments.test_batiments;
+package batiments;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import batiments.Entrepot;
-import batiments.TypeBatiment;
 import ressources.TypeRessource;
 
 public class TestEntrepot {
