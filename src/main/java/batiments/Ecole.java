@@ -35,7 +35,7 @@ public class Ecole implements Batiment {
         if (!isOperationnel()) return;
         // On fait travailler les ouvriers qui sont dedans
         for (Ouvrier ouvrier : eleves) {
-            if (ouvrier.getMetier() != null && "CHERCHEUR".equals(ouvrier.getMetier().getNom())) {
+            if (ouvrier.getMetier() != null && "Chercheur".equals(ouvrier.getMetier().getNomAffichage())) {
                 // L'expérience évolue selon progressionRecherche
                 int bonusTicks = (int) (tempsEcoule * (1.0f + progressionRecherche));
                 ouvrier.travailler(bonusTicks);
