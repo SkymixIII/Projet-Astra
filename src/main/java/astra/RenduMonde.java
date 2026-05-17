@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import batiments.Batiment;
+import entites.Ouvrier;
 import javafx.scene.AmbientLight;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
@@ -17,8 +19,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
-
-import entites.Ouvrier;
 import jeu.Jeu;
 
 /**
@@ -49,7 +49,9 @@ public class RenduMonde {
     // ── Contenu 3D ──
     private final Group terrain;
     private final Group groupeOuvriers;
+    private final Group groupeBatiments;
     private final Map<Ouvrier, Group> nodesOuvriers = new HashMap<>();
+    private final Map<Batiment, Group> nodesBatiments = new HashMap<>();
 
     // ── Overlay 2D ──
     private final EtiquettesOuvriers etiquettes;
@@ -72,8 +74,9 @@ public class RenduMonde {
         // 3D : terrain (statique) + groupe d'entités (dynamique) + lumière ambiante.
         this.terrain        = RenduCarte.creerTerrain(jeu.getCarte());
         this.groupeOuvriers = new Group();
+        this.groupeBatiments = new Group();
         AmbientLight ambient = new AmbientLight(Color.WHITE);
-        Group contenu3D = new Group(terrain, groupeOuvriers, ambient);
+        Group contenu3D = new Group(terrain, groupeBatiments, groupeOuvriers, ambient);
 
         // Caméra : centre de l'île de départ, orientée à l'horizontale.
         this.camRotX = new Rotate(0, Rotate.X_AXIS);
@@ -139,6 +142,7 @@ public class RenduMonde {
      */
     public void update() {
         long now = System.nanoTime();
+        synchroniserBatiments();
         synchroniserOuvriers();
         inputs.miseAJour(now);
         etiquettes.miseAJour();
@@ -147,6 +151,43 @@ public class RenduMonde {
     // ------------------------------------------------------------------ //
     //  Synchronisation modèle → 3D + collisions                           //
     // ------------------------------------------------------------------ //
+
+    private void synchroniserBatiments() {
+        List<Batiment> batiments = jeu.getJoueur().getBatiments();
+        Set<Batiment> presents   = new HashSet<>(batiments);
+
+        // Ajouts + mise à jour position.
+        for (Batiment b : batiments) {
+            Group node = nodesBatiments.get(b);
+            if (node == null) {
+                node = RenduBatiments.creerNode(b, jeu.getCarte());
+                nodesBatiments.put(b, node);
+                groupeBatiments.getChildren().add(node);
+            } else {
+                RenduBatiments.majPosition(node, b, jeu.getCarte());
+            }
+        }
+
+        // Retraits : bâtiments disparus du modèle.
+        nodesBatiments.entrySet().removeIf(e -> {
+            if (!presents.contains(e.getKey())) {
+                groupeBatiments.getChildren().remove(e.getValue());
+                return true;
+            }
+            return false;
+        });
+
+        // Collisions dynamiques reconstruites à chaque frame (bâtiments + ouvriers).
+        List<GestionCollisions.BoiteCollision> aabbs = new ArrayList<>();
+        for (Batiment b : batiments) {
+            aabbs.add(RenduBatiments.boiteCollision(b, jeu.getCarte()));
+        }
+        List<Ouvrier> ouvriers = jeu.getJoueur().getOuvriers();
+        for (Ouvrier o : ouvriers) {
+            aabbs.add(RenduOuvriers.boiteCollision(o, jeu.getCarte()));
+        }
+        collisions.setObstaclesDynamiques(aabbs);
+    }
 
     private void synchroniserOuvriers() {
         List<Ouvrier> ouvriers = jeu.getJoueur().getOuvriers();
@@ -172,12 +213,5 @@ public class RenduMonde {
             }
             return false;
         });
-
-        // Collisions dynamiques reconstruites à chaque frame (volume raisonnable).
-        List<GestionCollisions.BoiteCollision> aabbs = new ArrayList<>(ouvriers.size());
-        for (Ouvrier o : ouvriers) {
-            aabbs.add(RenduOuvriers.boiteCollision(o, jeu.getCarte()));
-        }
-        collisions.setObstaclesDynamiques(aabbs);
     }
 }
