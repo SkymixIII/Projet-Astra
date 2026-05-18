@@ -578,7 +578,7 @@ public class Jeu {
         this.joueur.getOuvriers().add(o);
         carte.getTile(ox, oy, 0).ajouter(o);
     }
-}
+
 
         // ============================================================
         // BÂTIMENT DE TEST
