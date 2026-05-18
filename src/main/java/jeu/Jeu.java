@@ -77,9 +77,7 @@ public class Jeu {
      * Point d'entrée principal du simulateur.
      */
     public static void main(String[] args) {
-        Jeu projetAstra = new Jeu();
-        projetAstra.creationMonde();
-                Jeu jeu = new Jeu();
+        Jeu jeu = new Jeu();
         jeu.creationMonde();
  
         // Remplir le stock de départ pour pouvoir tester la production
