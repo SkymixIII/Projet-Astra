@@ -2,7 +2,6 @@ plugins {
     id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
-    id 'com.gradleup.shadow' version '8.3.0'
 }
 
 
@@ -14,19 +13,9 @@ repositories {
 }
 
 
-// Déterminez votre OS pour JavaFX
-def os = System.getProperty("os.name").toLowerCase()
-def javafxPlatform = os.contains("win") ? "win" : os.contains("mac") ? "mac" : "linux"
-
 dependencies {
     // JUnit 4
     testImplementation 'junit:junit:4.13.2'
-
-    // Dépendances JavaFX explicites
-    implementation "org.openjfx:javafx-controls:21.0.11:${javafxPlatform}"
-    implementation "org.openjfx:javafx-fxml:21.0.11:${javafxPlatform}"
-    implementation "org.openjfx:javafx-graphics:21.0.11:${javafxPlatform}"
-    implementation "org.openjfx:javafx-base:21.0.11:${javafxPlatform}"
 }
 
 
@@ -83,18 +72,18 @@ run {
     ]
 }
 
-
-jar {
+// Configuration de la création du jar complet
+tasks.named('jar', Jar) {
     manifest {
-        attributes 'Main-Class': application.mainClass
+        attributes(
+            'Main-Class': 'astra.Launcher'
+        )
     }
-}
-
-
-shadowJar {
-    archiveFileName = 'Astra.jar'
-    // Important : inclure aussi le fichier manifest
-    manifest {
-        attributes 'Main-Class': application.mainClass
+    
+    // Inclusion des dépendances dans le jar dont javafx
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
