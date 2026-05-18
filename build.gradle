@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+	id 'com.gradleup.shadow' version '8.3.0'
 }
 
 group = 'com.projet'
@@ -58,7 +59,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'Main'
+        attributes 'Main-Class': application.mainClass
     }
 }
 
@@ -70,6 +71,7 @@ test {
     }
 }
 
+// Configure gradle pour prendre system.in comme entrée
 tasks.run.configure {
     standardInput = System.in
 }
