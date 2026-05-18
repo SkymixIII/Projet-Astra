@@ -40,6 +40,9 @@ public class Entrepot implements Batiment {
      * @param quantite La quantité à ajouter.
      */
     public void stocker(TypeRessource type, int quantite) {
+		if (quantite < 0) {
+			return ;
+		}
         if (type != null && isOperationnel() && (getVolumeActuel() + quantite <= capaciteMax)) {
             int cumul = stockInterne.getOrDefault(type, 0) + quantite;
             stockInterne.put(type, cumul);

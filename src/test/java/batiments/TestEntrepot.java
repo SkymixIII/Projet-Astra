@@ -1,11 +1,9 @@
-package batiments.test_batiments;
+package batiments;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import batiments.Entrepot;
-import batiments.TypeBatiment;
 import ressources.TypeRessource;
 
 public class TestEntrepot {
@@ -39,10 +37,10 @@ public class TestEntrepot {
         assertEquals("Le type de bâtiment doit être un ENTREPOT", TypeBatiment.ENTREPOT, hangar.getType());
     }
 
-    //@Test
-    //public void testStockerNegatif() {
-      //  hangar.stocker(TypeRessource.PIERRE, -50);
-        //assertEquals("On peu pas avoir -50 pls", 0, hangar.getQuantite(TypeRessource.PIERRE));
-        //assertEquals("Le volume doit être à 0", 0, hangar.getVolumeActuel());
-    //}
+    @Test
+    public void testStockerNegatif() {
+        hangar.stocker(TypeRessource.PIERRE, -50);
+        assertEquals("On peu pas avoir -50 pls", 0, hangar.getQuantite(TypeRessource.PIERRE));
+        assertEquals("Le volume doit être à 0", 0, hangar.getVolumeActuel());
+    }
 }
