@@ -29,6 +29,10 @@ application {
     ]
 }
 
+/*application {
+	mainClass = 'jeu.Jeu'
+}*/
+
 startScripts {
     doLast {
         windowsScript.text = windowsScript.text.replace(
@@ -65,6 +69,11 @@ test {
         events 'passed', 'failed', 'skipped'
     }
 }
+
+tasks.run.configure {
+    standardInput = System.in
+}
+
 
 run {
     jvmArgs = [
