@@ -691,36 +691,6 @@ public class Jeu {
     }
 
     // ------------------------------------------------------------------ //
-    //  Commandes (à compléter avec EventBus)                             //
-    // ------------------------------------------------------------------ //
-
-    /**
-     * Écoute les entrées utilisateur.
-     * À brancher sur l'EventBus quand il sera implémenté.
-     *
-     * Exemples de commandes à gérer :
-     *   - Construire un bâtiment
-     *   - Affecter un ouvrier
-     *   - Lancer une recherche
-     *   - Lancer la fusée
-     */
-    public void recupererCommande() {
-        // TODO : Commande cmd = bus.prochaine(Canal.SYSTEME);
-    }
-
-    /**
-     * Traite les commandes récupérées.
-     * À compléter selon les types de commandes.
-     */
-    public void traiterCommande() {
-        // TODO : switch sur le type de commande
-        // case CONSTRUIRE  → joueur.construire(batiment, x, y)
-        // case AFFECTER    → usine.affecterPersonnel(ouvrier)
-        // case RECHERCHER  → arbreTechno.lancerRecherche(nom)
-        // case LANCER      → fusee.lancer()
-    }
-
-    // ------------------------------------------------------------------ //
     //  Getters                                                            //
     // ------------------------------------------------------------------ //
 
