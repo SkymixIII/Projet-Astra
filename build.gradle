@@ -4,63 +4,58 @@ plugins {
     id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
-group = 'com.projet'
-version = '1.0'
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
-javafx {
-    version = '21'
-    modules = ['javafx.controls', 'javafx.fxml']
-}
-
-application {
-    mainClass = 'astra.Main'
-    applicationDefaultJvmArgs = [
-        '--module-path', '../lib',
-        '--add-modules', 'javafx.controls,javafx.fxml,javafx.graphics',
-        '--add-exports', 'javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED',
-        '--add-exports', 'javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED',
-        '--add-opens', 'javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED',
-        '--add-opens', 'javafx.base/com.sun.javafx.logging=ALL-UNNAMED'
-    ]
-}
-
-/*application {
-	mainClass = 'jeu.Jeu'
-}*/
-
-startScripts {
-    doLast {
-        windowsScript.text = windowsScript.text.replace(
-            'set DEFAULT_JVM_OPTS=',
-            'set DEFAULT_JVM_OPTS="--module-path" "..\\lib" "--add-modules" "javafx.controls,javafx.fxml,javafx.graphics" "--add-exports" "javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED" "--add-exports" "javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED" "--add-opens" "javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED" "--add-opens" "javafx.base/com.sun.javafx.logging=ALL-UNNAMED" '
-        )
-        unixScript.text = unixScript.text.replace(
-            'DEFAULT_JVM_OPTS=""',
-            'DEFAULT_JVM_OPTS="--module-path ../lib --add-modules javafx.controls,javafx.fxml,javafx.graphics --add-exports javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED --add-exports javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED --add-opens javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED --add-opens javafx.base/com.sun.javafx.logging=ALL-UNNAMED"'
-        )
-    }
-}
+group = 'ProjetAstra'
 
 
 repositories {
     mavenCentral()
 }
 
+
 dependencies {
     // JUnit 4
     testImplementation 'junit:junit:4.13.2'
 }
 
-jar {
-    manifest {
-        attributes 'Main-Class': 'Main'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
+
+javafx {
+    version = '21.0.11'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+
+application {
+    mainClass = 'astra.Main'
+}
+
+
+startScripts {
+    doLast {
+        windowsScript.text = windowsScript.text.replace(
+            'set DEFAULT_JVM_OPTS=',
+            'set DEFAULT_JVM_OPTS="--add-modules" "javafx.controls,javafx.fxml,javafx.graphics" '
+        )
+        unixScript.text = unixScript.text.replace(
+            'DEFAULT_JVM_OPTS=""',
+            'DEFAULT_JVM_OPTS="--add-modules javafx.controls,javafx.fxml,javafx.graphics"'
+        )
+    }
+}
+
+
+// Configure gradle pour prendre system.in comme entrée
+tasks.run.configure {
+    standardInput = System.in
+}
+
 
 test {
     useJUnit()
@@ -70,13 +65,25 @@ test {
     }
 }
 
-tasks.run.configure {
-    standardInput = System.in
-}
-
 
 run {
     jvmArgs = [
         "-Dprism.forceGPU=true",
     ]
+}
+
+// Configuration de la création du jar complet
+tasks.named('jar', Jar) {
+    manifest {
+        attributes(
+            'Main-Class': 'astra.Launcher'
+        )
+    }
+    
+    // Inclusion des dépendances dans le jar dont javafx
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
