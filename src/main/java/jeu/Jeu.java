@@ -23,6 +23,14 @@ import metiers.Metier;
 import ressources.Stock;
 import ressources.TypeRessource;
 
+import entites.EtatOuvrier;
+import entites.Role;
+import metiers.Bucheron;
+import metiers.Ingenieur;
+import metiers.Macon;
+import metiers.Mineur;
+import metiers.Technicien;
+
 /**
  * Classe orchestratrice principale.
  * Gère la boucle de jeu, la production et les besoins vitaux des ouvriers.
@@ -82,9 +90,7 @@ public class Jeu {
      * Point d'entrée principal du simulateur.
      */
     public static void main(String[] args) {
-        Jeu projetAstra = new Jeu();
-        projetAstra.creationMonde();
-                Jeu jeu = new Jeu();
+        Jeu jeu = new Jeu();
         jeu.creationMonde();
  
         // Remplir le stock de départ pour pouvoir tester la production
@@ -855,6 +861,112 @@ public class Jeu {
         // ============================================================
         construireUsine("FONDERIE", 50, 60);
 }
+
+    // ------------------------------------------------------------------ //
+    //  Boucle principale                                                  //
+    // ------------------------------------------------------------------ //
+
+    /**
+     * processTick — appelée à chaque tick (1 seconde réelle).
+     *
+     * Ordre d'exécution :
+     *   1. Avancer le temps
+     *   2. Production (uniquement matin/après-midi)
+     *   3. Besoins vitaux (une fois par demi-journée)
+     *   4. Récupération et traitement des commandes
+     *   5. Vérification des événements (EventBus)
+     *   6. Vérification de la victoire (si fusée assemblée)
+     */
+    public void processTick() {
+
+        if (partieTerminee) return; //Stoppe le tick si victoire
+
+        // ── 1. Avancer le temps ──────────────────────────────────────── //
+        this.temps.augmenterHeure();
+
+        // ── 2. Production (bloquée la nuit) ─────────────────────────── //
+        if (!temps.estNuit()) {
+            mettreAJourProduction();
+
+            // ── 3 Nuit : récupération de fatigue ───────────────────────── //
+            if (temps.estFinNuit()) {
+                recupererFatigue();
+            }
+        }
+
+        // ── 4. Commandes utilisateur ─────────────────────────────────── //
+        recupererCommande();
+        traiterCommande();
+
+        // ── 5. Événements ────────────────────────────────────────────── //
+        bus.traiter(temps, joueur.getStock(), joueur.getOuvriers());
+
+        // ── 6. Victoire (uniquement si la fusée est assemblée) ────────── //
+        verifierVictoire();
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Production                                                         //
+    // ------------------------------------------------------------------ //
+
+    /**
+     * Parcourt tous les bâtiments et déclenche la production.
+     * Appelée à chaque tick de travail (matin + après-midi).
+     */
+    public void mettreAJourProduction() {
+        List<Batiment> batiments = this.joueur.getBatiments();
+
+        for (Batiment b : batiments) {
+            if (b instanceof Usine) {
+                Usine u = (Usine) b;
+                if (u.isOperationnel()) {
+                    try {
+                        u.mettreAJour(joueur.getStock(), 1); // 1 tick écoulé
+                    } catch (Exception e) {
+                        System.err.println("[Production] " + e.getMessage());
+                    }
+                }
+            } else if (b instanceof LieuDeRessource) {
+                b.mettreAJour(joueur.getStock(), 1);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Nuit — récupération (doc p.2)                                     //
+    // ------------------------------------------------------------------ //
+
+    /**
+     * Après une nuit complète (600 ticks), les ouvriers récupèrent de la fatigue.
+     * Un ouvrier TRES_FATIGUE repasse à FATIGUE après 1 nuit + repas + eau (doc p.3).
+     */
+    private void recupererFatigue() {
+        for (Ouvrier o : this.joueur.getOuvriers()) {
+            o.recupererNuit(); // logique de récupération dans Ouvrier
+        }
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Victoire (doc p.12-13)                                            //
+    // ------------------------------------------------------------------ //
+
+    /**
+     * Vérifie si les conditions de lancement sont remplies.
+     * Seuil minimum : prob >= 70 pour que le bouton soit actif (doc p.13).
+     */
+    private void verifierVictoire() {
+        
+        if (fusee == null) return;
+ 
+        if (fusee.tousModulesAssembles() && fusee.isIngenieurABord()) {
+            partieTerminee = true;
+            System.out.println("==============================================");
+            System.out.println("[VICTOIRE] Tous les modules sont assemblés !");
+            System.out.println("           La fusée décolle automatiquement.");
+            System.out.println("==============================================");
+            // TODO : déclencher l'écran de victoire dans l'interface graphique
+        }
+    }
 
     // ------------------------------------------------------------------ //
     //  Getters                                                            //
