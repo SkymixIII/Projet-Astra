@@ -8,14 +8,18 @@ import java.util.Scanner;
 import batiments.Batiment;
 import batiments.LieuDeRessource;
 import batiments.Usine;
+import batiments.ZoneAssemblage;
 import carte.Carte;
 import carte.Sol;
 import carte.TypeSol;
 import entites.Joueur;
 import entites.Ouvrier;
+import entites.Role;
 import evenements.EventBus;
 import exceptions.StockException;
 import fusee.Fusee;
+import metiers.GestionMetiers;
+import metiers.Metier;
 import ressources.Stock;
 import ressources.TypeRessource;
 
@@ -56,6 +60,7 @@ public class Jeu {
     private EventBus bus;
     private Fusee    fusee;
     private Temps    temps;
+	private ZoneAssemblage zoneAssemblage;
     //private Age      age;
 
     private boolean partieTerminee = false;
@@ -176,8 +181,39 @@ public class Jeu {
                     }
                     break;
                 }
- 
-                // ── Afficher l'état complet ───────────────────────────── //
+
+                // ── Assigner un métier à un ouvrier ───────────────────── //
+                // [NOUVEAU] "metier <nomOuvrier> <ROLE>"
+                // Rôles disponibles : MINEUR BUCHERON MACON TECHNICIEN INGENIEUR
+                case "metier": {
+                    if (parts.length < 3) {
+                        System.out.println("[Erreur] Usage : metier <nomOuvrier> <ROLE>");
+                        System.out.println("  Rôles : MINEUR  BUCHERON  MACON  TECHNICIEN  INGENIEUR");
+                        break;
+                    }
+                    jeu.assignerMetier(parts[1], parts[2]);
+                    break;
+                }
+
+                // ── Démarrer l'assemblage d'un module ─────────────────── //
+                // [NOUVEAU] "assembler <PROPULSEUR|CHARGEUTILE|ORDIDEBORD>"
+                case "assembler": {
+                    if (parts.length < 2) {
+                        System.out.println("[Erreur] Usage : assembler <PROPULSEUR|CHARGEUTILE|ORDIDEBORD>");
+                        break;
+                    }
+                    jeu.demarrerAssemblage(parts[1].toUpperCase());
+                    break;
+                }
+
+                // ── Embarquer un ingénieur ────────────────────────────── //
+                // [NOUVEAU] "embarquer" — met un ingénieur à bord de la fusée
+                case "embarquer": {
+                    jeu.embarquerIngenieur();
+                    break;
+                }
+
+                // ── État complet ──────────────────────────────────────── //
                 case "etat": {
                     jeu.afficherEtat();
                     break;
@@ -188,7 +224,13 @@ public class Jeu {
                     jeu.afficherStock();
                     break;
                 }
- 
+
+                // ── Fusée ─────────────────────────────────────────────── //
+                case "fusee": {
+                    jeu.afficherFusee();
+                    break;
+                }
+
                 // ── Aide ─────────────────────────────────────────────── //
                 case "aide":
                 case "help": {
@@ -242,14 +284,187 @@ public class Jeu {
      * Construit une usine du type demandé aux coordonnées (x, y)
      * et l'ajoute à la liste des bâtiments du joueur.
      *
-     * Recettes conformes au doc §6.2 (version fonctionnelle).
+     * Ordre d'exécution :
+     *   1. Avancer le temps
+     *   2. Production bâtiments + travail des métiers (matin/après-midi seulement)
+     *   3. Récupération nocturne (fin de nuit)
+     *   4. Événements (EventBus)
+     *   5. Vérification victoire
+     */
+    public void processTick() {
+        if (partieTerminee) return;
+
+        // 1. Avancer le temps
+        this.temps.augmenterHeure();
+
+        // 2. Production (bloquée la nuit)
+        if (!temps.estNuit()) {
+            mettreAJourProduction();
+        }
+
+        // 3. Récupération nocturne en fin de nuit
+        if (temps.estFinNuit()) {
+            recupererFatigue();
+        }
+
+        // 4. Événements
+        bus.traiter(temps, joueur.getStock(), joueur.getOuvriers());
+
+        // 5. Victoire
+        verifierVictoire();
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Production                                                         //
+    // ------------------------------------------------------------------ //
+
+    /**
+     * Met à jour la production à chaque tick de travail.
      *
-     * @param type  Nom du type parmi : MENUISERIE, FONDERIE, RAFFINERIE,
-     *              ELECTRONIQUE, ASSEMBLAGE
-     * @param x     Coordonnée X sur la carte (z=0)
-     * @param y     Coordonnée Y sur la carte (z=0)
+     * Deux sources de production :
+     *   a) Usines génériques (Usine.mettreAJour) — chaîne de transformation.
+     *   b) Métiers individuels (Metier.travailler) — extraction + fabrication
+     *      spécialisée selon le bâtiment où l'ouvrier est affecté.
+     *   c) ZoneAssemblage — assemblage des modules fusée.
+     */
+    public void mettreAJourProduction() {
+        Stock stock = joueur.getStock();
+
+        // a) Bâtiments (Usine + LieuDeRessource)
+        for (Batiment b : joueur.getBatiments()) {
+            if (b instanceof Usine) {
+                Usine u = (Usine) b;
+                if (u.isOperationnel()) {
+                    try {
+                        u.mettreAJour(stock, 1);
+                    } catch (Exception e) {
+                        System.err.println("[Production] " + e.getMessage());
+                    }
+                }
+            } else if (b instanceof LieuDeRessource) {
+                b.mettreAJour(stock, 1);
+            }
+        }
+
+        // b) Métiers individuels — CORRECTION PRINCIPALE
+        // Les métiers (Mineur, Bucheron, Macon, Technicien, Ingenieur) contiennent
+        // leur propre logique de production ; ils doivent être appelés explicitement.
+        for (Ouvrier o : joueur.getOuvriers()) {
+            Metier metier = o.getMetier();
+            Batiment poste = o.getPosteActuel();
+            if (metier != null && poste != null && poste.isOperationnel()) {
+                metier.travailler(o, poste, stock, 1);
+            }
+        }
+
+        // c) Zone d'assemblage
+        if (zoneAssemblage != null) {
+            zoneAssemblage.mettreAJour(stock, 1);
+        }
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Commandes métier, assemblage, embarquement                        //
+    // ------------------------------------------------------------------ //
+
+    /**
+     * Assigne un métier à un ouvrier par son nom.
+     * Usage console : metier <nomOuvrier> <ROLE>
+     */
+    public void assignerMetier(String nomOuvrier, String nomRole) {
+        Ouvrier ouvrier = trouverOuvrier(nomOuvrier);
+        if (ouvrier == null) {
+            System.out.println("[Erreur] Ouvrier introuvable : " + nomOuvrier);
+            return;
+        }
+
+        Role role = GestionMetiers.roleDepuisNom(nomRole);
+        if (role == null) {
+            System.out.println("[Erreur] Rôle inconnu : " + nomRole);
+            System.out.println("  Disponibles : MINEUR  BUCHERON  MACON  TECHNICIEN  INGENIEUR");
+            return;
+        }
+
+        Metier metier = GestionMetiers.creer(role);
+        if (metier == null) {
+            System.out.println("[Info] Le rôle " + role + " n'a pas de métier jouable en V1.");
+            return;
+        }
+
+        ouvrier.setMetier(metier);
+        System.out.println("[Métier] " + nomOuvrier + " est maintenant : " + metier.getNomAffichage());
+    }
+
+    /**
+     * Démarre l'assemblage d'un module fusée dans la ZoneAssemblage.
+     * Usage console : assembler <PROPULSEUR|CHARGEUTILE|ORDIDEBORD>
+     *
+     * Consomme les ressources requises au démarrage (§7.1).
+     */
+    public void demarrerAssemblage(String nomModule) {
+        if (zoneAssemblage == null) {
+            System.out.println("[Erreur] Aucune Zone d'assemblage construite.");
+            System.out.println("  Utilisez : construire ASSEMBLAGE <x> <y>");
+            return;
+        }
+
+        fusee.synchroniserEtats();
+
+        switch (nomModule) {
+            case "PROPULSEUR":
+                zoneAssemblage.demarrerAssemblage(fusee.getPropulseur(), joueur.getStock());
+                break;
+            case "CHARGEUTILE":
+                zoneAssemblage.demarrerAssemblage(fusee.getChargeUtile(), joueur.getStock());
+                break;
+            case "ORDIDEBORD":
+                zoneAssemblage.demarrerAssemblage(fusee.getOrdiDeBord(), joueur.getStock());
+                break;
+            default:
+                System.out.println("[Erreur] Module inconnu : " + nomModule);
+                System.out.println("  Valeurs : PROPULSEUR  CHARGEUTILE  ORDIDEBORD");
+        }
+    }
+
+    /**
+     * Embarque un ingénieur à bord de la fusée (condition de victoire §7.2).
+     * Cherche le premier ouvrier avec le rôle INGENIEUR disponible.
+     */
+    public void embarquerIngenieur() {
+        for (Ouvrier o : joueur.getOuvriers()) {
+            if (o.getMetier() != null && o.getMetier().getType() == Role.INGENIEUR) {
+                fusee.setIngenieurABord(true);
+                System.out.println("[Embarquement] " + o.getNom() + " embarque dans la fusée.");
+                return;
+            }
+        }
+        System.out.println("[Erreur] Aucun ingénieur disponible dans la colonie.");
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Construction                                                       //
+    // ------------------------------------------------------------------ //
+
+    /**
+     * Construit une usine ou la zone d'assemblage aux coordonnées données.
+     * Recettes conformes au doc §6.2.
      */
     public void construireUsine(String type, int x, int y) {
+
+        // Cas spécial : ASSEMBLAGE crée une ZoneAssemblage, pas une Usine générique
+        if (type.equals("ASSEMBLAGE")) {
+            if (zoneAssemblage != null) {
+                System.out.println("[Info] Une Zone d'assemblage existe déjà.");
+                return;
+            }
+            zoneAssemblage = new ZoneAssemblage(x, y);
+            joueur.getBatiments().add(zoneAssemblage);
+            carte.getTile(x, y, 0).ajouter(zoneAssemblage);
+            System.out.println("[Construction] Zone d'assemblage placée en (" + x + "," + y + ")."
+                    + " Index : " + (joueur.getBatiments().size() - 1));
+            return;
+        }
+
         TypeRessource produit;
         Map<TypeRessource, Integer> recette = new HashMap<>();
  
@@ -365,6 +580,42 @@ public class Jeu {
     /**
      *  Affiche l'état complet du jeu : temps, ouvriers, bâtiments.
      */
+    private void verifierVictoire() {
+        if (fusee == null) return;
+
+        // Synchronise les floats de Fusee avec l'état réel des ModuleFusee
+        fusee.synchroniserEtats();
+
+        if (fusee.tousModulesAssembles() && fusee.isIngenieurABord()) {
+            partieTerminee = true;
+            System.out.println("==============================================");
+            System.out.println("[VICTOIRE] Tous les modules sont assemblés !");
+            System.out.println("           La fusée décolle automatiquement. ");
+            System.out.println("==============================================");
+        }
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Nuit                                                               //
+    // ------------------------------------------------------------------ //
+
+    private void recupererFatigue() {
+        for (Ouvrier o : joueur.getOuvriers()) {
+            o.recupererNuit();
+        }
+    }
+
+    // ------------------------------------------------------------------ //
+    //  Stubs commandes (à brancher sur EventBus)                         //
+    // ------------------------------------------------------------------ //
+
+    public void recupererCommande() { /* TODO EventBus */ }
+    public void traiterCommande()   { /* TODO EventBus */ }
+
+    // ------------------------------------------------------------------ //
+    //  Affichage console                                                  //
+    // ------------------------------------------------------------------ //
+
     public void afficherEtat() {
         System.out.println("\n══════════════ ÉTAT DU JEU ══════════════");
         System.out.println("  " + temps);
@@ -372,16 +623,16 @@ public class Jeu {
         // Ouvriers
         System.out.println("\n── Ouvriers (" + joueur.getOuvriers().size() + ") ──");
         for (Ouvrier o : joueur.getOuvriers()) {
+            String metierNom = (o.getMetier() != null)
+                    ? o.getMetier().getNomAffichage()
+                    : "sans métier";
             String poste = (o.getPosteActuel() != null)
                     ? "→ " + o.getPosteActuel().getType()
                                + " (" + o.getPosteActuel().getX()
                                + "," + o.getPosteActuel().getY() + ")"
                     : "→ sans poste";
-            System.out.printf("  %-10s  %-10s  exp:%-9s  %s%n",
-                    o.getNom(),
-                    o.getEtat(),
-                    o.getNiveau(),
-                    poste);
+            System.out.printf("  %-10s  %-12s  exp:%-9s  %s%n",
+                    o.getNom(), metierNom, o.getNiveau(), poste);
         }
  
         // Bâtiments
@@ -389,14 +640,15 @@ public class Jeu {
         List<Batiment> bats = joueur.getBatiments();
         for (int i = 0; i < bats.size(); i++) {
             Batiment b = bats.get(i);
-            String op = b.isOperationnel() ? "ACTIF" : "inactif";
-            System.out.printf("  [%2d]  %-14s  (%3d,%3d)  %s%n",
-                    i, b.getType(), b.getX(), b.getY(), op);
+            System.out.printf("  [%2d]  %-20s  (%3d,%3d)  %s%n",
+                    i, b.getType(), b.getX(), b.getY(),
+                    b.isOperationnel() ? "ACTIF" : "inactif");
         }
  
         // Stock résumé
         System.out.println();
         afficherStock();
+        afficherFusee();
         System.out.println("═════════════════════════════════════════");
     }
 
@@ -416,24 +668,42 @@ public class Jeu {
         }
         if (vide) System.out.println("  (vide)");
     }
- 
-        /**
-     * Affiche la liste des commandes disponibles.
-     */
+
+    /** Affiche la progression des 3 modules et l'état de l'équipage. */
+    public void afficherFusee() {
+        fusee.synchroniserEtats();
+        System.out.println("── Fusée ──");
+        System.out.printf("  Propulseur        : %5.1f%%%n", fusee.getEtatPropulseur()  * 100);
+        System.out.printf("  Charge Utile      : %5.1f%%%n", fusee.getEtatChargeUtile() * 100);
+        System.out.printf("  Ordinateur de Bord: %5.1f%%%n", fusee.getEtatCommande()    * 100);
+        System.out.printf("  Ingénieur à bord  : %s%n",     fusee.isIngenieurABord() ? "OUI ✓" : "NON");
+        if (zoneAssemblage != null && zoneAssemblage.getModuleEnCours() != null) {
+            System.out.printf("  En cours          : %s%n",
+                    zoneAssemblage.getModuleEnCours().getNom());
+        }
+    }
+
     private static void afficherAide() {
-        System.out.println("\n── Commandes disponibles ──────────────────────────────────────");
-        System.out.println("  tick [n]                      Avance de n ticks (défaut : 1)");
-        System.out.println("  construire <type> <x> <y>     Place une usine");
+        System.out.println("\n── Commandes ────────────────────────────────────────────────────");
+        System.out.println("  tick [n]                         Avance de n ticks (défaut : 1)");
+        System.out.println("  construire <type> <x> <y>        Place un bâtiment");
         System.out.println("    types : MENUISERIE  FONDERIE  RAFFINERIE  ELECTRONIQUE  ASSEMBLAGE");
-        System.out.println("  affecter <nom> <index>        Affecte un ouvrier à un bâtiment");
-        System.out.println("  retirer  <nom> <index>        Retire un ouvrier d'un bâtiment");
-        System.out.println("  etat                          Affiche ouvriers + bâtiments + stock");
-        System.out.println("  stock                         Affiche uniquement le stock");
-        System.out.println("  aide                          Cette aide");
-        System.out.println("  quitter                       Quitte le jeu");
-        System.out.println("───────────────────────────────────────────────────────────────");
-        System.out.println("  Exemple de partie rapide :");
+        System.out.println("  affecter <nom> <index>           Affecte un ouvrier à un bâtiment");
+        System.out.println("  retirer  <nom> <index>           Retire un ouvrier d'un bâtiment");
+        System.out.println("  metier   <nom> <ROLE>            Assigne un métier à un ouvrier");
+        System.out.println("    rôles : MINEUR  BUCHERON  MACON  TECHNICIEN  INGENIEUR");
+        System.out.println("  assembler <module>               Démarre l'assemblage d'un module");
+        System.out.println("    modules : PROPULSEUR  CHARGEUTILE  ORDIDEBORD");
+        System.out.println("  embarquer                        Embarque un ingénieur dans la fusée");
+        System.out.println("  etat                             Affiche tout l'état du jeu");
+        System.out.println("  stock                            Affiche uniquement le stock");
+        System.out.println("  fusee                            Affiche la progression de la fusée");
+        System.out.println("  aide                             Cette aide");
+        System.out.println("  quitter                          Quitte le jeu");
+        System.out.println("─────────────────────────────────────────────────────────────────");
+        System.out.println("  Exemple rapide :");
         System.out.println("    construire MENUISERIE 62 45");
+        System.out.println("    metier Alice MACON");
         System.out.println("    affecter Alice 0");
         System.out.println("    tick 300");
         System.out.println("    stock");
@@ -707,6 +977,6 @@ public class Jeu {
     public Fusee    getFusee()  { return fusee; }
     //public Age      getAge()    { return age; }
     public Temps    getTemps()  { return temps; }
-
+	public ZoneAssemblage getZoneAssemblage() { return zoneAssemblage; }
     public boolean isPartieTerminee() { return partieTerminee; }
 }

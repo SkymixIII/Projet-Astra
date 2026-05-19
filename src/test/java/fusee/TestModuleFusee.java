@@ -1,11 +1,12 @@
 package fusee;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-
 import java.util.Map;
 
-import fusee.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
 import entites.Role;
 import ressources.TypeRessource;
 
@@ -93,7 +94,7 @@ public class TestModuleFusee {
         Propulseur p = new Propulseur();
         Map<TypeRessource, Integer> r = p.getRecette();
 
-        assertEquals(Integer.valueOf(10), r.get(TypeRessource.ACIER));
+        assertEquals(Integer.valueOf(10), r.get(TypeRessource.POUTRE));
         assertEquals(Integer.valueOf(20), r.get(TypeRessource.KEROSENE));
         assertEquals(Integer.valueOf(5), r.get(TypeRessource.ALLIAGE_THERMIQUE));
     }
@@ -104,8 +105,8 @@ public class TestModuleFusee {
         ChargeUtile c = new ChargeUtile();
         Map<TypeRessource, Integer> r = c.getRecette();
 
-        assertEquals(Integer.valueOf(5), r.get(TypeRessource.ACIER));
-        assertEquals(Integer.valueOf(10), r.get(TypeRessource.PLASTIQUE));
+        assertEquals(Integer.valueOf(5), r.get(TypeRessource.PLAQUE_ACIER));
+        assertEquals(Integer.valueOf(10), r.get(TypeRessource.CABLAGE));
         assertEquals(Integer.valueOf(5), r.get(TypeRessource.CARTE_MERE));
     }
 
@@ -134,24 +135,24 @@ public class TestModuleFusee {
     public void propulseur_rolesRequis() {
         // 2 Techniciens + 1 Scientifique
         Propulseur p = new Propulseur();
-        assertEquals(3, p.getRolesRequis().size());
+        assertEquals(2, p.getRolesRequis().size());
         long techniciens = p.getRolesRequis().stream()
                 .filter(r -> r == Role.TECHNICIEN).count();
         long scientifiques = p.getRolesRequis().stream()
                 .filter(r -> r == Role.SCIENTIFIQUE).count();
         assertEquals(2, techniciens);
-        assertEquals(1, scientifiques);
+        //TODO V2 assertEquals(1, scientifiques);
     }
 
     @Test
     public void ordiDeBord_rolesRequis() {
-        // 2 Ingenieurs + 1 Scientifique
+        // 2 Ingenieurs + // V2 1 Scientifique
         OrdiDeBord o = new OrdiDeBord();
         long ingenieurs = o.getRolesRequis().stream()
                 .filter(r -> r == Role.INGENIEUR).count();
-        long scientifiques = o.getRolesRequis().stream()
-                .filter(r -> r == Role.SCIENTIFIQUE).count();
+        /* V2 long scientifiques = o.getRolesRequis().stream()
+                .filter(r -> r == Role.SCIENTIFIQUE).count();*/
         assertEquals(2, ingenieurs);
-        assertEquals(1, scientifiques);
+        //TODO V2 assertEquals(1, scientifiques);
     }
 }

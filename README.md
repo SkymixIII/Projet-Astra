@@ -20,6 +20,9 @@
 | `./gradlew clean` | Supprime le dossier `build/` |
 | `./gradlew clean build` | Recompile tout from scratch |
 | `./gradlew installDist` | Produit une application fonctionnelle dans `build/install/` |
+| `./gradlew jar` | Produit un jar fonctionnel dans `build/libs/` |
+
+## !! Pour lancer **jeu.Jeu** liser le fichier **build.gradle** et remplacer **astra.Main** par **jeu.Jeu** et inversement en fonction de la classe souhaitée.
 
 Les rapports de test sont dans `build/reports/tests/test/index.html`.
 
@@ -62,3 +65,8 @@ chmod +x gradlew
 - **Windows** : double-cliquer sur `run.bat` (ou l'exécuter dans un terminal)
 
 Le script compile automatiquement les fichiers de `src/` vers `out/` puis lance la classe `Main`.
+
+
+# Lancer le .jar
+Lancer la commande suivante après avoir construit le jar :
+`java -jar -Dprism.forceGPU=true build/libs/Projet-Astra.jar`

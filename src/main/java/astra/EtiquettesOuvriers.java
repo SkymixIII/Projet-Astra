@@ -27,7 +27,7 @@ import entites.Ouvrier;
  * Sync dynamique : à chaque {@link #miseAJour()}, on compare la liste
  * d'ouvriers du modèle avec les cartes existantes, on crée/supprime ce qu'il
  * faut, puis on reprojette toutes les positions vers l'écran en inversant les
- * transforms de la caméra (camRotX⁻¹ puis camRotY⁻¹, dans cet ordre).
+ * transforms de la caméra (camRotY⁻¹ puis camRotX⁻¹, dans cet ordre).
  */
 public class EtiquettesOuvriers {
 
@@ -171,14 +171,15 @@ public class EtiquettesOuvriers {
             double dy = ancY - camY;
             double dz = ancZ - camZ;
 
-            // World → caméra-local : camRotX⁻¹ d'abord, puis camRotY⁻¹.
-            double x1 = dx;
-            double y1 = cx * dy - sx * dz;
-            double z1 = sx * dy + cx * dz;
+            // transforms = [camRotY, camRotX]  ⇒  local→monde = camRotY · camRotX
+            // donc monde→local = camRotX⁻¹ · camRotY⁻¹ : on applique yaw⁻¹ d'abord.
+            double x1 =  cy * dx + sy * dz;
+            double y1 =  dy;
+            double z1 = -sy * dx + cy * dz;
 
-            double x2 =  cy * x1 + sy * z1;
-            double y2 =  y1;
-            double z2 = -sy * x1 + cy * z1;
+            double x2 = x1;
+            double y2 = cx * y1 - sx * z1;
+            double z2 = sx * y1 + cx * z1;
 
             if (z2 <= 0.001) {
                 c.node.setVisible(false);
