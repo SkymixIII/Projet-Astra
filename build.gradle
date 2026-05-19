@@ -33,7 +33,7 @@ javafx {
 
 
 application {
-    mainClass = 'astra.Main'
+    mainClass = 'astra.Main' // à remplacer par 'jeu.Jeu' pour lancer l'interface commande
 }
 
 

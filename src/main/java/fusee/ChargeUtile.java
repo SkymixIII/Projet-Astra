@@ -19,8 +19,8 @@ public class ChargeUtile extends ModuleFusee {
      */
     private static Map<TypeRessource, Integer> creerRecette() {
         Map<TypeRessource, Integer> r = new EnumMap<>(TypeRessource.class);
-        r.put(TypeRessource.ACIER, 5);             // TODO V2 : POUTRE
-        r.put(TypeRessource.PLASTIQUE, 10);        // TODO V2 : CABLAGE
+        r.put(TypeRessource.PLAQUE_ACIER, 5);             // TODO V2 : POUTRE
+        r.put(TypeRessource.CABLAGE, 10);
         r.put(TypeRessource.CARTE_MERE, 5);
         return r;
     }
@@ -32,7 +32,7 @@ public class ChargeUtile extends ModuleFusee {
     public ChargeUtile() {
         super("Charge Utile",
                 creerRecette(),
-                // 1 Ouvrier (non spécialisé) + 1 Technicien + 1 Scientifique
-                Arrays.asList(Role.OUVRIER_NON_SPECIALISE, Role.TECHNICIEN, Role.SCIENTIFIQUE));
+                // 1 Ouvrier (non spécialisé) + 1 Technicien // TODO V2 + 1 Scientifique (non implémenté dans V1)
+                Arrays.asList(Role.OUVRIER_NON_SPECIALISE, Role.TECHNICIEN));
     }
 }
