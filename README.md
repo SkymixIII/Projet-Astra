@@ -22,7 +22,7 @@
 | `./gradlew installDist` | Produit une application fonctionnelle dans `build/install/` |
 | `./gradlew jar` | Produit un jar fonctionnel dans `build/libs/` |
 
-## !! Pour lancer **jeu.Jeu** liserer le fichier **build.gradle** et remplacer **astra.Main** par **jeu.Jeu** et inversement en fonction de la classe souhaitée.
+## !! Pour lancer **jeu.Jeu** liser le fichier **build.gradle** et remplacer **astra.Main** par **jeu.Jeu** et inversement en fonction de la classe souhaitée.
 
 Les rapports de test sont dans `build/reports/tests/test/index.html`.
 
