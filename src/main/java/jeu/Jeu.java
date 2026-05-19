@@ -19,6 +19,14 @@ import fusee.Fusee;
 import ressources.Stock;
 import ressources.TypeRessource;
 
+import entites.EtatOuvrier;
+import entites.Role;
+import metiers.Bucheron;
+import metiers.Ingenieur;
+import metiers.Macon;
+import metiers.Mineur;
+import metiers.Technicien;
+
 /**
  * Classe orchestratrice principale.
  * Gère la boucle de jeu, la production et les besoins vitaux des ouvriers.
