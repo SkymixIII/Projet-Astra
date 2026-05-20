@@ -54,7 +54,8 @@ public class RenduMonde {
     private final Map<Batiment, Group> nodesBatiments = new HashMap<>();
 
     // ── Overlay 2D ──
-    private final EtiquettesOuvriers etiquettes;
+    private final EtiquettesOuvriers etiquettesOuvriers;
+    private final EtiquettesBatiment etiquettesBatiments;
 
     // ── Physique & inputs ──
     private final GestionCollisions collisions;
@@ -100,20 +101,26 @@ public class RenduMonde {
         collisions.construireDepuisCarte(jeu.getCarte());
 
         // Étiquettes 2D.
-        this.etiquettes = new EtiquettesOuvriers(
+        this.etiquettesOuvriers = new EtiquettesOuvriers(
                 jeu.getCarte(), jeu.getJoueur().getOuvriers(),
                 camera, camRotX, camRotY, largeur, hauteur);
+        this.etiquettesBatiments = new EtiquettesBatiment(
+                jeu.getCarte(), jeu.getJoueur().getBatiments(),
+                camera, camRotX, camRotY, largeur, hauteur);
 
-        // Scène = SubScene 3D + overlay 2D.
-        Group root = new Group(sub, etiquettes.getOverlay());
+        // Scène = SubScene 3D + overlay 2D (ouvriers + bâtiments).
+        Group root = new Group(sub, etiquettesOuvriers.getOverlay(), etiquettesBatiments.getOverlay());
         this.scene = new Scene(root, largeur, hauteur);
 
         // Inputs (a besoin de la Scene pour s'enregistrer aux events clavier).
         this.inputs = new GestionInputs(scene, camera, camRotX, camRotY, collisions);
 
-        // Touche I = bascule compact/détaillé des étiquettes ouvriers.
+        // Touche I = bascule compact/détaillé des étiquettes ouvriers + bâtiments.
         scene.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
-            if (e.getCode() == KeyCode.I) etiquettes.toggleModeDetaille();
+            if (e.getCode() == KeyCode.I) {
+                etiquettesOuvriers.toggleModeDetaille();
+                etiquettesBatiments.toggleModeDetaille();
+            }
         });
 
         // Initial : créer les nodes d'ouvriers existants.
@@ -145,7 +152,8 @@ public class RenduMonde {
         synchroniserBatiments();
         synchroniserOuvriers();
         inputs.miseAJour(now);
-        etiquettes.miseAJour();
+        etiquettesOuvriers.miseAJour();
+        etiquettesBatiments.miseAJour();
     }
 
     // ------------------------------------------------------------------ //

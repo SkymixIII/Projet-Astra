@@ -16,4 +16,4 @@ Flèches du clavier
 - → : rotation de la vue vers la droite
 
 ## Commandes
-- I : montre/cache les informations sur les ouvriers
+- I : montre/cache les informations sur les ouvriers et les batiments
