@@ -18,7 +18,9 @@ fichier .java de la classe.
 	- EtiquettesOuvriers.java
 	- GestionCollisions.java
     - GestionInput.java
+	- Launcher.java
     - Main.java
+	- RenduBatiments.java
     - RenduCarte.java
 	- RenduMonde.java
 	- RenduOuvriers.java
@@ -26,9 +28,14 @@ fichier .java de la classe.
 - package batiments :
     - Batiment.java
     - CentreLancement.java
+	- CentreRecherche.java
+	- Ecole.java
+	- Entrepot.java
     - Hopital.java
     - LieuDeRessource.java
     - Maison.java
+	- Serre.java
+	- StationPompage.java
 	- TypeBatiment.java
     - Usine.java
 
@@ -88,22 +95,42 @@ fichier .java de la classe.
 - package ressources:
     - Recette.java
     - RegistreRecettes.java
+	- Ressources.java
     - Stock.java
     - TypeRessource.java
 
 ### Packages de test dans src/test/java :    
 
 - package batiments :
-    - TestCentreLancement.java
+	- TestCentreLancementComplet.java
+    - TestCentreRecherche.java
+	- TestEcole.java
+	- TestEntrepot.java
     - TestHopital.java
     - TestLieuDeRessource.java
     - TestMaison.java
+	- TestSerre.java
+	- TestStationPompage.java
     - TestUsine.java
-    
+	- TestUsineComplet.java
+
+- package carte
+	- TestCase.java
+	- TestDirection.java
+
+- package entites
+	- TestJoueur.java
+	- TestOuvrier.java
 
 - package fusee :
-    - TestFusee.java
+    - TestFuseeComplet.java
     - TestModuleFusee.java
+
+- package metiers
+	- TestBucheron.java
+	- TestIngenieur.java
+	- TestMacon.java
+	- TestTechnicien.java
 
 - package ressources :
     - StockTest.java
