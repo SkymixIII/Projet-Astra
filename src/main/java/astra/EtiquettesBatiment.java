@@ -176,8 +176,15 @@ public class EtiquettesBatiment {
             double pxX = (ndcX + 1) * 0.5 * largeur;
             double pxY = (ndcY + 1) * 0.5 * hauteur;
 
-            double lw = c.node.getWidth();
-            double lh = c.node.getHeight();
+            // Scaling basé sur la distance : réduction de la taille avec la profondeur
+            // z2 est la profondeur. On utilise une scaling progressive pour garder lisibilité
+            double scale = Math.min(1.0, 50.0 / z2);
+            scale = Math.max(scale, 0.6);
+
+            double lw = c.node.getWidth() * scale;
+            double lh = c.node.getHeight() * scale;
+            c.node.setScaleX(scale);
+            c.node.setScaleY(scale);
             c.node.setTranslateX(pxX - lw / 2.0);
             c.node.setTranslateY(pxY - lh / MARGE_PX);
 
