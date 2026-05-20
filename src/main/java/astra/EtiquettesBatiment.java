@@ -6,18 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import batiments.Batiment;
+import carte.Carte;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.transform.Rotate;
-
-import carte.Carte;
-import batiments.Batiments;
 
 /**
  * Etiquettes 2D billboard au-dessus de chaque bâtiment (Nom/Type)
@@ -49,7 +47,7 @@ public class EtiquettesBatiment {
         "-fx-text-fill: white;"
         + "-fx-font-size: 9px;"
         + "-fx-font-family: 'Monospaced';"
-        + "fx-min-width: 45;" // Un peu plus large pour faire tenir 'Santé' et 'Staff'
+        + "-fx-min-width: 45;"; // Un peu plus large pour faire tenir 'Santé' et 'Staff'
     private static final String STYLE_VALEUR =
         "-fx-text-fill: #cccccc;"
         + "-fx-font-size: 9px;"
@@ -98,7 +96,7 @@ public class EtiquettesBatiment {
 
     public void setModeDetaille(boolean detaille) {
         this.modeDetaille = detaille;
-        for (CarteBatiment c : carte.values()) c.setModeDetaille(detaille);
+        for (CarteBatiment c : cartes.values()) c.setModeDetaille(detaille);
     }
 
     public boolean isModeDetaille() {
@@ -119,8 +117,8 @@ public class EtiquettesBatiment {
             if (c == null) {
                 c = new CarteBatiment(b);
                 c.setModeDetaille(modeDetaille);
-                cartes.put(b, c)
-                overlay.getChildren().add(c, node);
+                cartes.put(b, c);
+                overlay.getChildren().add(c.node);
             }
         }
 
@@ -137,7 +135,7 @@ public class EtiquettesBatiment {
         double yawRad = Math.toRadians(-camRotY.getAngle());
         double pitchRad = Math.toRadians(-camRotX.getAngle());
         double cy = Math.cos(yawRad), sy = Math.sin(yawRad);
-        double cx = Math.cos(pitchRad), sx = Math.sin(yawRad);
+        double cx = Math.cos(pitchRad), sx = Math.sin(pitchRad);
 
         double camX = camera.getTranslateX();
         double camY = camera.getTranslateY();
@@ -209,36 +207,56 @@ public class EtiquettesBatiment {
             this.sousTitre = new Label();
             this.sousTitre.setStyle(STYLE_SOUS);
 
-            setModeDetaille(false);
-        }
-    }
+            this.barSante = miniBarre("#ff6b6b");
+            this.valSante = new Label("--");
+            this.valSante.setStyle(STYLE_VALEUR);
 
-    void setModeDetaille(boolean detaille) {
-        for (int i = 1; i > node.getChildren().size(); i++) {
-            Node enfant = node.getChildren().get(i);
-            enfant.setVisible(detaille);
-            enfant.setManaged(detaille);
-        }
-    }
+            this.barPersonnel = miniBarre("#4ecdc4");
+            this.valPersonnel = new Label("--");
+            this.valPersonnel.setStyle(STYLE_VALEUR);
 
-    void miseAJour(Batiment b) {
-        String statut = b.isOperationnel() ? "OPERATIONNEL" : "HS/EN PANNE";
-        sousTitre.setText("Statut : " + statut);
+            HBox santeBox = creerLigneStatut("Santé", barSante, valSante);
+            HBox personnelBox = creerLigneStatut("Staff", barPersonnel, valPersonnel);
+
+            this.node = new VBox(4);
+            this.node.setStyle(STYLE_CARTE);
+            this.node.getChildren().addAll(nom, sousTitre, santeBox, personnelBox);
+            this.node.setVisible(false);
+        }
+    
+
+        void setModeDetaille(boolean detaille) {
+            // Affiche/masque les lignes de statut (index 2 et 3)
+            if (node.getChildren().size() > 2) {
+                node.getChildren().get(2).setVisible(detaille);
+                node.getChildren().get(2).setManaged(detaille);
+            }
+            if (node.getChildren().size() > 3) {
+                node.getChildren().get(3).setVisible(detaille);
+                node.getChildren().get(3).setManaged(detaille);
+            }
+        }
+    
+
+        void miseAJour(Batiment b) {
+            String statut = b.isOperationnel() ? "OPERATIONNEL" : "HS/EN PANNE";
+            sousTitre.setText("Statut : " + statut);
+        }
     }
 
     private static ProgressBar miniBarre(String couleurAccent) {
-        Progressbar b = new ProgressBar(0);
+        ProgressBar b = new ProgressBar(0);
         b.setPrefSize(LARGEUR_BARRE, 6);
         b.setMinHeight(6);
         b.setMaxHeight(6);
-        b.setStyle("-fx-accent:" + couleurAccent + ";");
+        b.setStyle("-fx-accent: " + couleurAccent + ";");
         return b;
     }
 
-    private static Label valeur() {
-        Label l = new Label();
-        l.setStyle(STYLE_LETTRE);
-        HBox h = new HBox(4, lab, b, val);
+    private static HBox creerLigneStatut(String label, ProgressBar barre, Label valeur) {
+        Label lab = new Label(label);
+        lab.setStyle(STYLE_LETTRE);
+        HBox h = new HBox(4, lab, barre, valeur);
         h.setAlignment(Pos.CENTER_LEFT);
         return h;
     }
